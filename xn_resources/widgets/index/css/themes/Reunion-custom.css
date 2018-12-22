@@ -1,0 +1,72 @@
+body {
+    background-position: top center;
+	background-repeat: repeat-y;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    padding:104px 0 0 110px;
+}
+#xg_masthead p#xg_sitename a {
+    font-size:150%;
+}
+#xg_masthead p#xg_sitedesc {
+    color:#b3ba5d;
+}
+#xg_navigation ul a {
+	color: #69523B;
+	background: transparent none;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+    color:#B3BA5B;
+    background:transparent url(/xn_resources/widgets/index/gfx/themes/Reunion/xg_tab.gif) repeat-x bottom center;
+}
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg #xg_body h1 {
+	color: #fff;
+}
+.xg_module_body,
+.xg_module_foot {
+    background-color: #F9F9F9;
+    background-image: none;
+    background-repeat: no-repeat;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #888D45;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #fff;
+}
+#xg_body ul.navigation a {
+	color: #fff;
+}
+ul.pagination li.this span {
+    background-color: #E3E3C1;
+    border-color: #E3E3C1;
+    color: #4C3831;
+}
+ul.page_tabs li.this {
+	background-color: #f9f9f9;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot {
+    color:#E3E3C1;
+}
+#xg_foot a {
+    color:#F4F4F4;
+}
+

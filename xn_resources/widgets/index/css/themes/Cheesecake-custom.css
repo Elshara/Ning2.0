@@ -1,0 +1,13 @@
+/* Page */
+#xg_body,
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+  background-color: #d5c29f;
+}
+/* Module Body: Background & Text */
+.xg_module_body, .xg_module_foot {
+  background-color: #fffde8;
+}
+.xg_module_head {
+  border-top:1px solid #a4804a;
+}

@@ -1,0 +1,130 @@
+body, .xg_marginbg {
+	background-repeat: repeat-x;
+}
+#xg {
+	background-color:transparent;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xn_bar {
+	border-bottom:1px solid #b4b4b4;
+}
+#xg_head {
+	background-color:transparent;
+}
+#xg_masthead {
+	height: 84px;
+	min-height: 84px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead a {
+	color:#BE1B3A;
+}
+#xg_masthead p#xg_sitename {
+	margin:0;
+	padding:25px 0 0 44px;
+	line-height:1.1em;
+}
+#xg_masthead p#xg_sitedesc {
+	color:#252323;
+	padding-bottom: .35em;
+}
+#xg_navigation ul li {
+	background-color: transparent;	
+	font: bold 10px "Trebuchet MS",sans-serif;
+	text-transform:uppercase;
+	margin: 0;
+}
+#xg_navigation ul li a {
+	background-color:#252323;
+	color:#9c9c9c;
+	line-height: 2em;
+	padding:0 1em;
+	border-right: thin solid #302e2e;
+}
+#xg_navigation ul li a:hover {
+	background-color:#605d5d;
+	color:#FFF;
+	border-color: #444242;
+}
+#xg_navigation ul li.this a {
+	color: #FFF;
+	background: #BE1B3A none;
+	border-color: #444242;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+	font-size: 1.1em;
+	padding-top: 10px;
+	border: thin solid #b4b4b4;
+	border-width: 0 thin;
+	margin-top: 4px;
+}
+#xg #xg_body h1 {
+    color: #252323;
+}
+.xg_module {
+	margin-bottom: 1.5em;
+}
+.xg_module_head {
+	margin-bottom:0;
+	background-image: url(/xn_resources/widgets/index/gfx/themes/Newsroom/xg_module_head.gif);
+	background-repeat: no-repeat;
+	line-height:1.2em;
+	border-bottom:4px solid #DADADA;
+	padding-left: 12px;
+}
+.xg_module_body,
+.xg_module_foot {
+	border-bottom:1px dotted #DADADA;
+}
+.ningmsg {
+	border-bottom-style: solid;
+	border-bottom-color: #abb;
+}
+h3, caption, .inplace_edit input.h3 {
+    color: #252323;
+	font-weight:lighter;
+}
+.xg_module_head h3 {
+	font-size:1em;
+	line-height:1.2em;
+	margin-bottom:0em;
+}
+input.large, textarea.large, select.large {
+	margin-top:1px;
+}
+ul.pagination li.this span {
+    background-color: #CCCCCC;
+    border-color: #CCCCCC;
+    color: #BE1B3A;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px dotted #ccc;
+}
+#xg_body ul.navigation a {
+	color: #666;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#333;
+}
+#xg_foot {
+	border-top:thin solid #b4b4b4;
+}

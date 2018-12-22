@@ -1,0 +1,23 @@
+
+            /* BACKGROUND AND BORDER */ 
+            #launchpad { 
+                background: #FFFFFF; 
+                border:1px solid #bbbbbb; 
+            } 
+
+            /* HIDE TABS */ 
+            #tabs { 
+                position: absolute; 
+                left: -1000px; 
+            } 
+
+            /* BUTTONS */ 
+            #launchpad .buttons a { 
+                color: #0066CC; 
+            } 
+
+            /* TEXT COLOR */ 
+            #launchpad .lightbox div, 
+            #launchpad .lightbox h2 { 
+                color:#666666; 
+            }

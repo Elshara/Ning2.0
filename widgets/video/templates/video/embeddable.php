@@ -1,0 +1,1 @@
+<?php $this->_widget->dispatch('video', 'embeddableProper', array($this->args)); ?>

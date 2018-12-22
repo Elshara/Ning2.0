@@ -1,0 +1,8 @@
+/*----------------------------------------------------------------------
+	Blog Posts
+----------------------------------------------------------------------*/
+
+.module_blog .blogpost { margin-bottom:.4em; clear:both; }
+.module_blog .ib {float:left;width:32px;}
+.module_blog img.photo {margin:0;}
+.module_blog .tb {margin-left:40px;}

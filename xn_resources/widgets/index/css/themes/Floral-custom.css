@@ -1,0 +1,94 @@
+body {
+	background-position:50% top;
+}
+#xg {
+	background-color: transparent;
+}
+
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_head {
+	position:relative;
+	background-color:transparent;
+}
+#xg_masthead {
+	text-align: right;
+	padding: 60px 230px 0 0;
+}
+#xg_masthead p#xg_sitename {
+	font-size: 4em;
+	line-height: 100%;
+}
+#xg_navigation ul li a {
+	color:#ffffff;
+	background-color: #630328;
+	font-size: 1em;
+	line-height: 24px;
+	padding: 0 .7em;
+}
+#xg_navigation ul li.this a {
+	font-style: italic;
+	background-color: #7E123B;
+}
+#xg_navigation ul li a:hover {
+	background-color: #7E123B;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+	clear:both;
+	font-size: 1.1em;
+}
+#xg #xg_body h1 {
+	color: #d99a41;
+}
+.xg_module_head h2 {
+	color:#7E123B;
+}
+ul.pagination li.this span {
+    border-color: #931c49;
+    color: #FFFFFF;
+}
+.xg_module_head {
+	background-image: url(/xn_resources/widgets/index/gfx/themes/Floral/xg_module_head.jpg);
+	background-repeat: no-repeat;
+	background-position: left top;
+	padding-left:24px;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+	color:#d99a41;
+	background-image:url(/xn_resources/widgets/index/gfx/themes/Floral/yellowflower.jpg) ;
+	background-repeat:no-repeat;
+	background-position:top left;
+	padding-left:28px;
+	vertical-align:middle;
+}
+.xg_module_body {
+	background: #931C49 url(/xn_resources/widgets/index/gfx/themes/Floral/xg_module_body.jpg) no-repeat right top;
+}
+.xg_module_foot,
+ul.page_tabs li.this {
+	background-color:#931C49;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #630328;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+	background-color: transparent;
+    color:#ccc;
+}

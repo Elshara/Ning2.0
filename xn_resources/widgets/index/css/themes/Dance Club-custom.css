@@ -1,0 +1,58 @@
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_head {
+  padding:18px 0;
+}
+#xg_body {
+    background-color: transparent;
+}
+#xg_navigation ul li a {
+    background-color: #023;
+	color: #f60;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+    color: #ddd;
+	background-color: #216F86;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg #xg_body h1 {
+    color: #ddd;
+}
+ul.pagination li.this span {
+    background-color: #023;
+    border-color: #023;
+    color: #fff;
+}
+.xg_module_body,
+.xg_module_foot,
+ul.page_tabs li.this {
+    background-color: #eee;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #002233;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #023;
+}
+#xg_body ul.navigation a {
+	color: #ddd;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+	color: #ccc;
+}

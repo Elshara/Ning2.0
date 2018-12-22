@@ -1,0 +1,110 @@
+#xg {
+    background-color:transparent;
+}
+#xg_body,
+.xg_bodybg,
+.xg_floating_container {
+	background-repeat: repeat-y;
+}
+
+.xg_floating_container {
+	background-image: none;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+	padding: 146px 70px 0 46px;
+}
+#xg_masthead p#xg_sitename {
+	width: 500px;
+	float: left;
+	padding: 0;
+	font-size:3em;
+	line-height:1em;
+}
+#xg_masthead p#xg_sitedesc {
+	width: 330px;
+	float: right;
+	text-align: right;
+	padding: .75em 0 0 0;
+}
+#xg_navigation {
+	clear: both;
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Doodle/hr.gif) no-repeat 50% 20%;
+    padding: 20px 0 0 28px;
+    margin-top:0;
+}
+#xg_navigation ul li a {
+    color:#aaa;
+    background-color:transparent;
+	padding: 0 10px;
+}
+#xg_navigation ul li a:hover {
+    color:#80426f;
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Doodle/xg_navigation_ul_li.gif) no-repeat 0 50%;
+}
+#xg_navigation ul li.this a {
+    color:#B63642;
+    background: url(/xn_resources/widgets/index/gfx/themes/Doodle/xg_navigation_ul_li.gif) no-repeat 0% 50%;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+.xg_module {
+	margin-bottom: 1em;
+}
+#xg_body {
+     padding-top: 2em;
+}
+#xg #xg_body h1 {
+	color: #93738A;
+}
+.xg_module_head {
+    background-image:url(/xn_resources/widgets/index/gfx/themes/Doodle/xg_module_head.gif);
+	background-repeat:repeat-x;
+	background-position:left bottom;
+	padding-bottom:1em;
+    border-bottom:none;
+    margin-bottom:0;
+}
+.xg_module_body,
+.xg_module_foot {
+    border-bottom:1px dotted #C9B9C4;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #93AA50;
+}
+ul.pagination li.this span {
+    background-color: #F0F0F0;
+    border-color: #F0F0F0;
+    color: #7F1A56;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #ccc;
+}
+#xg_body ul.navigation a {
+	color: #93738A;
+}
+ul.page_tabs li.this {
+	background: #fff none;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#93738A;
+}
+#xg_foot {
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Doodle/xg_foot.jpg) no-repeat;
+}

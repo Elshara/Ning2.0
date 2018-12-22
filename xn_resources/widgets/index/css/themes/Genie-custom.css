@@ -1,0 +1,79 @@
+#xg, .xg_headerbg {
+	background-repeat: repeat-x;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    height: 140px;
+	min-height: 140px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+
+#xg_masthead p#xg_sitename {
+    padding:30px 0 0 15px;
+	margin:0;
+}
+#xg_navigation {
+    border-bottom:2px solid #e72d4f;
+	padding-bottom: .5em;
+}
+#xg_navigation ul li a {
+    color:#aaa;
+}
+#xg_navigation ul li a:hover {
+    color:#F61F46;
+}
+#xg_navigation ul li.this {
+    background: url(/xn_resources/widgets/index/gfx/themes/Genie/xg_navigation_ul_li.gif) no-repeat left center;
+}
+#xg_navigation ul li.this a {
+	padding:0 0.7em;
+    background: url(/xn_resources/widgets/index/gfx/themes/Genie/xg_navigation_ul_li_a.gif) no-repeat right center;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+    border-top:2px solid #b1223d;
+}
+.xg_module_head {
+	margin-bottom:0;
+    border-bottom:1px solid #7d7d7d;
+}
+#xg #xg_body h1 {
+    color: #333;
+}
+ul.pagination li.this span {
+    background-color: #F0F0F0;
+    border-color: #F0F0F0;
+    color: #BE1B3A;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #555;
+}
+
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #ccc;
+}
+#xg_body ul.navigation a {
+	color: #333;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#ccc;
+}

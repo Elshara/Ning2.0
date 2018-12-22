@@ -1,0 +1,123 @@
+#xg {
+    background-color:transparent;
+}
+body, .xg_marginbg {
+	background-repeat: repeat-x;
+}
+#xg_body,
+.xg_bodybg,
+.xg_floating_container {
+	background-repeat: repeat-y;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    min-height: 120px;
+	height: 120px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead p#xg_sitename {
+	padding:48px 0pt 0pt 20px;
+	font-size:5em;
+	line-height:1em;
+}
+#xg_masthead p#xg_sitedesc {
+	color:#810519;
+	font-size:1.4em;
+	padding:0px 0pt 0em 23px;
+}
+#xg_navigation {
+	margin: 2em .3em 0 0;
+}
+#xg_navigation ul {
+	float:right;
+}
+#xg_navigation ul li {
+	font-size:90%;
+	text-align:right;
+	text-transform:uppercase;
+	margin: 0;
+}
+#xg_navigation ul li a {
+	text-decoration:none;
+	padding:0 10px;
+	color:#BBB5A4;
+}
+#xg_navigation ul li a:hover {
+	color: #6e8f9d;
+}
+#xg_navigation ul li.this {
+	background:transparent url(/xn_resources/widgets/index/gfx/themes/Gossip/xg_navigation_ul_li.gif) no-repeat top right;
+}
+#xg_navigation ul li.this a {
+	color:#FFF;
+	background:transparent url(/xn_resources/widgets/index/gfx/themes/Gossip/xg_navigation_ul_li_a.gif) no-repeat top left;
+	padding-bottom: 1em;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+.xg_module {
+	margin-bottom: 2em;
+}
+#xg #xg_body h1 {
+    color: #382513;
+}
+ul.pagination li.this span {
+    border-color: #ffe;
+    color: #9B9280;
+}
+.xg_module_head {
+	background-image:url(/xn_resources/widgets/index/gfx/themes/Gossip/xg_module_head.gif);
+	background-repeat:no-repeat;
+	background-position:left bottom;
+	padding-bottom: 1em;
+	border: none;
+    margin-bottom:0;
+}
+.xg_module_head h2 {
+    font-size:1.4em;
+	font-weight: bold;
+    margin-left:2pt;
+}
+.xg_module_body,
+.xg_module_foot {
+    border-bottom:1px dotted #BBB5A4;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #7F949C;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px dotted #ccccbe;
+}
+#xg_body ul.navigation a {
+	color: #382513;
+}
+ul.page_tabs li.this {
+	background-image: none;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#CCCCCC;
+}
+
+#xg_foot {
+	border-left:2px solid #d81f3a;
+	border-right:2px solid #d81f3a;
+	width:931px;
+}

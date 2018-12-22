@@ -1,0 +1,107 @@
+/*----------------------------------------------------------------------
+    This file is generated whenever you customize the appearance of your
+    app. We recommend that you avoid editing this file directly; instead,
+    simply use or not use these styles in your app as desired.
+    For more information, contact support@ning.com.
+----------------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------------
+    Fonts
+----------------------------------------------------------------------*/
+/* Font (Body Text) */
+body, select, input, button, textarea, .xg_bodyfont {
+    font-family:/* %textFont% */ "Trebuchet MS", sans-serif;
+}
+/* Font (Headings) */
+h1, h2, h3, h4, h5, h6,
+#xg_sitename,
+.xg_headingfont {
+    font-family:/* %headingFont% */ "Trebuchet MS", sans-serif;
+}
+
+
+/*----------------------------------------------------------------------
+    Colors
+----------------------------------------------------------------------*/
+/* Main Color */
+body,
+#xg_navigation li.this a,
+.xg_bodytexgcolor {
+    color:/* %moduleBodyTextColor% */ #333333;
+}
+a, .xg_linkcolor {
+    color:/* %siteLinkColor% */ #69523B;
+}
+a.button, button, input.button,
+a.button:hover, button:hover, input.button:hover {
+    color:/* %buttonTextColor% */ #FFF;
+    background:/* %siteLinkColor% */ #69523B;
+}
+/* Margins */
+body, .xg_marginbg {
+    background-color:/* %siteBgColor% */ #4B3831;
+    background-image:/* %siteBgImage% */ url(/xn_resources/widgets/index/gfx/themes/Reunion/body.gif);
+    background-repeat:/* %siteBgImage_repeat% */ repeat;
+}
+/* Header Background Color/Image */
+#xg_head,
+#xg_head a,
+.xg_headertextcolor {
+	color:/* %pageHeaderTextColor% */ #e3e3c1;
+}
+#xg, .xg_headerbg {
+    background-color:/* %headBgColor% */ #000000;
+    background-image:/* %headBgImage% */ url(/xn_resources/widgets/index/gfx/themes/Reunion/xg.jpg);
+    background-repeat:/* %headBgImage_repeat% */ no-repeat;
+}
+/* Page */
+#xg_body,
+.xg_bodybg,
+.xg_floating_container {
+    background-color:/* %pageBgColor% */ #000000;
+    background-image:/* %pageBgImage% */ none;
+    background-repeat:/* %pageBgImage_repeat% */ no-repeat;
+}
+#xg_navigation ul li.this a,
+ul.page_tabs li.this {
+    background-color:/* %pageBgColor% */ #000000;
+}
+/* Module Headers */
+.xg_module_head {
+	color:/* %moduleHeadTextColor% */ #4C3831;
+	background-color:/* %moduleHeadBgColor% */ #E3E3C1;
+}
+/* Ningbar */
+/* %ningbarInvert% */ 
+#xn_bar,
+.xg_ningbarbg {
+    background-color:/* %ningbarColor% */ #888D45!important;
+}
+/* Footer */
+#xg_foot {
+    background-color:/* %ningbarColor% */ #888D45;
+}
+
+
+/*----------------------------------------------------------------------
+    Misc
+----------------------------------------------------------------------*/
+#xn_brand,
+.xg_displaybrand {
+	display:/* %ningLogoDisplay% */ block!important;
+}
+
+/* this color is the average between moduleBodyTextColor and pageBgColor: */
+.xg_lightfont {
+	color:#969696;
+}
+hr {
+	color:#969696;
+	background-color:#969696;
+}
+/* this color is (moduleBodyTextColor + (2 * pageBgColor))/3 */
+.xg_lightborder {
+	border-style:solid;
+	border-color:#b7b7b7;
+}

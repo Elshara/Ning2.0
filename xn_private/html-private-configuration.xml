@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<privateConfigWrapper>
+<config>
+        <version type="string" checkState="true">0.1</version>
+    	<title>Text Box</title>
+        <displayName>Text Box</displayName>
+        <description>A box in which you can write any text (or HTML) you want.</description>
+        <isMozzle type="number">1</isMozzle>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">1</isEnabledDefault>
+    <maxLength>500000</maxLength></config><privateConfig>
+<isEnabled type="string">1</isEnabled>
+</privateConfig>
+</privateConfigWrapper>

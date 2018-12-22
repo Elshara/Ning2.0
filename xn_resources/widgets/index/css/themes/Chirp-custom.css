@@ -1,0 +1,116 @@
+body, .xg_marginbg {
+	background-repeat: repeat-x;
+}
+.xg_widget_main_authorization .xg_module {
+	background-color: #e8fbef;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg {
+	background-color:transparent;
+	background-position: 0 -7px;
+}
+#xg_masthead {
+	height: 76px;
+	min-height: 76px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead p#xg_sitename {
+	padding:15px 0 0 13px;
+	margin:0;
+	background-color:transparent;
+	line-height:1.1em;
+}
+#xg_navigation {
+	margin: 34px 0 0 0;
+}
+#xg_navigation ul li a {
+	color:#86E2DE;
+	background: transparent none;
+	padding: 0 .84em;
+	border:1px solid #6AB4B1;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+	background:transparent none;
+	color:#FFF;
+	border-color: #fff;
+}
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+	clear: both;
+	background-color:transparent;
+	padding: 30px 0 15px 15px;
+}
+#xg #xg_body h1 {
+    color: #333;
+}
+.xg_module_head {
+    background-image: url(/xn_resources/widgets/index/gfx/themes/Chirp/xg_module_head.png);
+    background-repeat: repeat-x;
+    background-position: left bottom;
+	border-bottom:1px solid #b1ccbb;
+	margin-bottom:0;
+}
+.xg_module_body,
+.xg_module_foot {
+    color: #5D9E9B;
+	border-bottom:1px dotted #B1CCBB;
+}
+.xg_module_foot {
+	background-color:transparent;
+	border-bottom:1px solid #b1ccbb;
+}
+h3, caption, .inplace_edit input.h3 {
+	font-weight:lighter;
+}
+.xg_module_head h3 {
+	font-size:1.2em;
+	line-height:1em;
+	margin-bottom:0.6em;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #393A3D;
+}
+p, div.description {
+	font-size:1.1em;
+	margin-bottom:.6em;
+}
+input.large, textarea.large, select.large {
+	margin-top:1px;
+}
+ul.pagination li.this span {
+    background-color: #ddd;
+    border-color: #ddd;
+    color: #393A3D;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px dotted #ccc;
+}
+
+#xg_body ul.navigation a {
+	color: #333;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#467775;
+}
+#xg_foot {
+    background: url(/xn_resources/widgets/index/gfx/themes/Chirp/xg_foot-v2.jpg) repeat-x;
+}

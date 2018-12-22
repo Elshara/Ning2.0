@@ -1,0 +1,84 @@
+.notes_body p {
+	font-size:1em;
+}
+.notes_body {
+	font-size:1.2em;
+	margin-bottom:.4em;
+}
+.notes_body_edit {
+    border:1px solid #999;
+    border-top-width:0;
+    background:#fff;
+	color:#333;
+	margin-bottom:.4em;
+}
+.edit_body {
+	height:30em;
+	overflow:auto;
+	border:1px solid #999;
+	border-width:0 1px 1px;
+	padding: 5px;
+	margin-bottom:.4em;
+}
+.notes_list h3 {
+	margin:0.8em 0 0;
+}
+.notes_body ul, .notes_body ol {font-size:1em;margin:.4em 0}
+.notes_body ul, .notes_body ol, .notes_body dl {
+  margin-left:1.5em;
+}
+.notes_body_edit iframe {
+	width:100%;
+	height:30em;
+	border:none;
+	display:block;
+}
+.notes_body .adminbox {font-size:.83333em;}
+.notes_body .adminbox ul {font-size:1.2em;margin:0;}
+
+/* gwt editor */
+.gwteditor {
+	background:#f3f3f3;
+	border-style: solid;
+	border-color: #999 #999 #ccc;
+	border-width: 0pt 1px 1px;
+}
+.gwteditor select {
+	margin-left:5px;
+}
+.gwteditor table {
+	margin:0;
+}
+.gwteditor td td {
+	padding:0;
+}
+.gwt-ToggleButton,
+.gwt-PushButton {
+	padding:3px;
+	margin:2px 0;
+}
+.gwt-ToggleButton-up,
+.gwt-PushButton-up {
+	padding:4px;
+}
+.gwt-ToggleButton-down,
+.gwt-PushButton-down {
+	border:1px solid;
+	border-color:#ccc #fff #fff #ccc;
+}
+.gwt-ToggleButton-up-hovering,
+.gwt-PushButton-up-hovering {
+	border:1px solid;
+	border-color:#fff #ccc #ccc #fff;
+	background:#fff;
+}
+.gwt-ToggleButton-down-hovering,
+.gwt-PushButton-down-hovering {
+	border:1px solid;
+	border-color:#ccc #fff #fff #ccc;
+	background:#fff;
+}
+
+.gwt-Image {
+	display:block;
+}

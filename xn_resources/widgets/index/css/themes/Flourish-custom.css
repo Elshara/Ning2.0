@@ -1,0 +1,127 @@
+#xn_bar {
+	background-image: url(/xn_resources/widgets/index/gfx/themes/Flourish/scroll.gif);
+	background-repeat: repeat-x;
+	background-position: center bottom;
+	padding-bottom: 4px;
+}
+#aubg {
+	background-color: #fff !important;
+	border-color: #fff !important;
+}
+
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_head {
+	width: 980px;
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Flourish/xg_head.jpg) no-repeat center top;
+	font-style: italic;
+	text-align: center;
+	padding-top: 90px;
+}
+#xg_masthead {
+	height: 110px;
+	min-height: 110px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead p#xg_sitename {
+	font-size: 370%;
+	line-height: 110%;
+	letter-spacing: -0.03em;
+	font-weight: bold;
+	padding: 0;
+	margin: 0;
+}
+#xg_masthead p#xg_sitedesc {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	padding: 0;
+	margin: 0 0 5em 0;
+}
+#xg_navigation {
+	min-height: 110px;
+	height: 110px;
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Flourish/xg_body.gif) no-repeat center bottom;
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-style: normal;
+	font-variant: small-caps;
+	padding-bottom: 60px;
+}
+#xg_head > #xg_navigation {
+	height: auto;
+}
+#xg_navigation ul {
+	display: inline-block;
+	float: none;
+	width: 1px;
+	white-space: nowrap;
+	margin: 0 auto;
+}
+#xg_navigation > ul {
+	display: table;
+	width: auto;
+}
+#xg_navigation ul li {
+	display: inline;
+	float: none;
+	padding: 0 .5em;
+}
+#xg_navigation ul > li {
+	display: table-cell;
+}
+*:first-child+html #xg_navigation ul > li { /* IE7 */
+	display: inline;
+}
+#xg_navigation ul li a {
+	display: inline-block;
+	padding-bottom: 3px;
+}
+#xg_navigation ul li > a {
+	display: block;
+}
+*:first-child+html #xg_navigation ul li > a { /* IE7 */
+	display: inline-block;
+}
+#xg_navigation ul li a:hover {
+	color: #1c2b3c;
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Flourish/li_hover.gif) no-repeat center bottom;
+}
+#xg_navigation ul li.this a {
+	color: #1c2b3c;
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Flourish/li_this.gif) no-repeat center top;
+}
+
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+	position: relative;
+ 	top: -98px;
+	width: 940px;
+	background: #fff url(/xn_resources/widgets/index/gfx/themes/Flourish/xg_body_repeat.gif) repeat-y 0px -5px;
+	padding: 10px 20px 20px 20px;
+}
+.xg_module_head {
+	background-image:url(/xn_resources/widgets/index/gfx/themes/Flourish/xg_module_head.gif);
+	background-repeat:no-repeat;
+	background-repeat:left center;
+	padding: .8em 0 .8em 10px;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot {
+	width: 960px;
+	margin-top: -98px;
+}
+#xg_foot,
+#xg_foot a {
+	color: #fff;
+	background-color: transparent;
+}

@@ -1,0 +1,1187 @@
+/*----------------------------------------------------------------------
+	Reset elements
+----------------------------------------------------------------------*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+:focus {
+/*  outline: 0;*/
+}
+ins {
+	text-decoration: none;
+}
+del {
+	text-decoration: line-through;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+
+/*----------------------------------------------------------------------
+	Word Breaking
+----------------------------------------------------------------------*/
+* {
+  word-wrap: break-word;
+}
+
+#network,
+#network strong,
+div.about .tb .name {
+  text-overflow:ellipsis;
+  overflow:hidden;
+}
+
+/*----------------------------------------------------------------------
+	Basic Element Styles
+----------------------------------------------------------------------*/
+/*
+-webkit-tap-highlight-color:rgba(200,0,0,0.4);
+*/
+html, body {
+  font: 12px/1.4em Helvetica, Arial, sans-serif;
+  -webkit-text-size-adjust: none
+}
+a {text-decoration:none;}
+p {margin:.6em 0 .4em;}
+.legend {margin:.6em 5px .4em;}
+h1, h2, h3, h4, h5, h6 {
+  margin:.6em 5px .4em;
+  font-weight:bold;
+}
+h1 {
+  font-size:24px;
+  text-align:center;
+  margin-top:25px;
+}
+h2 {font-size:16px;}
+h3 {font-size:14px;}
+h4 {font-size:12px;}
+.disabled {
+	opacity:0.4;
+	cursor:default;
+}
+dt {font-weight:bold;}
+
+
+.thumb.photo {
+  border:5px solid #FFF;
+  -webkit-box-shadow:0px 0px 3px rgba(0,0,0,.5);
+  vertical-align:middle;
+  background-color:#FFFFFF;
+  margin:3px 7px 3px 0;
+}
+.lighter {
+  padding-left:8px;
+  opacity:0.75;
+  white-space:nowrap;
+}
+.short {height:2.5em;}
+.sparse {
+  opacity:0.75;
+  background-image:none !important;
+  border-bottom:0 !important;
+}
+.tb img {max-width:100%;height:auto;}
+
+ul.list .tb:after, ul.detail .tb:after {content:'';clear:both;display:block;}
+
+
+/*----------------------------------------------------------------------
+	Form Elements
+----------------------------------------------------------------------*/
+fieldset {
+  margin-bottom:15px;
+}
+label {
+  text-transform:capitalize;
+}
+label + input[type="text"] {display:block;}
+input[type="text"], textarea, select {
+  width:100%;
+}
+textarea {
+  width:93%;
+  height:7em;
+}
+
+input[type="radio"] {
+  width:auto;
+  height:auto;
+  vertical-align:middle;
+  margin-top:1px;
+  padding:0;
+}
+
+input[type="checkbox"]:not(#tosAgree) {
+  position:absolute;
+  margin-top:-14px;
+  right:11px;
+  top:50%;
+  width:94px;
+  height:27px;
+  display:block;
+  -webkit-border-radius:6px;
+  background-image:url('../gfx/iphone/bg-checkbox3.png');
+  background-position:top right;
+  background-repeat:no-repeat;
+  z-index:2;
+  visibility: hidden;
+  -webkit-box-sizing: border-box;
+  -webkit-appearance:none;
+}
+span.checkbox {
+  position:absolute;
+  margin-top:-14px;
+  right:11px;
+  top:50%;
+  width:94px;
+  height:27px;
+  display:block;
+  -webkit-border-radius:6px;
+  background-image:url('../gfx/iphone/bg-checkbox3.png');
+  background-position:top right;
+  background-repeat:no-repeat;
+  z-index:3;
+}
+input[type="checkbox"][value="1"], input[type="checkbox"][checked="checked"], input[type="checkbox"][value="1"], input[type="checkbox"]:hover, span.checkbox.checked {
+  background-position:top left;
+}
+#tosAgree {
+  vertical-align:middle;
+  width:20px;
+  height:20px;
+  -webkit-appearance: checkbox;
+}
+
+/*----------------------------------------------------------------------
+	Containers
+----------------------------------------------------------------------*/
+#w {position:relative;overflow:hidden;}
+#content {
+  min-height:316px;
+  padding:8px 0;
+}
+/* Compose Pages */
+#content.compose {
+  margin-top:40px;
+}
+#content.compose #header {
+  position:fixed;
+  top:0;
+  left:0;
+  width:320px;
+}
+/*----------------------------------------------------------------------
+	Orientation From: http://www.engageinteractive.co.uk/blog/2008/06/19/tutorial-building-a-website-for-the-iphone/
+----------------------------------------------------------------------*/
+#content_left,
+#content_right,
+#content_normal,
+#content_flipped{
+	display:none;
+}
+.show_normal,
+.show_flipped{
+	width:320px;
+}
+.show_left,
+.show_right{
+	width:480px;
+}
+.show_left #content_left,
+.show_right #content_right,
+.show_normal #content_normal,
+.show_flipped #content_flipped{
+	display:block;
+}
+
+
+/*----------------------------------------------------------------------
+	Language Specific
+----------------------------------------------------------------------*/
+html[lang="de"] #navigation .lead a {
+  padding:0 7px;
+}
+
+
+/*----------------------------------------------------------------------
+	Buttons & Pins
+----------------------------------------------------------------------*/
+.pin {
+  display:block;
+  width:19px;
+  height:19px;
+  -webkit-border-radius:11px;
+  border:2px solid #fff;
+  -webkit-box-shadow: 0px 0px 2px rgba(0,0,0,.77);
+  background-image:url(../gfx/iphone/bg-pin2.png);
+}
+.mark {
+  display:block;
+  width:19px;
+  height:19px;
+  background-image:url(../gfx/iphone/bg-pin2.png);
+}
+
+
+
+
+
+/*----------------------------------------------------------------------
+	Header Area
+----------------------------------------------------------------------*/
+#header { /* 33px tall total */
+  height:34px;
+  line-height:32px;
+  height:42px;
+  line-height:41px;
+  padding-top:1px;
+  vertical-align:middle;
+  position:relative;
+  background-image: url('../gfx/iphone/iphone-core.png');
+  background-position:0 -991px;
+  background-repeat:repeat-x;
+  text-align:center;
+  font-size:16px;
+}
+#header a, #navigation a, #header strong {
+  text-decoration:none;
+  text-shadow: rgba(0, 0, 0, 0.1) 1px 1px 0;
+  display:block;
+}
+#network {
+  font-size:16px;
+  width:206px;
+  display:inline;
+  margin:0 auto;
+  white-space:nowrap;
+}
+#network strong {
+  display:inline;
+  max-width:176px;
+  text-align:left;
+}
+.show_left #network,
+.show_right #network {
+  width:366px;
+}
+.show_left #network strong,
+.show_right #network strong{
+  max-width:336px;
+}
+#header a {
+  text-shadow: 0px 1px 1px rgba(0,0,0,0.25);
+}
+#largeheader {
+  margin:10px 0 4px;
+  text-align: center;
+}
+#largeheader strong {
+  margin-left: 5px; 
+  font-size: 14pt;
+  text-shadow: 0px 1px 1px rgba(0,0,0,0.25);
+}
+#network .logo.small {
+  vertical-align:text-top;
+  margin:-3px 2px 0 0;
+  width:24px;
+  height:24px;
+  -webkit-border-radius: 5px;
+  -webkit-box-shadow: 0px 1px 1px rgba(0,0,0,0.5);
+  display:inline-block;
+  -webkit-background-size:24px 24px;
+}
+/* Title Button */
+.title-button {
+  display:inline-block;
+  font-weight:bold;
+  border:1px solid rgba(0,0,0,.35);
+  border-top-color:rgba(0,0,0,.45);
+  -webkit-border-radius:5px;
+  height:27px;
+  line-height:27px;
+  padding:0 8px;
+  font-size:12px;
+  -webkit-box-shadow:0px 1px 2px rgba(255,255,255,.25);
+  text-shadow:0 0px 2px rgba(0,0,0,.65);
+  background:transparent url(../gfx/iphone/iphone-core.png) repeat-x 0 -1209px;
+}
+#add, #quick_add {
+  position:absolute;
+  top:6px;
+  right:6px;
+}
+#cancel {
+  position:absolute;
+  top:6px;
+  left:6px;
+  background-color:#444 !important;
+  color:#fff !important;
+}
+
+
+/*----------------------------------------------------------------------
+	Footer
+----------------------------------------------------------------------*/
+#footer {
+  clear:both;
+  margin-top:-1px;
+  padding:3px 5px;
+  text-align:center;
+  line-height:16px;
+  font-size:11px;
+}
+#footer p {margin:1px 0;}
+#footer a {padding:1px 4px;}
+
+
+/*----------------------------------------------------------------------
+	Navigation
+----------------------------------------------------------------------*/
+#navigation {
+  text-align:center;
+  -webkit-box-shadow: 0 0 3px rgba(0,0,0,.5);
+  padding-top:2px;
+  margin-bottom:3px;
+}
+#navigation .lead {
+  height:29px;
+  line-height:29px;
+  background-image: url('../gfx/iphone/iphone-core.png');
+  background-position:0 -1101px;
+  background-repeat:repeat-x;
+  display:block;
+}
+#navigation .lead li {
+  display:inline-block;
+  font-weight:bold;
+  width:23.5%;
+}
+#navigation .lead li a {
+  padding:0 4px;
+  font-size:13px;
+  white-space:nowrap;
+  overflow-x:hidden;
+  opacity:.9;
+}
+#navigation .lead li.this a {
+  opacity:1;
+  background-position:0 -1101px;
+  background-repeat:repeat-x;
+  border-color:rgba(255,255,255,.4);
+  border-width:1px 1px 0 1px;
+  border-style:solid;
+  background-image: url('../gfx/iphone/iphone-core.png');
+  -webkit-border-top-right-radius:5px;
+  -webkit-border-top-left-radius:5px;
+}
+#navigation .sub {
+  height:24px;
+  line-height:24px;
+  border-bottom:1px solid rgba(255,255,255,0.4);
+  border-top:1px solid rgba(255,255,255,.4);
+}
+#navigation .sub.empty {
+  height:3px;
+  line-height:3px;
+  display:block;
+}
+#navigation .sub li {
+  display:inline-block;
+  margin:0 2px;
+  font-weight:bold;
+  width:30%;
+}
+#navigation .sub li a {
+  padding:0 5px;
+}
+#navigation .sub li.this a {
+	opacity:1.0;
+}
+#navigation .sub a {
+	opacity:0.7;
+}
+/*----------------------------------------------------------------------
+	Overlays (Quick Add)
+----------------------------------------------------------------------*/
+.overlay {
+  position:fixed;
+  top:0;
+  left:0;
+  width:320px;
+  height:416px;
+  background:rgba(0,0,0,.5);
+  z-index:100;
+}
+.show_left .overlay,
+.show_right .overlay {
+	width:480px;
+	height:268px;
+}
+.overlay p, .overlay a {
+  margin:5% 0;
+  color: #FFFFFF !important;
+}
+.overlay a[href^="mailto"] {
+  border-bottom:1px dotted;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  font-weight:bold;
+}
+.overlay ul, .overlay div {
+  margin:5% 2.5% 0;
+  -webkit-border-radius:16px;
+  height:85%;
+  width:85%;
+  padding:5%;
+  background:rgba(0,0,0,.6);
+}
+.overlay ul li {
+  border:4px solid #FFF;
+  background:rgba(0,0,0,.5);
+  -webkit-border-radius:16px;
+  padding:2.5%;
+  text-align:center;
+  margin:5% 0;
+}
+.overlay ul li a {
+  color:#FFF;
+  text-decoration:none;
+  font-size:20px;
+  font-weight:bold;
+}
+.overlay-close, .close {
+  width:28px;
+  height:28px;
+  position:absolute;
+  top:-1.5%;
+  left:1.5%;
+  text-indent:-9999px;
+  background:transparent url(../gfx/iphone/iphone-core.png) no-repeat 0 -300px;
+}
+
+/*----------------------------------------------------------------------
+	Fullscreen Mode
+----------------------------------------------------------------------*/
+#fullscreen {
+  width:320px;
+  height:416px;
+  background:#000;
+  position:relative;
+  line-height:416px;
+}
+.show_left #fullscreen,
+.show_right #fullscreen {
+	width:480px;
+	height:268px;
+	line-height:268px;
+}
+#fullscreen h1 {
+  font-size:12px;
+  padding:6px 10%;
+  text-align:center;
+  background:rgba(0,0,0,.75);
+  color:#FFF;
+  line-height:24px;
+  -webkit-text-shadow: 0 0 6px rgba(0,0,0,.5);
+  position:absolute;
+  z-index:2;
+  top:0;
+  margin:0;
+  width:80%;
+}
+#fullscreen a {
+  color:#FFF !important;
+  text-decoration:none !important;
+  vertical-align:middle;
+  font-size:50px;
+  display:inline-block;
+  -webkit-text-shadow: 0 0 6px rgba(0,0,0,.5);
+}
+#fullscreen #controls {
+  height:56px;
+  width:160px;
+  border:4px solid #FFF;
+  -webkit-border-radius:14px;
+  -webkit-box-shadow: 0 0 6px rgba(0,0,0,.5);
+  line-height:53px;
+  text-align:center;
+  position:absolute;
+  bottom:12px;
+  left:76px;
+  z-index:2;
+  background:rgba(0,0,0,.5);
+}
+#fullscreen #controls a#back, #fullscreen #controls a#forward {
+  height:36px;
+  width:36px;
+  background-image:url(../gfx/iphone/iphone-core.png);
+  background-repeat:no-repeat;
+  text-indent:-9999px;
+  margin:0 5px;
+  padding:0 10px;
+}
+#fullscreen #controls a#back {background-position:10px -100px;}
+#fullscreen #controls a#forward {background-position:10px -200px;}
+.show_left #fullscreen #controls,
+.show_right #fullscreen #controls {
+  left:156px;
+}
+#fullscreen .frame {
+  z-index:1;
+  height:416px;
+  width:320px;
+  display:inline-block;
+  text-align:center;
+}
+.show_left #fullscreen .frame,
+.show_right #fullscreen .frame {
+	width:480px;
+	height:268px;
+}
+#fullscreen .frame img {
+  max-width:100%;
+  max-height:100%;
+  width:auto;
+  height:auto;
+  vertical-align:middle;
+  display:inline;
+}
+a#return {
+  position:absolute;
+  left:3px;
+  top:3px;
+  display:block;
+  z-index:3;
+  width:28px;
+  height:28px;
+  background:transparent url(../gfx/iphone/iphone-core.png) no-repeat 0 -400px;
+  text-indent:-9999px;
+}
+#frameSlider {
+  height:416px;
+  width:9000px;
+  overflow:hidden;
+}
+.show_left #frameSlider,
+.show_right #frameSlider {
+	height:268px;
+}
+#fullscreen a.disabled {
+  color:rgba(255,255,255,.25) !important;
+}
+
+
+/*----------------------------------------------------------------------
+	Login Screen
+----------------------------------------------------------------------*/
+.logo.large {
+  display:inline-block;
+  vertical-align: middle;
+  margin-bottom:5px;
+  width:48px;
+  height:48px;
+  -webkit-border-radius: 10px;
+  -webkit-box-shadow:1px 2px 2px rgba(0,0,0,.5);
+  -webkit-background-size:48px 48px;
+}
+#content.simple.signIn {
+  padding-top:50px;
+}
+#content.simple fieldset {
+  margin:10px 5px;
+  color:#222;
+}
+#content.simple a[type="submit"] {
+  margin:5px 5px 15px;
+  color:#222;
+}
+.promo {font-size:18px;font-weight:bold;text-align:center;}
+.management {text-align:center;}
+.management a, #footer a {text-decoration:underline;}
+.captcha {
+  height:48px;
+  padding-right:100px;
+  position:relative;
+}
+div.captcha label {
+  font-size:12px;
+  line-height:16px;
+  padding:7px 0;
+}
+.captcha img {
+  display:block;
+  position:absolute;
+  right:0;
+  top:0;
+}
+div.captcha input[type="text"] {
+  width:9.2ex;
+  height:40px;
+  left:113px;
+  font-size:18px;
+  padding:4px .4ex;
+  text-align:center;
+}
+
+
+/*----------------------------------------------------------------------
+	Buttons
+----------------------------------------------------------------------*/
+/* iUI */
+.whiteButton,
+.grayButton {
+    display: block;
+    border-width: 0 12px;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: inherit;
+    color: inherit;
+}
+.whiteButton {
+    -webkit-border-image: url(../gfx/iphone/whiteButton.png) 0 12 0 12;
+    text-shadow: rgba(255, 255, 255, 0.7) 0 1px 0;
+}
+.buttongroup {
+  margin:0.3em 0;
+  padding-top:.5em;
+}
+.buttongroup a {
+  background:rgba(255,255,255,.75) !important;
+  color:#444 !important;
+  display:block;
+  border: 1px solid rgba(0,0,0,.5);
+  text-align: center;
+  -webkit-border-radius: 5px;
+  -webkit-box-sizing: border-box;
+  padding: 2px 2px 3px;
+  margin: .2em 0;
+  width:60%;
+}
+.buttongroup a#remove_friend_link {
+  font-size:12px;
+}
+
+/*----------------------------------------------------------------------
+	Lists
+----------------------------------------------------------------------*/
+ul.table {
+  margin-bottom:2em;
+}
+ul.table li {
+  padding-left:11px;
+  position:relative;
+  clear:both;
+}
+ul.table li img {
+  margin:4px 11px 8px 0;
+  float:left;
+}
+ul.table li sub {
+  font-size:12px;
+  font-weight:normal;
+  padding-left:.5em;
+}
+ul.table h4 {
+  font-size:20px;
+  font-weight:bold;
+}
+ul.table.lined li {
+  border-style:solid;
+  border-width:1px 0 0;
+}
+ul.table.lined li:last-child {
+  border-width:1px 0 1px;
+}
+ul.table.single li {
+  font-size:20px;
+  font-weight:bold;
+  line-height:43px;
+  padding-right:46px;
+  min-height:43px;
+}
+ul.table.single li img {
+  margin-bottom:0;
+}
+ul.table.double li {
+  padding:5px 46px 5px 11px;
+  line-height:1.5em;
+}
+ul.table.double li strong {
+  font-size:16px;
+  display:block;
+}
+ul.table.double li span {
+  display:block;
+  font-size:14px;
+}
+ul.table.variable li {
+  padding:5px 46px 5px 11px;
+  line-height:1.3em;
+  font-size:14px;
+}
+ul.table.lined li.heading {
+  padding:0 0 0 11px;
+  line-height:26px;
+  font-size:18px;
+  font-weight:bold;
+  text-shadow: 0px 1px 1px rgba(0,0,0,0.75);
+
+}
+ul.table.lined li .pin {
+  position:absolute;
+  right:11px;
+  margin-top:-11px;
+  top:50%;
+}
+ul.table.lined li a {
+  display:block;
+}
+ul.table.lined li span {
+  position:absolute;
+  right:11px;
+  margin-top:-11px;
+  top:50%;
+}
+
+
+/*----------------------------------------------------------------------
+	Lists (older)
+----------------------------------------------------------------------*/
+ul.list {clear:both;}
+ul.list li {
+  position: relative;
+  border-bottom: 1px solid rgba(255,255,255,.5);
+  padding: 5px 30px 5px 5px;
+  list-style: none;
+  display:block;
+}
+ul li.title, ul li.category, ul li.section {
+  clear:both;
+  position: relative;
+  border-top: 1px solid rgba(255,255,255,.5);
+  border-bottom: 1px solid rgba(255,255,255,.5);
+  padding: 4px 5px;
+  font-weight: bold;
+  background-image:none !important;
+}
+ul.list li.more {
+  clear:both;
+  text-align:right;
+  padding-bottom:5px;
+  padding:5px 30px 6px 5px;
+}
+ul.list li.previous {
+  clear:both;
+  text-align:left;
+  padding-bottom:5px;
+  padding:5px 5px 6px 30px;
+}
+ul.list.members div.tb div,
+ul.list .metadata {
+  font-size:11px;
+}
+
+/* Activity Feed */
+ul.list.activity .ib {float:left;}
+ul.list.activity .tb {margin-left:56px;}
+.list.activity h5 {margin: 0;}
+ul.list.activity li:not([onclick]) {
+  background-image:none;
+}
+.list.activity .message {padding-right:8px;}
+.list.activity .lighter {padding-left:0;}
+
+/* Members */
+ul.list.members {
+  margin: 0 0 10px;
+}
+ul.list.members li:not(.title) {
+  clear:left;
+}
+ul.list.members .ib {float:left;}
+ul.list.members .tb {margin-left:56px;}
+ul.list.members a {font-weight:bold;}
+ul.list li.simple-48:nth-of-type(2), ul.list li.simple-48:nth-of-type(8) {margin-left:5px;}
+ul.list li.simple {
+  float:left;
+  padding:0;
+  background:none;
+  border:0;
+  display:block;
+}
+ul.list li.simple a {
+  display:inline !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+ul.list li.simple-48 {
+  margin:5px 5px 5px 0;
+  width:48px;
+  height:48px;
+}
+ul.list li.simple-64 {
+  margin:3px 7px;
+  width:64px;
+  height:64px;
+  line-height:64px;
+  text-align:center;
+}
+ul.list li.simple-64 img {
+  margin:0 auto;
+  max-width:64px;
+  max-height:64px;
+  height:auto;
+  width:auto;
+  vertical-align:middle;
+}
+ul li.title, ul li.category, ul li.section, ul li.title a, ul li.category a, ul li.section a {
+  background-image:none !important;
+}
+ul li.add {text-align:center;background-image:none !important;}
+ul li.add a {
+  border-bottom:0;
+  padding-left:17px;
+  line-height:24px;
+  font-weight:bold;
+  display:inline-block;
+  background:transparent url(../gfx/iphone/iphone-core.png) no-repeat 0 -595px !important;
+}
+/*----------------------------------------------------------------------
+	Panels
+----------------------------------------------------------------------*/
+.compose .panel {margin:0 5px;}
+.panel select {border:0;width:auto;background:inherit;}
+.panel fieldset *:not(p) {color:#222;}
+.panel p {padding:.5em 15px;}
+.panel fieldset {
+  background: #FFFFFF;
+  -webkit-border-radius: 10px;
+  border: 1px solid #999999;
+}
+.panel fieldset, .panel label, .panel textarea, .panel select, .panel input {
+  font-size: 14px;
+  -webkit-appearance: none;
+}
+.panel .row  {
+  position: relative;
+  min-height: 32px;
+  line-height: 24px;
+  padding:6px 0 2px;
+  border-bottom: 1px solid rgba(0,0,0,.2);
+  clear:both;
+}
+.panel .row:last-child {border-bottom: none !important;}
+.panel input:not(input[type=checkbox]), .panel select, .panel textarea {
+  border: none;
+  margin:0;
+  background:none;
+}
+.panel input:not(input[type=checkbox]) {
+  width:217px;
+  width:187px;
+  line-height: 24px;
+  padding: 0;
+}
+.panel label {
+  font-weight:bold;
+  width:90px;
+  margin:0 5px 0 8px;
+}
+.compose .panel label {
+  width:auto;
+}
+.panel label, .panel input:not(input[type=checkbox]), .panel select {
+  display:inline-block;
+  vertical-align:middle;
+}
+.panel select.date {letter-spacing:-1px;}
+.panel.profile select.date {letter-spacing:0;margin-left:2.5%;}
+.panel.profile textarea {margin-top:4px;}
+.panel.profile input:not(input[type=checkbox]), .panel.profile select:not(select.date), .panel.profile textarea {
+  padding:4px 0;
+  margin:4px 2.5%;
+  width:95%;
+}
+.panel.profile label {
+  margin-left:4%;
+  width:95%;
+}
+.panel.profile ul.table {
+  margin-bottom:0;
+}
+.panel.profile ul.table.lined li {
+  border-color:#ccc;
+}
+.panel.profile ul.table.lined li:last-child {
+  border-bottom:0;
+}
+.panel .mark.check {background-position:-2px -290px !important;}
+.panel .mark.chevron {background-position:-2px -290px !important;}
+
+
+/*----------------------------------------------------------------------
+	Profile
+----------------------------------------------------------------------*/
+div.about {margin:5px 0px;}
+div.about .ib {
+  float:left;
+  width:96px;
+  margin-left:5px;
+}
+div.about .tb {
+  margin-left:109px;
+}
+div.about-64 .ib {
+  width:64px;
+}
+div.about-64 .tb {
+  margin-left:74px;
+}
+div.about .tb span {
+  display:block;
+}
+div.about .tb .name {
+  font-size:14px;
+  font-weight:bold;
+  margin-bottom:.4em;
+}
+.wall .ib {
+  float:left;
+  width:48px;
+}
+.wall .tb {
+  margin-left:56px;
+}
+ul.wall li {
+  clear:left;
+  background-image:none;
+}
+.list.photos {
+  min-height:178px;
+}
+
+/* Detail */
+ul.detail li:not(.more), ul.detail li:not(.previous) {
+  padding-right:5px !important;
+  background-image:none !important;
+}
+
+/*---------------------------------------------------------------
+ * Activity Feed
+ *--------------------------------------------------------------*/
+ .activity .question,
+ .activity .friends,
+ .activity .statement,
+ .activity .featured {
+ 	width:32px;
+ 	height:32px;
+ 	background-image:url(../gfx/icon/activity.png);
+ 	background-repeat:no-repeat;
+	position:absolute;
+	display:block;
+	left:15px;
+  top:6px;
+ }
+ .activity .question {background-position: -5px -332px;}
+ .activity .friends {background-position: -5px -150px;}
+ .activity .statement {background-position: -5px -514px;}
+ .activity .featured {background-position: -5px -696px;}
+
+
+/* YouTube Videos */
+a[href^="http:\/\/www.youtube.com"] div, a[href^="http:\/\/youtube.com"] div {
+  position:relative;
+}
+a[href^="http:\/\/www.youtube.com"] div:after, a[href^="http:\/\/youtube.com"] div:after {
+   display:block;
+   position:absolute;
+   content:'';
+   top:0;
+   left:0;
+   width:108px;
+   height:75px;
+   z-index:5;
+   background:transparent url(../gfx/iphone/iphone-core.png) no-repeat 34px -467px;
+}
+
+/* Music */
+a[href$=".mp3"] {display:block;margin:5px 0;padding:3px 15px 3px 33px;position:relative;border:1px solid rgba(0,0,0,.5);-webkit-border-radius:5px;background: rgba(255,255,255,.2);}
+a[href$=".mp3"] img {position:absolute;top:50%;margin-top:-8px;margin-left:-28px}
+
+
+/* Profile URL Questions */
+div.row input.url {
+   width:170px;
+}
+div.row input.url:before {
+   content:'http://';
+   display:inline;
+   padding:0 8px;
+}
+span.icon {
+  padding-left:20px;
+  line-height:24px;
+  font-size:14px;
+  background-image:url(../gfx/iphone/iphone-core.png);
+  background-repeat:no-repeat;
+}
+span.icon.private {
+  background-position:1px -700px;
+}
+span.icon.required {
+  background-position:0 -800px;
+}
+span.icon.error {
+  background-position:0 -900px;
+}
+input.error {
+  padding-left:134px !important;
+  background:transparent url(../gfx/iphone/iphone-core.png) no-repeat 114px -900px !important;
+  border:2px solid #f00 !important;
+}
+.profile input.error {
+  padding-left:24px !important;
+  background:transparent url(../gfx/iphone/iphone-core.png) no-repeat 4px -900px !important;
+  border:2px solid #f00 !important;
+}
+
+
+
+
+/*---------------------------------------------------------------
+ *  Forum
+ *--------------------------------------------------------------*/
+ .forum .category {
+   position: relative;
+   padding: 4px 5px;
+   font-weight: bold;
+   background-image:none;
+ }
+ .forum .category:not(li:first-child) {margin-top:10px;}
+ .forum .ib {
+   width:48px;
+   float:left;
+ }
+ .forum .tb {
+   margin-left:56px;
+ }
+ .forum .title {
+   font-weight:bold;
+   font-size:14px;
+ }
+ .forum .metadata, .forum cite {
+   opacity:0.75;
+ }
+ .forum .metadata, .forum cite, .forum .post  {
+   margin-bottom: .4em;
+   display:block;
+ }
+ .forum .timestamp {margin-left:.5ex;}
+ .forum blockquote {
+   border-left-width:2px;
+   border-left-style:solid;
+   border-left-color:rgba(0,0,0,.5); /* move to color theme stuff */
+   padding:4px 7px 7px;
+   margin:0 0 .3em;
+ }
+ .forum blockquote blockquote {
+   margin-top:.3em;
+ }
+
+.i1 .ib, .i2 .ib, .i3 .ib, .i4 .ib, .i5 .ib, .i6 .ib, .i7 .ib, .i8 .ib, .i9 .ib {
+  text-align:right;
+}
+.dots {
+  background-color:transparent;
+  background-repeat:no-repeat;
+  background-image:url(../gfx/iphone/bg-dots.png);
+  position:relative;
+  height:17px;
+  width:27px;
+  margin-left:21px;
+}
+.i6 .dots { background-position: 0 -150px; }
+.i1 .dots { background-position: 0 -317px; }
+.i9 .dots { background-position: 0 -484px; }
+.i4 .dots { background-position: 0 -651px; }
+.i5 .dots { background-position: 0 -818px; }
+.i3 .dots { background-position: 0 -985px; }
+.i8 .dots { background-position: 0 -1152px; }
+.i7 .dots { background-position: 0 -1319px; }
+.i2 .dots { background-position: 0 -1486px; }
+
+
+/*----------------------------------------------------------------------
+	Error messages
+----------------------------------------------------------------------*/
+#notification {
+  position:absolute;
+  top:110px;
+  left:18%;
+  opacity:1;
+  width:220px;
+}
+#notification.fadeOut {
+  opacity:0;
+  -webkit-transition:opacity 1.0s linear;
+}
+.msg {
+  -webkit-border-radius: 8px;
+  border:4px solid;
+  background:#FFF !important;
+  -webkit-box-shadow: 0 0 20px #000;
+  color:#222 !important;
+  width:89%;
+  margin: 0 auto 10px;
+}
+.msg a {color:#222 !important;text-decoration:underline;}
+.msg h2 {
+  margin:0;
+  color:#FFF !important;
+  padding:2px 6px;
+}
+.msg p, .msg ul {padding:0px 6px;}
+.msg br {margin-bottom:8px;}
+.msg ul {list-style:disc;margin-left:1.5em;}
+.msg h2, .msg p, .msg ul {margin-bottom:.4em;line-height:1.4em;}
+
+.error.msg {border-color:#DA2B31;}
+.error.msg h2 {background-color:#DA2B31;}
+.success.msg {border-color:#36AA1F;}
+.success.msg h2 {background-color:#36AA1F;}
+.notification.msg {border-color:#e1b400;}
+.notification.msg h2 {background-color:#e1b400;}
+
+.r.error label { /* should be row, not r */
+  font-weight:bold;
+  color:#DA2B31;
+}
+.r.error input[type="text"] {border:2px solid #DA2B31;margin-bottom:.4em;}

@@ -1,0 +1,96 @@
+#xg {
+    background-color:transparent;
+}
+
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    height: 82px;
+	min-height: 82px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead p#xg_sitename {
+	padding:20px 0 0 16px;
+	font-size:2.5em;
+	line-height:1em;
+}
+#xg_masthead p#xg_sitedesc {
+	padding:0 0 0 16px;
+	color:#9DD3DD;
+	font-size:1.1em;
+}
+#xg_navigation {
+	padding: .3em .7em .9em .7em;
+	margin: 0;
+}
+#xg_navigation ul li a {
+    color:#327987;
+	background:transparent url(/xn_resources/widgets/index/gfx/themes/Bondi/xg_navigation_ul_li_a.gif) no-repeat 0% 50%;
+    text-transform:uppercase;
+    font-size:12px;
+	padding: 0 1em;
+}
+#xg_navigation ul li a:hover,
+#xg_navigation ul li.this a {
+    color:#FFF;
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Bondi/xg_navigation_ul_li_b.gif) no-repeat 0% 50%;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg #xg_body h1 {
+	color: #333;
+}
+#xg_body {
+	padding:15px 0 15px 15px;
+	border: 1px solid;
+	border-color: #e1e1e1 #c5c5c5 #000 #e1e1e1;
+}
+.xg_module_head {
+	background-color: transparent;
+    margin-bottom:0;
+    border-bottom:1px solid #9dd3dd;
+	padding-bottom: .3em;
+}
+.xg_module_head h2 {
+    font-size:1.5em;
+	font-weight: normal;
+}
+.xg_module_body,
+.xg_module_foot {
+    border-bottom:1px dotted #E0E0E0;
+}
+ul.pagination li.this span {
+    border-color: #fff;
+    color: #ccc;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #555;
+}
+.xg_module_body h4 {
+	font-weight: normal;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #9dd3dd;
+}
+ul.page_tabs li.this {
+	background-image: none;
+}
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#888;
+}

@@ -1,0 +1,105 @@
+#xg {
+    background-color:transparent;
+}
+
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    height: 185px;
+	min-height: 185px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+
+#xg_masthead p#xg_sitename {
+    margin:0;
+    padding:42px 0 0 15px;
+    line-height:1.0em;
+}
+#xg_masthead p#xg_sitedesc {
+    font-size:1.2em;
+    padding:0pt 0pt 0em 18px;
+    color:#587f94;
+}
+#xg_navigation ul li  {
+    font-size:.85em;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin: 0 0 0 14px;
+}
+#xg_navigation ul li a {
+    background-color:transparent;
+    color:#5d8398;
+	line-height: 25px;
+	padding-bottom:40px;
+}
+#xg_navigation ul li a:hover {
+	background: transparent none;
+    color:#fff;
+}
+#xg_navigation ul li.this a {
+    background: transparent url(/xn_resources/widgets/index/gfx/themes/Graph/xg_naviagtion_ul_li.gif) no-repeat center bottom;
+    color:#fff;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+.xg_module {
+	margin-bottom: 1.5em;
+}
+.xg_module_head {
+    border-bottom:2px dotted #CFE9F3;
+    margin-bottom:0pt;
+    text-transform:uppercase;
+}
+.xg_module_body,
+.xg_module_foot {
+	border-top: 2px dotted #ddeff5;
+}
+.xg_module_body {
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Graph/xg_module_body.gif) repeat;
+}
+#xg #xg_body h1 {
+	color: #333;
+}
+ul.pagination li.this span {
+    background-color: #FBFEFF;
+    border-color: #FBFEFF;
+    color: #367933;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #367933;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px dotted #ddeff5;
+}
+ul.page_tabs {
+	border-bottom-color: #ccc;
+}
+ul.page_tabs li a,
+ul.page_tabs li.this span {
+	border-color: #ccc;
+}
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#333;
+	background-color: transparent;
+}
+#xg_foot {
+    border-top:2px solid #c8e5f0;
+}
+
+

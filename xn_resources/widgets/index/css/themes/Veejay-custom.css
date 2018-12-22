@@ -1,0 +1,133 @@
+body {
+	background-attachment:fixed;
+	background-position: 50% 20%; 
+}
+#xg, .xg_floating_container {
+    background-color:transparent;
+}
+ 
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_head {
+	position:relative;
+    background-color:transparent;
+}
+#xg_masthead {
+	height: 290px;
+	min-height: 290px;
+    background-color:transparent;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead p#xg_sitename {
+    margin:0;
+	padding:92px 0 0 85px;
+    line-height:1em;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+}
+#xg_masthead p#xg_sitedesc {
+    padding:0pt 0pt 0em 100px;
+    color:#e80c7a;
+}
+#xg_navigation {
+	position:absolute;
+	right:40px;
+	top:10px;
+	width:160px;
+    background-color:transparent;
+}
+#xg_navigation ul li {
+	float:none;
+	text-align:right;
+	font-size:90%;
+	margin:.1em 0;
+	border-bottom:1px solid #191919;
+	text-transform:uppercase;
+	background-color:transparent;
+	color:#fff;
+}
+#xg_navigation ul li a,
+#xg_navigation ul li span {
+	display:block;
+	text-decoration:none;
+	background-color:transparent;
+	color:#ffb80c;
+	line-height:180%;
+}
+#xg_navigation ul li a:hover {
+    background-color:transparent;
+    color:#FFF;
+}
+#xg_navigation ul li.this a {
+	background-color:transparent;
+	color:#FFF;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+	clear: both;
+    background-color:transparent;
+	padding-top: 4em;
+}
+.xg_module {
+	background-color: transparent;
+}
+#xg #xg_body h1 {
+    color: #E80C7A;
+	background-color: #000;
+	font-size:1.6em;
+}
+.xg_module_head {
+    background: transparent url(/xn_resources/widgets/index/gfx/themes/Veejay/xg_module_head.gif) no-repeat;
+	font-size: 1.2em;
+	text-transform:uppercase;
+    margin-bottom:0;
+    border-bottom:1px solid #FFBB0A;
+    padding:15px 0px 0px .5em;
+}
+.xg_module_head h2 {
+	font-weight: normal;
+}
+.xg_module_body,
+.xg_module_foot {
+    background-color: #191919;
+	margin: 0;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #FFBB0A;
+}
+ul.pagination li.this span {
+    border-color: #000000;
+    color: #FA4401;
+}
+#xg_body ul.navigation {
+	background: url(/xn_resources/widgets/index/gfx/themes/Veejay/xg_module_head.gif) repeat-x;
+	position: static;
+	float: left;
+	clear: both;
+	padding: 1em 1em 0 .3em;
+	border-bottom: 1px solid #000;
+}
+ul.page_tabs li.this span {
+	color: #FFBB0A;
+}
+#xg_body form.notes_search p {
+	margin-top: 0;
+}
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#333;
+	padding-bottom: 0;
+}

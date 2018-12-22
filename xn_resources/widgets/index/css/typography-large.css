@@ -1,0 +1,18 @@
+#xg, .xg_floating_module {font-size:1.272728em}
+#xg_navigation ul li a,
+#xg_navigation ul li span {
+  font-size:0.98253em;
+}
+p.buttongroup a.button, p.buttongroup input.button, p.buttongroup button {
+  _font-size:15px !important;
+}
+p.buttongroup input.button, p.buttongroup button {
+  _padding:4px 8px 4px !important;
+}
+p.buttongroup a.button {
+  _line-height:16px !important;
+  _position:relative;
+  _margin-bottom:0 !important;
+  _padding:5px 8px 7px !important;
+  _bottom:-2px !important;
+}

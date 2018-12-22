@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Module>
+<ModulePrefs title="Hello, world!">
+<Require feature="opensocial-0.7" />
+</ModulePrefs>
+<Content type="html">
+<![CDATA[
+<script type="text/javascript">
+
+function init() {
+   document.getElementById("handler").innerHTML = "Hello, world.";
+}
+gadgets.util.registerOnLoadHandler(function() { init(); });
+</script>
+
+<div id="handler"></div>
+]]>
+</Content>
+</Module>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<privateConfigWrapper>
+<config>
+        <version type="string" checkState="true">0.1</version>
+        <title>Pages</title>
+        <displayName>Pages</displayName>
+        <description>A Mozzel for static pages.</description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">0</isFirstOrderFeature>
+        <isPermanent type="number">1</isPermanent>
+        <isEnabledDefault type="number">0</isEnabledDefault>
+        <anyUserCanCreatePage type="number">0</anyUserCanCreatePage>
+        <usersCanComment type="number">1</usersCanComment>
+    </config><privateConfig>
+<isEnabled type="string"/>
+</privateConfig>
+</privateConfigWrapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Module>
+<ModulePrefs title="TotalVideoViews, Test1">
+<Require feature="opensocial-0.7" />
+</ModulePrefs>
+<Content type="html">
+<![CDATA[
+<script type="text/javascript">
+
+function init() {
+  request();
+}
+gadgets.util.registerOnLoadHandler(function() { init(); });
+
+function request() {
+  var params = {};
+  params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.TEXT;
+  var url = "http://www.bkserv.net/YTS/GetTVVDBData.aspx?id=403";
+
+  gadgets.io.makeRequest(url, response, params);
+};
+
+function response(obj) {
+   document.getElementById("handler").innerHTML = "HotForWords has " + obj.text + " Total Video Views on YouTube.";
+};
+
+</script>
+
+<div id="handler">Loading...</div>
+]]>
+</Content>
+</Module>

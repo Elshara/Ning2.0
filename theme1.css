@@ -1,0 +1,116 @@
+/*----------------------------------------------------------------------
+	This file is generated whenever you customize the appearance of your 
+	app. We recommend that you avoid editing this file directly; instead, 
+	simply use or not use these styles in your app as desired.
+	For more information, contact support@ning.com.
+----------------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------------
+	General
+----------------------------------------------------------------------*/
+/* Ningbar & Footer */
+/* %ningbarInvert% */ 
+#xn_bar,
+#xg_foot {
+	background-color:/* %ningbarColor% */ #333333!important;
+}
+#xg_foot,
+#xg_foot a {
+	color:#ccc;
+}
+/* Font (Body Text) */
+body, select, input, textarea {
+	font-family:/* %textFont% */ "Lucida Grande", "Lucida Sans Unicode", verdana, clean, sans-serif;
+}
+/* Font (Headings) */
+#xg_masthead a,
+#xg_body h1,
+.xg_module_head h2,
+.xg_module_body h3,
+.xg_module_body caption,
+table thead th {
+	font-family:/* %headingFont% */ "Lucida Grande", "Lucida Sans Unicode", verdana, clean, sans-serif;
+}
+/* Links */
+body a {
+	color:/* %siteLinkColor% */ #0000EE;
+}
+/* Page */
+#xg_body,
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+	background-color:/* %pageBgColor% */ #CCCCCC;
+}
+#xg_body {
+	background-image:/* %pageBgImage% */  none;
+	background-repeat:/* %pageBgImage_repeat% */  no-repeat;
+}
+/* Margins */
+body {
+	background-color:/* %siteBgColor% */ #EEEEEE;
+	background-image:/* %siteBgImage% */  none;
+	background-repeat:/* %siteBgImage_repeat% */  no-repeat;
+}
+/* Page Title */
+#xg_body h1,
+#xg_body ul.navigation a,
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+	color:/* %pageTitleColor% */ #333333;
+}
+
+
+/*----------------------------------------------------------------------
+	Header & Navigation
+----------------------------------------------------------------------*/
+/* Site Name */
+#xg_masthead,
+#xg_masthead a {
+	color:/* %pageHeaderTextColor% */ #333333;
+}
+/* Header Background Color/Image */
+#xg {
+	background-color:/* %headBgColor% */ #FFFFFF;
+	background-image:/* %headBgImage% */  none;
+	background-repeat:/* %headBgImage_repeat% */  no-repeat;
+}
+/* Tab Color */
+#xg_navigation ul li a {
+	background-color:/* %headTabColor% */ #EEEEEE;
+}
+
+
+/*----------------------------------------------------------------------
+	Modules
+----------------------------------------------------------------------*/
+/* Titlebars: Background & Text */
+.xg_module_head,
+.xg_module_head a,
+table thead th,
+ul.navigation,
+ul.pagination li.this span {
+	background-color:/* %moduleHeadBgColor% */ #000000;
+	border-color:/* %moduleHeadBgColor% */ #000000;
+	color:/* %moduleHeadTextColor% */ #FFFFFF;
+}
+/* Module Body: Background & Text */
+.xg_module_body,
+.xg_module_body legend,
+.xg_module_body legend.toggle a,
+.xg_module_foot,
+ul.page_tabs li.this {
+	background-color:/* %moduleBodyBgColor% */ #FFFFFF;
+	background-image:/* %moduleBgImage% */  none;
+	background-repeat:/* %moduleBgImage_repeat% */  no-repeat;
+	color:/* %moduleBodyTextColor% */ #333333;
+}
+table tbody td,
+table tbody th {
+	border:1px solid /* %moduleBodyBgColor% */ #FFFFFF;
+}
+/* Module Body: Headings */
+.xg_module_body h3,
+.xg_module_body caption {
+	color:/* %moduleHeadingColor% */ #000000;
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<privateConfigWrapper>
+<config>
+        <version type="string" checkState="true">0.1</version>
+        <title>Gadgets</title>
+        <displayName>Gadgets</displayName>
+        <description>Gadget widget</description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">1</isEnabledDefault>
+    </config><privateConfig>
+<isEnabled type="string">0</isEnabled>
+</privateConfig>
+</privateConfigWrapper>

@@ -1,0 +1,124 @@
+body {
+	background-position: 0 -30px;
+	background-repeat: repeat-x;
+}
+.xg_widget_main_authorization .xg_module {
+	background-color: #e3e3e3;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg {
+	background-color:transparent;
+}
+#xg_masthead {
+	height: 94px;
+	min-height: 94px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead p#xg_sitename {
+	margin:0;
+	background-color:transparent;
+	text-transform: uppercase;
+	line-height:1.1em;
+	padding:40px 0 0 13px;
+}
+#xg_masthead p#xg_sitedesc {
+	padding-bottom: 0px;
+}
+#xg_navigation {
+	padding-top: 0;
+	margin-left: -1em;
+	margin-top: 14px;
+}
+#xg_navigation ul {
+	margin:0 2em;
+}
+#xg_navigation ul li {
+	margin:0pt 0pt 0pt 1px;
+}
+#xg_navigation ul li a {
+	background-color:#252525;
+	color:#6d6d6d;
+	padding:0pt 3em 1em 1em;
+	font-size: .9em;
+	border: 1px solid #000;
+	border-width: 0 1px 1px 0;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover,
+#xg_navigation ul li.this a:hover {
+	background:#252525 none;
+	color:#FFF;
+}
+#xg_navigation ul li a:hover {
+	background-color:#191919;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+	background-color:transparent;
+	padding: 2em 0pt 2em 15px;
+}
+#xg #xg_body h1 {
+    color: #5c5c5c;
+}
+.xg_module {
+	margin-bottom: 1.5em;
+}
+.xg_module_head {
+	background: url(/xn_resources/widgets/index/gfx/themes/Ezra/xg_module_head.png) repeat-x left bottom;
+	border-bottom:1px solid #5c5c5c;
+	padding:.2em 0;
+	margin-bottom:0;
+}
+.xg_module_body,
+.xg_module_foot {
+	border-bottom:1px dotted #5c5c5c;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #6C6C6C;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px dotted #5c5c5c;
+}
+#xg_body ul.navigation a {
+	color: #5c5c5c;
+}
+h3, caption, .inplace_edit input.h3 {
+	font-size:1.2em;
+	font-weight:lighter;
+	line-height:1em;
+	margin-bottom:0.6em;
+}
+ul.pagination li.this span {
+    background-color: #252525;
+    border-color: #252525;
+    color: #FFFFFF;
+}
+input.large, textarea.large, select.large {
+	margin-top:1px;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#666!important;
+}
+#xg_foot {
+    background: url(/xn_resources/widgets/index/gfx/themes/Ezra/xg_foot.gif) repeat-x;
+	padding-bottom: 0;
+}

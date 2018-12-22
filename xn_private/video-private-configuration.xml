@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<privateConfigWrapper>
+<config>
+        <version type="string" checkState="true">0.1</version>
+        <title>Videos</title>
+        <displayName>Video Sharing</displayName>
+        <description>Add this feature to your site and allow members to upload and share videos!</description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">1</isEnabledDefault>
+        <addVideoPermission type="string">all</addVideoPermission>
+    <indexing_VideoAttachment>set</indexing_VideoAttachment><indexing_Video>set</indexing_Video><indexing_VideoPreviewFrame>set</indexing_VideoPreviewFrame></config><privateConfig>
+<isEnabled type="string">1</isEnabled>
+<embeddableAccessCode type="string">bOz8TgSxfla4YFZZMoFtwbHpJMKpFUtW</embeddableAccessCode>
+<playerLogoType type="string"/>
+<playerHeaderBackground type="string"/>
+<playerLogoUrl type="string"/>
+<playerSmoothing type="string"/>
+<playerHorizontalResize type="string"/>
+<playerVerticalResize type="string"/>
+<videoMaxWidth type="string"/>
+<videoMaxHeight type="string"/>
+</privateConfig>
+</privateConfigWrapper>

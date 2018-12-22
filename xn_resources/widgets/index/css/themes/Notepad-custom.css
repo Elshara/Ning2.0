@@ -1,0 +1,52 @@
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+	height: 93px;
+	min-height: 93px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead p#xg_sitedesc {
+	padding-bottom: 1.5em;
+}
+#xg_navigation {
+    margin:0;
+	padding:0px 0px 10px 0px;
+}
+#xg_navigation ul li a {
+    background-color:transparent;
+    color:#2F2E1D;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+    background:none;
+    color:#c00;
+}
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg #xg_body h1 {
+    color: #2F2E1D;
+}
+.xg_module_head {
+	padding-left:23px;
+	background-image:url(/xn_resources/widgets/index/gfx/themes/Notepad/titlebar.gif);
+	background-repeat:no-repeat;
+	background-position:left top;
+}
+ul.pagination li.this span {
+    background-color: #2F2E1D;
+    border-color: #2F2E1D;
+    color: #F6ED91;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#666;
+}

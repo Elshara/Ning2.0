@@ -1,0 +1,84 @@
+body {
+	background-attachment: fixed;
+	background-position: center top;
+}
+#xg {
+	background-position: 0px -10px;
+}
+
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    height: 230px;
+	min-height: 230px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+
+#xg_masthead p#xg_sitename {
+	padding:25px 0pt 0pt 20px;
+	text-transform:uppercase;
+	font-size: 50pt;
+	line-height: 35pt;
+	letter-spacing: -0.-07em;
+}
+#xg_masthead p#xg_sitedesc {
+	padding:0pt 0pt 0pt 20px;
+	text-transform:uppercase;
+}
+#xg_navigation ul li {
+	text-transform:uppercase;
+}
+#xg_navigation ul li a {
+	background-color: #fff;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+	color: #fff;
+	background-color: #15bfff;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+	background-color:transparent;
+}
+h1,
+.xg_module_head h2,
+.xg_module_body h3,
+.xg_module_body caption {
+	text-transform:uppercase;
+}
+#xg #xg_body h1 {
+    color: #FFFFFF;
+}
+.xg_module_head {
+	background:transparent url(/xn_resources/widgets/index/gfx/themes/Highrise/xg_module_head.gif) repeat;
+	border-bottom: none;
+	margin-bottom:0pt;
+}
+ul.pagination li.this span {
+    background-color: #6DACCC;
+    border-color: #6DACCC;
+    color: #FFFFFF;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #333;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#999;
+}

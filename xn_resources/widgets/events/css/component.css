@@ -1,0 +1,188 @@
+/* Standard Listing Convention */
+* html ul.clist li {display:inline;} /* IE6 double margin */
+.clist h3 {
+  margin-top:0;
+  font-size:1em;
+}
+.clist p {
+  font-size:.9173em;
+  margin-bottom:0;
+}
+.item_status {font-weight:bold;}
+
+/* Calendar: a Javascript class for Mootools that adds accessible and unobtrusive date pickers to your form elements <http://electricprism.com/aeron/calendar> */
+/* Default CSS for Calendar (navigation: 1), Copyright (c) 2007 Aeron Glemann <http://electricprism.com/aeron>, MIT Style License. */
+
+div.calendar {
+	text-align: center;
+}	
+	div.calendar div {
+		background: none !important;
+		overflow: hidden;
+		position: relative;
+		width: 173px;
+	}	
+	
+	div.calendar .calendar_head {
+		padding-top: .3em;
+		text-align: center;
+    font-size:1.1em;
+    display:block;
+    font-weight:bold;
+    padding-left:0;
+	}
+	div.calendar table {
+		border: 0;
+		border-collapse: collapse;
+		border-spacing: 0;
+		margin: 0 auto;
+		overflow: hidden;
+		width: 173px;
+		font-size:1em; /*IE6 Fix */
+	}
+	div.calendar td,
+	div.calendar th {
+		border: 0;
+		height:1em;
+		text-align: center;
+		width:11%;
+		padding:2px 1%;
+	}
+	div.calendar th {
+		padding:3px 1%;
+	}
+	div.calendar td {
+		visibility:hidden;
+		cursor: default;
+	}
+	div.calendar td.past,
+	div.calendar td.future {
+		visibility:visible;
+	}
+	div.calendar td.present {
+	  visibility:visible;
+	  font-weight:bold;
+	}
+	div.calendar a {
+		cursor:pointer;
+	}
+
+ul.clist .attending, .body_events_feature-single .attending {font-weight:bold;}
+
+.body_events_feature-single span {display:block;}
+.body_events_feature-single a img {
+	border:1px solid;
+	float:left;
+	margin-left:0px;
+}
+
+.body_events_feature-single ul.clist li {
+	list-style:none;
+	overflow:hidden;
+	margin-left:0;
+}
+.body_events_feature-single li div.tb {
+	margin-left:215px;
+	margin-bottom:.8em;
+	word-wrap:break-word;
+}
+.body_events_feature-single .right a {text-decoration:none;}
+
+
+
+
+ul.clist h3 {
+	display:inline;
+}
+ul.clist span {
+	display:block;
+}
+.body_events_main ul.clist {
+	clear:both;
+	margin-left:100px;
+}
+* html .body_events_main ul.clist li { height:1%;}
+.body_events_main ul.clist li {
+	display:block;
+	list-style:none;
+	margin-left:5px;
+	overflow:hidden;
+	clear:left;
+	margin-top:1em;
+}
+.body_events_main ul.clist li a span.image {
+	float:left;
+	border:1px solid;
+	width:96px;
+	height:96px;
+	margin-bottom:.8em;
+	background-repeat:no-repeat;
+	background-position:center top;
+	display:block;
+	cursor:pointer;
+}
+.body_events_main ul.clist span.date strong {
+	font-weight:bold;
+}
+.body_events_main ul.clist li, .body_events_main ul.clist {
+	clear:none;
+	margin-top:.4em;
+}
+.body_events_main ul.clist div.tb {
+	margin-bottom:.8em;
+	margin-left:110px;
+}
+*:first-child+html .body_events_main ul.clist div.tb {height:1%;}
+* html .body_events_main ul.clist div.tb {height:1%;}
+.body_events_main h3 {
+	clear:both;
+	float:left;
+	width:auto;
+	text-align:right;
+	margin:0;
+	width:95px;
+}
+.body_events_main .tb h3 {
+	float:none;
+	width:auto;
+}
+.body_events_main h3 span {
+  font-size:.9173em;
+  font-weight:normal;
+	display:block;
+}
+.body_events_main div.wrap {
+  border-width:0 0 1px 0;
+  border-style:solid;
+	margin:.8em 0;
+	clear:both;
+}
+.body_events_main div.last-child {
+  border:0;
+}
+.body_events_main div.wrap h3.date {padding-left:0;}
+.eventDetailsShorten {
+  height:140px;
+  overflow:hidden;
+  margin-bottom:5px;
+}
+.title_simple {clear:both;}
+.title_simple .pagination {
+  margin-top:2em;
+}
+.title_simple .pagination a {
+text-decoration:none;
+}
+.title_simple .pagination a:hover {
+text-decoration:underline;
+}
+* html .texteditor {height:1%;}
+* html fieldset dd {height:1%;padding-left:1px;}
+* html .required .swatch {margin-left:0;}
+*:first-child+html .vcard-48grid {
+  padding-right:9px;
+}
+/*BAZ-7117: fixing event time selector width */
+.xg_widget_events_event_new fieldset .xg_span-16 select {font-size:0.95em;}
+#startM {width:4em;}
+#startR {width:4em;}

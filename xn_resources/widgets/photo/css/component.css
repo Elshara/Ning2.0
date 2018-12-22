@@ -1,0 +1,211 @@
+/*----------------------------------------------------------------------
+	Album Detail (1/08)
+----------------------------------------------------------------------*/
+.albuminfo .albumimg {
+	width:171px;
+	height:171px;
+	line-height:169px;
+	margin-bottom:.8em;
+}
+.body_albumdetail_main ul.clist {
+	padding-top:5px;
+}
+.body_albumdetail_main ul.clist li {
+	list-style:none;
+	margin:0;
+	float:left;
+	width:136px;
+	height:136px;
+	text-align:center;
+	line-height:134px;
+}
+.body_albumdetail_main ul.clist img {
+	border:1px solid #ccc;
+	vertical-align:middle;
+}
+
+
+/*----------------------------------------------------------------------
+	Album List (1/08)
+----------------------------------------------------------------------*/
+/* album cover for 166px square cover photos; override w/h for other sizes */
+.albumcover {
+	display:block;
+	width:171px;
+	height:171px;
+	border:1px solid #ccc;
+	border-bottom-width:3px;
+	text-indent:-9999px;
+	background:#fff center center no-repeat;
+	margin-bottom:.4em;
+}
+
+
+/*----------------------------------------------------------------------
+	Photo Detail
+----------------------------------------------------------------------*/
+.imgarea {
+	clear:both;
+}
+.mainimg p {
+  margin:.5em 0;
+}
+.mainimg .photo {
+  text-align:center;
+  min-height:200px;
+  vertical-align:middle;
+}
+* html .mainimg .photo {
+  font-size:200px;
+}
+.mainimg .photo img {
+  vertical-align:middle;
+}
+.edit_options {
+	float:right;
+	font-size:1.2em;
+	margin:0 0 1em 5px;
+}
+img.rating {
+	vertical-align:middle;
+}
+ul.photo_sorter li {
+	list-style:none;
+	margin:5px 0;
+}
+ul.photo_sorter a img {
+	padding:2px;
+}
+ul.photo_sorter li.this {
+	border:2px solid #ccc;
+}
+ul.photo_sorter img {
+	display:block;
+}
+.photo_title {
+	margin-bottom:0;
+}
+
+/*----------------------------------------------------------------------
+	PNG logo on IE6
+----------------------------------------------------------------------*/
+* html #flickrlogo {
+	display:inline-block;
+}
+* html #flickrlogo img {
+	visibility:hidden;
+}
+* html #flickrlogo {
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/xn_resources/widgets/photo/gfx/flickr/flickr.png',sizingMethod='scale');
+}
+
+
+/*----------------------------------------------------------------------
+	Albums (old)
+----------------------------------------------------------------------*/
+.album_cover {
+	float:left; display:inline;
+	position:relative;
+	margin:0 5px 1em 0;
+	border:1px solid #eee;
+	background-color:#fff;
+}
+.album_cover span  {
+	position:absolute;
+	left:-1px; top:-1px;
+	display:block;
+	border:1px solid #ddd;
+	background-color:#fff;
+}
+.album_cover span a {
+	display:block;
+	left:0; right:0;
+	border:solid #fff;
+	text-indent:-9999px;
+	overflow:hidden;
+	background-position:50% 50%;
+	background-repeat:no-repeat;
+}
+
+
+/*----------------------------------------------------------------------
+	Create an Album
+----------------------------------------------------------------------*/
+.album_head dl {
+	margin-top:17px;
+}
+.album_head dl dt {
+	width:80px;
+	text-align:right;
+}
+.album_head dl dd {
+	padding-left:85px;
+}
+.album_head dl dd label {
+	display:block;
+}
+.album_well {
+	position:relative;
+	margin-bottom:0.2em;
+	width:320px; height:425px;
+	border:1px solid; border-color:#666 #ccc #ccc #ccc;
+	background-color:#fff;
+}
+.album_well .disabled {cursor:auto;}
+.album_well .enabled {cursor:move;}
+
+.album_well .available,
+.album_well .target {
+	display:block; float:left;
+	width:70px; height:70px;
+	padding:5px;
+	position:relative;
+	z-index:2;
+}
+.album_well .slot,
+.album_well .insertSlot {
+	display:inline; float:left;
+	width:70px; height:70px;
+}
+.album_well .insertSlot {
+	width:0;
+}
+.album_well p.instruction {
+	position:absolute; top:175px; left:0px;
+	width:320px;
+	font-size:2em; font-weight:bold; text-align:center;
+	color:#ccc;
+	z-index:1;
+}
+fieldset p.album_cover {
+	margin-top:5px;
+	margin-left:0px;
+	width:70px; height:70px;
+	padding:5px;
+}
+fieldset p.album_cover span {
+	width:70px; height:60px;
+	border:6px solid #ddd;
+	background-position:50% 50%; background-repeat:no-repeat;
+	padding-top:10px;
+	font-weight:bold; font-size:0.8em; text-align:center;
+	color:#bbb;
+}
+fieldset p.album_cover span.disabled {
+	opacity:1;
+	filter:alpha(opacity=100);
+}
+fieldset p.album_cover span img {
+	margin-top:-10px;
+}
+#olderAvailablePhotos.disabled,
+#newerAvailablePhotos.disabled,
+#nextPage.disabled,
+#prevPage.disabled {
+	visibility:hidden;
+}
+.xg_widget_photo_album .showembed {top:3.25em;}
+
+.actions a.desc {
+  margin-bottom:4px;
+}

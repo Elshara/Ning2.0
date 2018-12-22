@@ -1,0 +1,410 @@
+/*----------------------------------------------------------------------
+	Fonts
+----------------------------------------------------------------------*/
+/* Font (Body Text) */
+body, select, input, button, textarea, .xg_bodyfont {
+	font-family:/* %textFont% */ "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+}
+/* Font (Headings) */
+h1, h2, h3, h4, h5, h6,
+#xg_sitename,
+.xg_headingfont {
+	font-family:/* %headingFont% */ Rockwell, Georgia, "Times New Roman", Times, serif;
+}
+#xg { font-size:1em; }
+
+/*----------------------------------------------------------------------
+	Colors
+----------------------------------------------------------------------*/
+/* Main Color */
+body,
+#xg_navigation li.this a,
+.xg_bodytexgcolor {
+	color:/* %moduleBodyTextColor% */ #333;
+}
+a, .xg_linkcolor {
+	color:/* %siteLinkColor% */ #0096ff;
+}
+a.button, button, input.button,
+a.button:hover, button:hover, input.button:hover {
+    color:/* %buttonTextColor% */ #222;
+    background:/* %siteLinkColor% */ #0096ff;
+}
+/* Margins */
+body, .xg_marginbg {
+	background-color:/* %siteBgColor% */ #fff;
+	background-image:/* %siteBgImage% */ url(../gfx/ning/bg.gif);
+	background-repeat:/* %siteBgImage_repeat% */ no-repeat;
+}
+/* Header Background Color/Image */
+#xg_head,
+#xg_head a,
+.xg_headertextcolor {
+	color:/* %pageHeaderTextColor% */ #0096ff;
+}
+#xg, .xg_headerbg {
+	background-color:/* %headBgColor% */ #fff;
+	background-image:/* %headBgImage% */ none;
+	background-repeat:/* %headBgImage_repeat% */ no-repeat;
+}
+/* Page */
+#xg_body,
+.xg_bodybg,
+.xg_floating_container {
+	background-color:/* %pageBgColor% */ #fff;
+	background-image:/* %pageBgImage% */ none;
+	background-repeat:/* %pageBgImage_repeat% */ no-repeat;
+}
+#xg_navigation ul li.this a,
+ul.page_tabs li.this {
+	background-color:/* %pageBgColor% */ #fff;
+}
+/* Module Headers */
+.xg_module_head {
+	color:/* %moduleHeadTextColor% */ #390;
+	background-color:/* %moduleHeadBgColor% */ #fff;
+}
+/* Ningbar */
+/* %ningbarInvert% */
+#xn_bar,
+.xg_ningbarbg {
+	background-color:/* %ningbarColor% */ #fff!important;
+}
+/* Footer */
+#xg_foot {
+	background-color:/* %ningbarColor% */ #fff;
+}
+
+
+/*----------------------------------------------------------------------
+	Misc
+----------------------------------------------------------------------*/
+#xn_brand,
+.xg_displaybrand {
+	display:/* %ningLogoDisplay% */ block!important;
+}
+
+/* this color is the average between moduleBodyTextColor and pageBgColor: */
+.xg_lightfont {
+	color:#909090;
+}
+hr {
+	color:#909090;
+	background-color:#909090;
+}
+/* this color is (moduleBodyTextColor + (2 * pageBgColor))/3 */
+.xg_lightborder {
+	border-style:solid;
+	border-color:#b5b5b5;
+}
+
+
+/*----------------------------------------------------------------------
+	Custom Alterations: Brings the system styles to the GYO process
+----------------------------------------------------------------------*/
+#xn_bar {
+	display:none;
+}
+
+body {
+	background-repeat: repeat-y;
+	background-position: center top;
+	border-top: 3px solid #390;
+}
+#xg, #xg_body {
+	background: transparent;
+}
+#xg {
+	width: 960px;
+}
+.xg_3col {
+	width: 680px;
+}
+.xg_widget_main_appearance .xg_3col {
+	width: 747px;
+}
+
+#xg_head {
+	width: 170px;
+	float: left;
+	padding: 24px 10px 0 0;
+}
+
+	#xg_setup {
+		height: auto;
+		background: transparent none;
+	}
+
+	#xg_head #xg_setup {
+		background: transparent url(../gfx/ning/logo.gif) no-repeat 7px 0px;
+		padding: 82px 0 0 0;
+	}
+
+	#xg_head ul.setup_progress {
+		float: none;
+		margin: 0;
+	}
+
+		#xg_head ul.setup_progress li {
+			text-align: right;
+			padding-right: 6px;
+		}
+
+		#xg_head ul.setup_progress li.last-child {
+			margin-bottom: .4em !important;
+		}
+
+			#xg_head ul.setup_progress li a {
+				color: #390;
+				font-weight: bold;
+				text-decoration: none;
+			}
+			#xg_head ul.setup_progress li a:hover {
+				background-color: #f7f8b6;
+			}
+			#xg_head ul.setup_progress li.this a, #xg_head ul.setup_progress li.this a:hover {
+				color: #fff;
+				position: relative;
+				display: block;
+				width: 172px;
+				right: -7px;
+				background: #008bed url(../gfx/ning/arrow.gif) no-repeat right center;
+				font-size: 125%;
+				font-weight: normal;
+				padding: .3em 18px .3em 0;
+				border-left: 3px solid #70bbed;
+				_margin-bottom: -15px;
+			}
+
+#xg_body {
+	width: 730px;
+	float: right;
+	padding: 2.7em 0 1em 0;
+}
+h1, h2, h3, h4, h5, h6 {
+	color: #390;
+	font-weight: normal;
+}
+h1 {
+	font-size: 300%;
+	margin-bottom: .2em;
+	padding-left: 0 !important;
+}
+h2, h3, h4 {
+	font-size: 180%;
+	margin-bottom: .5em;
+}
+#xg_body p {
+	margin-bottom: 1.5em;
+}
+#xg_body a {
+	text-decoration: none;
+}
+#xg_body a:hover {
+	text-decoration: underline;
+}
+#xg_foot {
+	display:none;
+}
+.pad {
+	padding: 0;
+}
+p big {
+	font-size: 120%;
+}
+.note {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-style: italic;
+	color: #777;
+}
+/* Forms */
+#xg_body h3#xg_preview_heading_text {
+	color: #333;
+}
+#xg_body dl dt {
+	color: #666;
+	font-weight: bold;
+}
+#xg_body fieldset.networkinfo {
+	width: auto;
+}
+#xg_body form fieldset.networkinfo dl {
+	clear: both;
+	margin-bottom: 0;
+}
+
+#xg_body form fieldset.networkinfo dl.first {
+	border-top: none;
+}
+
+	#xg_body form fieldset.networkinfo dl dt {
+		float: left;
+		width: 160px;
+		color: #390;
+		font-size: 110%;
+		font-weight: normal;
+		text-align: right;
+		padding: 10px 10px 0 0;
+		line-height:1.5em;
+	}
+
+	#xg_body form fieldset.networkinfo dl dd {
+		float: left;
+		width: 490px;
+		padding: 6px 0;
+	}
+
+	#xg_body form fieldset.networkinfo dl dd.textonly {
+		font-size: 110%;
+		padding-top: 8px;
+		padding-bottom: 8px;
+	}
+
+		#xg_body form fieldset.networkinfo dl dd small {
+			font: italic 95% Georgia, "Times New Roman", Times, serif;
+		}
+
+		#xg_body form fieldset.networkinfo dl dd ul.options {
+			list-style: none;
+			margin-bottom: 0;
+		}
+
+			#xg_body form fieldset.networkinfo dl dd ul.options li {
+				margin-bottom: 0;
+			}
+
+	#xg_body form fieldset.networkinfo dl img {
+		border: 3px solid #e8eef0;
+	}
+
+	#xg_body form fieldset.networkinfo input.textfield, #xg_body form fieldset.networkinfo input.password, #xg_body form fieldset.networkinfo textarea, #xg_body form fieldset.networkinfo select {
+		width: 480px;
+		color: #252b31;
+		font: 130% Georgia, "Times New Roman", Times, serif;
+		padding: 4px;
+        border: 1px solid #aaa;
+        background: none;
+	}
+
+	#xg_body form fieldset.networkinfo select {
+		width: auto;
+		padding: 2px 1px;
+	}
+
+	#xg_body form fieldset.networkinfo button {
+		float: right;
+		background: #008bed url(../gfx/ning/teal_arrow.gif) no-repeat right center;
+		color: #fff;
+		font: 130% Rockwell, Georgia, "Times New Roman", Times, serif;
+		padding: 5px 16px 3px 5px;
+		border: none;
+		border-left: 3px solid #fff;
+	}
+
+	#xg_body form fieldset.networkinfo button:hover {
+		border-left-color: #7dbeec;
+	}
+
+ul.setup_nav {
+	float: none;
+	clear: both;
+	width: 680px;
+	padding-top: 1em;
+}
+ul.setup_nav_top {
+	float:right;
+	clear: none;
+}
+#xg_setup_back_header {
+	margin-right: 5px;
+	float: left;
+	list-style:none;
+}
+#xg_setup_next_header {
+	float: right;
+}
+#xg_setup_next_header, #xg_setup_back_header {
+	background: transparent none;
+}
+#xg_setup_next_header_top {
+	font-size: 1.2em;
+	color: #666;
+}
+#xg_setup_next_header a, #xg_setup_back_header a, #xg_setup_next_header_top a {
+	font: 150% Rockwell, Georgia, "Times New Roman", Times, serif;
+}
+#xg_setup_next_header_top a {
+	text-decoration: underline;
+}
+#xg_setup_next_header a, #xg_setup_back_header a, #xg_setup_next_header_top a.next {
+	background: #008bed url(../gfx/ning/teal_arrow.gif) no-repeat right center;
+	color: #fff;
+	text-decoration: none;
+	padding: 5px 16px 5px 7px;
+	border: none;
+	border-left: 3px solid #fff;
+}
+#xg_setup_back_header a {
+	background-image: url(../gfx/ning/teal_arrow_reverse.gif);
+	background-position: left center;
+	padding: 5px 7px 5px 16px;
+	border-left: none;
+	border-right: 3px solid #fff;
+}
+#xg_setup_next_header_top a.next {
+	display: inline-block;
+}
+#xg_setup_next_header a:hover, #xg_setup_back_header a:hover, #xg_setup_next_header_top a.next:hover {
+	text-decoration: none;
+	border-color: #7dbeec;
+}
+#xg_setup_next_header_top {
+	float: right;
+	padding-top: 1em;
+    color:#666666;
+    font-size:1.2em;
+}
+fieldset.appearance {
+	width: 450px;
+}
+* html fieldset.appearance {
+  width:405px;
+}
+div.errordesc {
+	background: #fdd url(../gfx/ning/error-body.png) repeat-x left bottom;
+	padding: 1em 1em .5em 1em;
+	border: none;
+	margin-bottom: 1.2em !important;
+}
+div.errordesc ul {
+	list-style: none;
+	margin: 0;
+}
+div.errordesc ul li {
+	background: transparent url(../gfx/ning/exclamation.gif) no-repeat 0px 2px;
+	list-style: none;
+	padding: 0 0 .5em 20px;
+}
+div.errordesc a {
+	color: #333;
+	font-weight: bold;
+	text-decoration: underline;
+}
+#xg_body form fieldset.networkinfo dl dt.error {
+	color: #c3402f;
+	font-weight: bold;
+}
+#xg_body form fieldset.networkinfo dl dt.error label {
+	background-color: transparent;
+	color: #c3402f;
+}
+#xg_body form fieldset.networkinfo dl dd.error {
+	background: transparent url(../gfx/ning/error_arrow.gif) no-repeat 0px 15px;
+}
+.xg_widget_main_admin_appProfile #xg_body form fieldset.networkinfo dl dd.error {
+	background: none;
+}
+#xg_body form fieldset.networkinfo dl dd.error input.textfield {
+	background-color: #ecd3d3;
+	border: 1px solid #ef5858;
+}

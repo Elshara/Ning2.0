@@ -1,0 +1,60 @@
+body {
+    background-position: center top;
+    background-attachment: fixed;
+	background-repeat: repeat-y;
+}
+
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    min-height:120px;
+}
+* html #xg_masthead {
+    height:120px;
+}
+#xg_navigation ul li a {
+    color:#fff;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+    background-color:#f3f3f3;
+	color: #930;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg #xg_body h1 {
+    color: #930;
+}
+ul.pagination li.this span {
+    background-color: #bbb;
+    border-color: #bbb;
+    color: #fff;
+}
+
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #666;
+}
+
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #ccc;
+}
+#xg_body ul.navigation a {
+	color: #930;
+}
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#CCCCCC;
+}

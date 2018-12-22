@@ -1,0 +1,110 @@
+body {
+	background-position: center top;
+	background-repeat: repeat-x;
+}
+#xg {
+	background-color: transparent;
+	background-position: center -28px;
+}
+
+
+/*----------------------------------------------------------------------
+	Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_head {
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Pavement/xg_masthead-v2.jpg) no-repeat 0px 39px;
+	margin: 0 10px;
+}
+#xg_masthead {
+	height: 116px;
+	min-height: 116px;
+	color:#fff;
+	padding-top: 40px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead p#xg_sitename {
+	font-size:5.4em;
+	line-height: 100%;
+	letter-spacing: -.05em;
+	text-transform: lowercase;
+	padding: 15px 0 0 0;
+	margin: 0;
+}
+#xg_masthead p#xg_sitedesc {
+	font-family: Futura, "Avant Garde", "Century Gothic", "Gill Sans MT", sans-serif;
+	color:#A12525;
+	font-size:1.4em;
+	padding: 0 0 0 .2em;
+	margin-bottom: 2em;
+}
+#xg_navigation {
+	background: transparent url(/xn_resources/widgets/index/gfx/themes/Pavement/xg_navigation.jpg) no-repeat center center;
+	font-family: Futura, "Avant Garde", "Century Gothic", "Gill Sans MT", sans-serif;
+	margin: 0;
+}
+#xg_navigation ul {
+	margin-left:0;
+}
+#xg_navigation ul li a {
+	display:block;
+	float:left;
+	color:#FFFFFF;
+	background-color:transparent;
+	font-weight:normal;
+	line-height:32px;
+	margin:0pt 0pt 0pt .3em;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+	background-color:transparent;
+	color:#000;
+}
+#xg_navigation ul li.this a {
+	font-weight: bold;
+}
+
+/*----------------------------------------------------------------------
+	Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+	background-color: transparent;
+	padding-top: 4em;
+}
+#xg #xg_body h1,
+.xg_module_body h3,
+.xg_module_body caption {
+	color: #FFFFFF;
+	font-weight: normal;
+}
+.xg_module_head h2 {
+	font-size: 1.3em;
+	margin:0pt;
+}
+.xg_module_body,
+.xg_module_foot {
+	background-color:#111113;
+}
+ul.pagination li.this span {
+    border-color: #111113;
+    color: #FFFFFF;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #333;
+}
+#xg_body ul.navigation a {
+	color: #fff;
+}
+
+/*----------------------------------------------------------------------
+	Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+	color: #3F484B;
+	background-color: transparent;
+}

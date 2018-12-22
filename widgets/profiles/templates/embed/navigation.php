@@ -1,0 +1,1 @@
+<?php $this->renderPartial('fragment_navigation', '_shared', array('screenName' => $this->screenName)) ?>

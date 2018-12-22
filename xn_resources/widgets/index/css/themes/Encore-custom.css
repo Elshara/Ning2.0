@@ -1,0 +1,77 @@
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    min-height:180px;
+}
+* html #xg_masthead {
+	height:180px;
+}
+#xg_masthead p#xg_sitename {
+    font-size:4em;
+}
+#xg_navigation {
+    margin:0 0 1em 0;
+}
+#xg_navigation ul li {
+    padding-left: 10px;
+    background: url(/xn_resources/widgets/index/gfx/themes/Encore/xg_navigation_ul_li.gif) no-repeat left center;
+}
+#xg_navigation ul li:first-child { /* Won't work in IE6, but not functionally important */
+    padding-left:0;
+    background:none;
+}
+#xg_navigation ul li a {
+    color:#d91313;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+    background:transparent none;
+    color:#fff;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+h1,
+.xg_module_head h2,
+.xg_module_body h3,
+.xg_module_body caption {
+	font-weight: normal;
+}
+#xg #xg_body h1 {
+    color: #929292;
+}
+.xg_module_head h2 {
+    background:url(/xn_resources/widgets/index/gfx/themes/Encore/xg_module_head.gif) no-repeat 0 4px;
+    font-size:150%;
+    text-transform:lowercase;
+    padding:0 0 0 15px;
+}
+ul.pagination li.this span {
+    color: #464646;
+	border-color: #fff;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #929292;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #ddd;
+}
+#xg_body ul.navigation a {
+	color: #929292;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#CCCCCC;
+}

@@ -1,0 +1,18 @@
+/*----------------------------------------------------------------------
+	Page
+----------------------------------------------------------------------*/
+.wpage {
+	clear:left;
+	margin-bottom:2em;
+}
+.wpage h3 small {
+	font-size:75%; font-weight:lighter;
+}
+.actionpadding {
+	padding:10px 0;
+}
+.buttongroup .spinner {
+	width:20px; height:20px;
+	margin-right:3px;
+	vertical-align:top;
+}

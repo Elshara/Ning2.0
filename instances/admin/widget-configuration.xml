@@ -1,0 +1,8 @@
+<widget id="1" root="admin">
+<name>admin</name>
+  <config>
+        <version type="string" checkState="true">0.1</version>
+        <debug></debug>
+        <logMessaging type="number">0</logMessaging>
+  </config>
+</widget>

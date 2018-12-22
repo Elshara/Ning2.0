@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<widget id="82" root="feed">
+    <name>feed</name>
+    <config>
+        <version type="string" checkState="true">0.1</version>
+    	<title>RSS</title>
+        <displayName>RSS Box</displayName>
+        <description>Shows a list of news items or photos from an RSS or Atom feed.</description>
+        <isMozzle type="number">1</isMozzle>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">1</isEnabledDefault>
+    </config>
+    <privateConfig>
+        <isEnabled/>
+    </privateConfig>
+</widget>

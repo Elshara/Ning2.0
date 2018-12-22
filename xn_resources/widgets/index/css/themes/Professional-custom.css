@@ -1,0 +1,75 @@
+#xg_body,
+.xg_bodybg,
+.xg_floating_container {
+	background-repeat: repeat-x;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    min-height: 88px;
+    padding-top: 90px;
+}
+
+* html #xg_masthead {
+    height: 88px;
+}
+
+#xg_navigation {
+    border-bottom: 6px solid #2079b9;
+}
+
+	#xg_navigation ul li.this {
+	    background: #2079b9 url(/xn_resources/widgets/index/gfx/themes/Professional/xg_navigation_ul_li.gif) no-repeat 0 0;
+	}
+
+		#xg_navigation ul li a {
+			color: #2079B9;
+		}
+
+		#xg_navigation ul li a:hover {
+			color: #fff;
+		}
+
+		#xg_navigation ul li.this a {
+			color: #fff;
+		    background: url(/xn_resources/widgets/index/gfx/themes/Professional/xg_navigation_ul_li_a.gif) no-repeat right top;
+		}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+	background-position: left bottom;
+}
+#xg_body a:hover {
+	color: #1A3459;
+}
+#xg_body h1,
+.xg_module_head,
+.xg_module_body h3,
+.xg_module_body caption {
+	color: #1a3459;
+}
+.xg_module_head {
+    border-bottom: 2px solid #b5daf5;
+}
+.notitle {
+    display:none!important;
+}
+ul.pagination li.this span {
+    border-color: #fff;
+    color: #1a3459;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color: #ccc;
+	background-color: transparent;
+}

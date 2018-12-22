@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<widget id="91" root="video">
+    <name>video</name>
+    <config>
+        <version type="string" checkState="true">0.1</version>
+        <title>Videos</title>
+        <displayName>Video Sharing</displayName>
+        <description>Add this feature to your site and allow members to upload and share videos!</description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">1</isEnabledDefault>
+        <addVideoPermission type="string">all</addVideoPermission>
+    <indexing_VideoAttachment>set</indexing_VideoAttachment><indexing_Video>set</indexing_Video><indexing_VideoPreviewFrame>set</indexing_VideoPreviewFrame></config>
+    <privateConfig>
+        <isEnabled/>
+        <embeddableAccessCode/>
+        <playerLogoType/>
+        <playerHeaderBackground/>
+        <playerLogoUrl/>
+        <playerSmoothing/>
+        <playerHorizontalResize/>
+        <playerVerticalResize/>
+        <videoMaxWidth/>
+        <videoMaxHeight/>
+    </privateConfig>
+</widget>

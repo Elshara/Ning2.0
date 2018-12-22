@@ -1,0 +1,111 @@
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    height: 210px;
+	min-height: 210px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead p#xg_sitename {
+    padding:75px 0 0 40px;
+	margin:0;
+    background-color:transparent;
+}
+#xg_masthead p#xg_sitedesc {
+	background-color:transparent;
+    padding:0 0 0 40px;
+    margin:0;
+}
+#xg_head {
+	position:relative;
+}
+#xg_navigation {
+	position:absolute;
+	right:30px;
+	top:50px;
+	width: 300px;
+	margin: 0;
+}
+#xg_navigation ul {
+	padding: 0;
+	margin: 0;
+}
+#xg_navigation ul li {
+	display:block;
+	float:left;
+	width:130px;
+	font-size:90%;
+	text-transform:uppercase;
+	text-align:right;
+	padding: 0;
+	border-bottom:1px dotted #C7B493;
+	margin:0 20px 0 0;
+}
+#xg_navigation ul li a,
+#xg_navigation ul li span {
+	display:block;
+    background-color:transparent;
+    color:#CC6600;
+	text-decoration:none;
+	line-height:180%;
+}
+#xg_navigation ul li a:hover {
+    background-color:transparent;
+    color:#7A0808;
+}
+#xg_navigation ul li.this {
+    background: url(/xn_resources/widgets/index/gfx/themes/Quill/arrow.gif) no-repeat 0 50%;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+    background: transparent none;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+    background-color:transparent;
+	padding-top: 0;
+}
+.xg_module_head {
+    margin-bottom:0;
+    background-image: url(/xn_resources/widgets/index/gfx/themes/Quill/xg_module_head.jpg);
+ 	background-repeat: repeat-x;
+    border-bottom:1px dotted #AE9A78;
+}
+.xg_module_body {
+    background:url(/xn_resources/widgets/index/gfx/themes/Quill/xg_module_body.jpg) repeat-x;
+    border-top:1px dotted #DEC599;
+}
+.xg_module_foot {
+    background-color:transparent;
+    border-top:1px dotted #AE9A78;
+    border-bottom:1px dotted #AE9A78;
+}
+.activityitem {
+    border-right:1px dotted #DAD1BF;
+    border-left:1px dotted #DAD1BF;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px dotted #dec599;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot {
+	background: #3c110a url(/xn_resources/widgets/index/gfx/themes/Quill/xg_foot.jpg) repeat-x;
+	padding-bottom: 0;
+}
+#xg_foot,
+#xg_foot a {
+	color: #ccc;
+}

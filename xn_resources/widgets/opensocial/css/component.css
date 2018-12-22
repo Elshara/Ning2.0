@@ -1,0 +1,99 @@
+/*----------------------------------------------------------------------
+	OpenSocial
+----------------------------------------------------------------------*/
+
+/* Container frame */
+._opensocial_container  {
+  font-size: smaller;
+}
+
+/* Gadget frame */
+._opensocial_gadget {
+}
+
+/* div for iframe */
+._opensocial-gadget-chrome {
+  width: 100%;
+  float: none;
+  margin: auto;
+}
+p.options a {
+  margin-right:10px;
+}
+
+/*OpenSocial Applications*/
+ul.categories li.this {font-weight:bold;}
+.module_application .clist li {
+  list-style:none;
+  border-width:0 0 1px;
+  padding-bottom:1.5em;
+  margin-bottom:1.5em;
+  margin-left:0;
+  zoom:1;
+}
+.module_application .clist li.last-child {border-bottom-width:0;margin-bottom:0;padding-bottom:.25em;}
+.module_application .clist .ib {
+  float:left;
+  width:120px;
+  height:60px;
+  overflow:hidden;
+}
+.module_application .clist .ib img {
+  max-height:60px;
+  max-width:120px;
+}
+.module_application .clist .tb {
+  margin-left:132px;
+}
+.module_application .clist h3 {
+  font-weight:bold;
+  margin:0 0 .4em;
+}
+.module_application .clist .description {
+  font-size:1em;
+  display:inline;
+}
+.module_application .clist .details {
+  margin:.4em 0 0;
+}
+.module_application .clist .details img {
+  margin:1px 7px 0 0;
+  vertical-align:top;
+}
+.module_application .clist .button {margin-bottom:4px;}
+.module_application .clist .item_ratings {
+  float:right;
+  font-size:0.9173em;
+  text-align:right;
+  margin-top:4px;
+}
+.module_application .clist .item_ratings a {
+  display:block;
+  margin-left:3px;
+}
+.module_reviews dl dd {
+  display:block;
+}
+p.item_add_url {
+  margin-bottom:0;
+}
+p.item_add_url a.add {
+  font-size:1em;
+}
+.body_loading {
+  height:500px;
+  background-image:url(../../index/gfx/spinner.gif);
+  background-repeat:no-repeat;
+  background-position:center center;
+}
+.body_loading iframe {display:none;}
+.module_application .body_loading {
+  height:140px;
+}
+.item_screenshot img {
+  max-height:1000px;
+  _height:expression(this.height > 1000 ? 1000: true);
+}
+p.item_add-button {text-align:center;margin:0;}
+
+dl ul.rating-small {margin:5px 0;}

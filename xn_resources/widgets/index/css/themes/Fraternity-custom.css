@@ -1,0 +1,77 @@
+body {
+    background-position: top center;
+	background-repeat: repeat-y;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    padding: 24px 0 0 256px;
+}
+
+	#xg_masthead p#xg_sitename {
+	    font-variant: small-caps;
+	}
+
+		#xg_masthead p#xg_sitename a {
+		    font-size: 180%;
+		}
+		
+#xg_navigation {
+    border-bottom:7px solid #696969;
+	background:#FFFFFF url(/xn_resources/widgets/index/gfx/themes/Fraternity/xg_navigation.jpg) repeat-x top center;
+	font-size:120%;
+}
+
+	#xg_navigation ul li a {
+	    font-weight: normal;
+	    font-variant: small-caps;
+	    font-family: Georgia, "Times New Roman", serif;
+	    background-color: transparent;
+	}
+
+	#xg_navigation ul li.this a,
+	#xg_navigation ul li a:hover {
+	    color: #fff;
+	    background: #666 url(/xn_resources/widgets/index/gfx/themes/Fraternity/xg_tab.gif) repeat-x top center;
+	}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+    background-position: top left;
+}
+
+#xg #xg_body h1,
+.xg_module_head,
+.xg_module_body h3,
+.xg_module_body caption {
+	color: #501100;
+}
+
+.notitle {
+    display:none!important;
+}
+
+ul.pagination li.this span {
+    color: #3e3e3e;
+	background-color: #EAD385;
+    border-color: #EAD385;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot {
+    color: #999;
+}
+
+#xg_foot a {
+	color: #ccc;
+}
+
+

@@ -1,0 +1,337 @@
+.module_user_summary ul.nobullets li a {font-size:.95em;}
+
+
+
+
+p.ningid {
+	padding-left:30px;
+	margin-left:-3px;
+	background:url(/xn_resources/widgets/index/gfx/ning/ningid.gif) no-repeat 0 3px;
+	line-height:2em;
+}
+/* Profile page specific */
+.profile input.textfield,
+.profile textarea {
+	width:455px;
+}
+.profile dl input.textfield {
+	width:250px;
+}
+.profile input.url {
+	width:400px;
+}
+.profile input.date {
+	width:3em;
+}
+.profile select.date {
+	width:80px;
+}
+.xg_widget_profiles_settings_editProfileInfo .profile dt {
+  text-align:right;
+}
+.xg_widget_profiles_settings_editProfileInfo p label {
+  font-weight:normal;
+}
+
+/* new blog details pages */
+.xg_blog h3.title {
+  font-size:1.6em;
+	position:relative;
+	margin:0 0 5px 60px;
+	height:1%;
+  padding:0 !important;
+  background-image:none !important;
+}
+.xg_blog_mypage h3.title {
+	margin-left:0;
+}
+.xg_blog h3 img {
+  float:left;
+	margin-left:-60px;
+	margin-bottom:5px;
+}
+* html .xg_blog h3 img {
+  position:relative;
+}
+.xg_blog .postbody {
+  clear:left;
+  font-size:1.2em;
+  margin-bottom:.7em;
+}
+.xg_blog .postbody .adminbox {font-size:.8333em}
+
+.xg_widget_profiles_blog_new p label {
+   display:block;
+   margin-bottom:0.3em;
+}
+.xg_blog .xg_module_body p.small {
+  clear:both;
+}
+
+/*module profile*/
+.xg_module_body dl dd {
+	margin:0;
+}
+.module_about_user dl {
+  clear:both;
+}
+.module_about_user .xg_module_body dl dd {
+	margin-left:10px;
+}
+.profile dl dt span {
+	display:block;
+	font-weight:normal;
+	font-size:.95em;
+}
+.profile dl dt.fn span.fn {
+	font-weight:bold;
+	font-size:1em;
+}
+
+/* Email Settings */
+.clear_follow_list {
+  line-height:2em;
+}
+.never_email {
+  border-top:1px dotted;
+  margin-top:.5em;
+  padding-top:.5em
+}
+.body_add_modules ul.panel {
+	margin:0;
+}
+.body_add_modules ul.panel li {
+	margin:3px 0;
+	list-style:none;
+}
+.body_add_modules ul.panel li a {
+	padding:1px 0 1px 18px;
+	padding:1px 0 1px 0px;
+	text-decoration:none;
+	display:block;
+}
+
+.placeholder {
+  border:3px dashed;
+}
+.xg_module .xg_handle {
+  position:absolute;
+  height:17px;
+  width:17px;
+  background:transparent url(/xn_resources/widgets/profiles/gfx/icon/dragIcon.gif) no-repeat center center;
+  text-indent:-9999px;
+  display:none;
+  top:2px;
+  left:-19px;
+  z-index:999;
+  _display:none !important;
+}
+.draggable {cursor:move;}
+.no_cross_container .xg_handle {background-image: url(/xn_resources/widgets/profiles/gfx/icon/dragIcon-vertical.gif);}
+.no_drag .xg_handle {background-image: url(/xn_resources/widgets/profiles/gfx/icon/dragIcon-noDrag.gif);}
+.ui-sortable-helper {
+  display:block;
+  width:163px !important;
+  height:120px !important;
+  background: #fff;
+  color:#333;
+  border: 2px solid #ccc;
+  padding: 2px 8px;
+  z-index: 999;
+  font-size:1.2em;
+  font-weight:bold;
+	opacity:.8; filter:alpha(opacity=80);
+	left:-9999px;
+	top:-9999px;
+}
+.ui-sortable-helper div.sortable-inner {
+  height:120px;
+  background-position:center center;
+  overflow:hidden;
+  cursor:move;
+}
+div.ui-sortable-helper div.sortable-inner {background-image: url(/xn_resources/widgets/profiles/gfx/icon/dragBG-multi.gif);}
+div.no_cross_container div.sortable-inner {background-image: url(/xn_resources/widgets/profiles/gfx/icon/dragBG-vertical.gif);}
+div.ui-sortable-helper div.sortable-nodrop {background-image: url(/xn_resources/widgets/profiles/gfx/icon/dragBG-nodrop.gif);}
+body {position:relative;}
+#inbox_search p {
+	font-size:1.08em;
+	padding-right:15px;
+	margin-top:1em;
+}
+#xg_compose_tab {
+	padding-top:4px;
+	float:right;
+	border-style:none; border-width:0;
+}
+#xg_compose_tab a {
+  font-weight:bold;
+  font-size:1em;
+  line-height:1.2em;
+  padding:0 0 0 17px;
+	border-style:none; border-width:0;
+}
+table.mail {
+	margin-bottom:1em;
+	*border-collapse:separate;
+}
+table.mail td.first-child {
+	text-align:center;
+}
+table.mail th select {
+	margin-left:10px;
+}
+table.mail thead th {
+	font-weight:normal;
+}
+table.mail td,
+table.mail th {
+	vertical-align:middle;
+}
+table.mail tr {
+	border-width:0 0 1px;
+}
+table.mail tr td {
+	*border-bottom:1px solid !important;
+	line-height:1.3em;
+}
+table.mail tr td a {
+	text-decoration:none;
+}
+table.mail tr td a:hover {
+	text-decoration:underline;
+}
+.success p,
+.nomargin {
+	margin:0;
+}
+.highlight {
+	background-color:#f7f8b6;
+}
+
+/* Friend Requests */
+.request {
+	clear:left;
+	border-width:0 0 1px;
+	padding:10px 0 10px 76px;
+	position:relative;
+	min-height:66px;
+	*height:66px;
+}
+.request img {
+	border-width:1px;
+	display:block;
+	position:absolute;
+	left:0;
+}
+.request blockquote {
+	border:none;
+	margin:0;
+	padding:0;
+	font-style:normal;
+}
+.request a.name {
+	font-weight:bold;
+}
+.request small {
+	font-size:.9em;
+}
+p.buttons {
+	padding:10px 0 0 76px;
+}
+.request a.sendmessage {
+	margin-left:.5em;
+}
+
+/* Message Detail */
+.title_detail {
+	margin-bottom:0;
+	clear:left;
+}
+.title_detail p {
+	line-height:1.3em;
+	margin-bottom:0;
+	margin-left:76px;
+}
+#message-reply-actions {
+	overflow:auto;
+	padding:0;
+	margin:0;
+}
+#message-detail-actions {
+	padding:8px 0;
+	border-width:1px 0;
+	margin:1.2em 0;
+}
+#message-detail-actions li, #message-reply-actions li {
+	float:left;
+	list-style:none;
+	padding:0;
+	margin:0 10px 0 0;
+}
+#message-detail-actions li.last-child, #message-reply-actions li.last-child {
+	float:right;
+	margin-right:0;
+}
+blockquote {
+	font-style:normal;
+	font-size: 1.2em;
+}
+fieldset.nolegend dd ul.recipient-delete {
+	font-size:1em;
+}
+fieldset.nolegend dd ul.recipient-delete li {
+	float:left;
+	list-style:none;
+	padding:0;
+	margin:0 .5em 0 0;
+}
+fieldset.nolegend dd ul li a.recipient-delete {
+	display:block;
+	float:left;
+	height:10px;
+	width:10px;
+	text-indent:-5000px;
+	margin:.4em 4px 0 0;
+	_margin-top:0;
+}
+fieldset.nolegend dd small {
+	font-size:.84em;
+}
+fieldset.nolegend dd p.toggle {
+	font-size:1em;
+	margin-top:.3em;
+}
+fieldset.nolegend p.buttons {
+	padding-left:120px;
+}
+fieldset.nolegend input#recipients,
+fieldset.nolegend input#subject,
+fieldset.nolegend textarea {
+	width:98%;
+}
+.xg_widget_profiles_message_new fieldset.nolegend textarea {
+	width:587px;
+	display:block;
+}
+.xg_widget_profiles_message_reply fieldset.nolegend dd ul.recipient-delete li.leftpad {
+	padding-left:10px;
+}
+fieldset.profile p textarea {
+	width:455px;
+}
+#friends {
+	width:392px;
+	padding-left:16px;
+}
+#friends input {
+	margin-bottom:.5em;
+}
+#friends .friend_list {
+	height:220px;
+	font-size:.92em;
+}
+form#xg_mail_compose {
+	padding-top:1em;
+}
+.xg_widget_profiles_message #xj_list_body {*clear:both;zoom:1;}

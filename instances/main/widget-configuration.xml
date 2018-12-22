@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<widget id="2" root="index">
+<name>main</name>
+<config>
+    <version type="string" checkState="true">0.1</version>
+    <appSubdomain type="string">VloggerClub</appSubdomain>
+    <launched type="number">1</launched>
+    <prelaunchStepsCompleted type="string">About+Your+Site%3AFeatures%3AAppearance</prelaunchStepsCompleted>
+    <mainFeature type="string">events</mainFeature>
+    <userCssVersion type="number">3</userCssVersion>
+    <siteBgImageName></siteBgImageName>
+    <headBgImageName></headBgImageName>
+    <pageBgImageName></pageBgImageName>
+    <moduleBgImageName></moduleBgImageName>
+    <logoImageName></logoImageName>
+    <logoImageUrl></logoImageUrl>
+    <darkNingbarText>0</darkNingbarText>
+    <appPrivacy>private</appPrivacy>
+    <allowInvites>no</allowInvites>
+    <allowRequests>no</allowRequests>
+    <nonregVisibility>everything</nonregVisibility>
+    <tagline>Join the Vlogger Club!</tagline>
+    <description>A community of videomakers - vloggers and more!</description>
+    <moderate>no</moderate>
+    <tzOffset>300</tzOffset>
+    <tzUseDST>1</tzUseDST>
+    <locale>en_US</locale>
+    <appCodeVersion>3.7.1:9983</appCodeVersion>
+    <customCssVersion type="number">3</customCssVersion>
+<headingFont>Georgia, "Times New Roman", Times, serif</headingFont><siteLinkColor>283F4B</siteLinkColor><ningbarColor>3F484B</ningbarColor><ningLogoDisplay>block!important</ningLogoDisplay><localeHasCustomCatalog>0</localeHasCustomCatalog><languageVersion>2</languageVersion><membersCanCustomizeTheme>yes</membersCanCustomizeTheme><membersCanCustomizeLayout>yes</membersCanCustomizeLayout><indexing_User>set</indexing_User><customLocales>[]</customLocales><adColors>a:4:{s:2:"bg";s:6:"FFFFFF";s:4:"link";s:6:"283F4B";s:4:"text";s:6:"333333";s:3:"url";s:6:"283F4B";}</adColors><allowJoin>invited</allowJoin><addFeaturesSortOrder>a:18:{s:8:"activity";i:10;s:12:"_description";i:20;s:8:"_members";i:30;s:5:"photo";i:40;s:5:"video";i:50;s:5:"forum";i:60;s:6:"events";i:70;s:6:"groups";i:80;s:8:"profiles";i:90;s:4:"chat";i:100;s:5:"music";i:110;s:5:"notes";i:120;s:4:"html";i:130;s:4:"feed";i:140;s:7:"_badges";i:150;s:4:"_ads";i:160;s:10:"_createdBy";i:170;s:7:"gadgets";i:180;}</addFeaturesSortOrder><typography>normal</typography><disableMusicDownload>yes</disableMusicDownload><indexing_Comment>set</indexing_Comment><moderateGroups>no</moderateGroups><moderateMembers>yes</moderateMembers><onlyAdminsCanCreateGroups>no</onlyAdminsCanCreateGroups><onlyAdminsCanCreateEvents>no</onlyAdminsCanCreateEvents><siteTabLayout>a:2:{s:4:"tabs";a:6:{s:4:"main";O:6:"XG_Tab":7:{s:6:"tabKey";s:4:"main";s:3:"url";s:1:"/";s:5:"label";s:4:"Main";s:10:"visibility";s:3:"all";s:12:"windowTarget";N;s:8:"isSubTab";b:0;s:6:"pageId";N;}s:6:"invite";O:6:"XG_Tab":7:{s:6:"tabKey";s:6:"invite";s:3:"url";s:7:"/invite";s:5:"label";s:6:"Invite";s:10:"visibility";s:6:"member";s:12:"windowTarget";N;s:8:"isSubTab";b:0;s:6:"pageId";N;}s:7:"profile";O:6:"XG_Tab":7:{s:6:"tabKey";s:7:"profile";s:3:"url";s:9:"/profiles";s:5:"label";s:7:"My Page";s:10:"visibility";s:3:"all";s:12:"windowTarget";N;s:8:"isSubTab";b:0;s:6:"pageId";N;}s:7:"members";O:6:"XG_Tab":7:{s:6:"tabKey";s:7:"members";s:3:"url";s:18:"/profiles/members/";s:5:"label";s:7:"Members";s:10:"visibility";s:3:"all";s:12:"windowTarget";N;s:8:"isSubTab";b:0;s:6:"pageId";N;}s:5:"video";O:6:"XG_Tab":7:{s:6:"tabKey";s:5:"video";s:3:"url";s:6:"/video";s:5:"label";s:6:"Videos";s:10:"visibility";s:3:"all";s:12:"windowTarget";N;s:8:"isSubTab";b:0;s:6:"pageId";N;}s:6:"manage";O:6:"XG_Tab":7:{s:6:"tabKey";s:6:"manage";s:3:"url";s:18:"/main/admin/manage";s:5:"label";s:6:"Manage";s:10:"visibility";s:5:"admin";s:12:"windowTarget";N;s:8:"isSubTab";b:0;s:6:"pageId";N;}}s:12:"subTabColors";a:4:{s:9:"textColor";s:7:"#666666";s:14:"textColorHover";s:7:"#333333";s:15:"backgroundColor";s:7:"#F2F2F2";s:20:"backgroundColorHover";s:7:"#CFDCE2";}}</siteTabLayout></config>
+<privateConfig>
+ <googleMapsApiKeys/>
+ <appPrivacySet type="number"/>
+ <tzSet type="number"/>
+ <noMessageInNotification type="number"/>
+ <nextEmbedInstanceId type="number"/>
+<embeds_backgroundColor/><embeds_badgeLogoImageUrl/><embeds_displayNameInPlayer/><embeds_networkNameColor/><embeds_resourceGenerationTime/><asyncJobKeyGracePeriodStart/><csrfTokenGracePeriodStart/><asyncJobKey/><csrfSalts/><optOutCipher/></privateConfig>
+</widget>

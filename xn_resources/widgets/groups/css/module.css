@@ -1,0 +1,25 @@
+.xg_1col .module_groups ul.clist li, .xg_span-4 .module_groups ul.clist li {
+  float:none;
+  display:block;
+}
+.xg_1col .module_groups .clist li, .xg_span-4 .module_groups .clist li {
+  border-width:0 0 1px;
+  border-bottom-style:solid;
+  padding:4px 0;
+  _height:44px;
+  _overflow-y:visible;
+}
+.xg_1col .module_groups .ib, .xg_span-4 .module_groups .ib {float:left;width:40px;}
+.xg_1col .module_groups .tb, .xg_span-4 .module_groups .tb {margin-left:48px;}
+.xg_1col .module_groups .clist li.last-child, .xg_span-4 .module_groups .clist li.last-child {border-bottom:0;}
+
+.xg_2col .module_groups .clist li {
+  width:90px;
+  margin:0 4px 8px 3px;
+  border:0;
+  text-align:center;
+}
+.xg_2col .module_groups .clist { padding-left: 2px; }
+.xg_widget_profiles .xg_2col .module_groups .clist li {
+  margin:0 8px 8px;
+}

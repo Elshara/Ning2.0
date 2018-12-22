@@ -1,0 +1,118 @@
+/* Wraps */
+.module_events .wrap {
+  border-width:0;
+  border-bottom-width:1px;
+  border-bottom-style:solid;
+	clear:both;
+	padding-bottom:.4em;
+	margin-bottom:.8em;
+}
+.module_events .last-child {
+  border-bottom:0;
+}
+.module_events .dategroup {
+	float:left;
+	text-align:right;
+	width:98px;
+	clear:both;
+}
+.module_events .body_list h3, .module_events .body_detail h3 {display:inline;}
+.module_events h3 {margin-top:0;}
+
+
+
+/* List & Detail View */
+* html .module_events ul.clist li { height:1%;}
+.module_events ul.clist {
+  display:block;
+}
+.module_events ul.clist li .ib {display:inline;}
+.module_events ul.clist li {
+	overflow:hidden;
+	margin-bottom:.4em;
+	display:block;
+	float:none;
+}
+.module_events ul.clist li .ib a span {
+	float:left;
+	border:1px solid;
+	background-repeat:no-repeat;
+	background-position:center top;
+	display:block;
+}
+.module_events ul.clist li, .module_events ul.clist {
+  clear:none;
+}
+
+/* Detail */
+.module_events .body_detail ul.clist li .ib a span {
+	width:96px;
+	height:96px;
+	display:block;
+}
+.module_events ul.clist p.info {
+  margin:.4em 0;
+}
+.module_events .body_detail ul.clist .tb, .xg_3col .xg_2col .module_events ul.clist {
+	margin-left:106px;
+}
+.xg_1col .module_events .body_detail ul.clist .tb,
+.xg_span-4 .module_events .body_detail ul.clist .tb,
+.xg_1col .module_events .body_list ul.clist .tb,
+.xg_span-4 .module_events .body_list ul.clist .tb {
+  margin-left:0;
+}
+/* List */
+.module_events .body_list ul.clist li .ib a span{
+	width:36px;
+	height:36px;
+	display:block;
+}
+.module_events .body_list ul.clist .tb {
+	margin-left:46px;
+}
+
+
+/* Calender View */
+.module_events div.calendar {
+	padding:0 4px;
+}	
+.xg_3col .xg_2col .module_events .body_calendar ul.clist {
+  margin-left:0px;
+}
+.module_events div.calendar div {
+	background: none !important;
+	overflow: hidden;
+	position: relative;
+}	
+.module_events div.calendar .calendar_head {
+	padding-top: .3em;
+	text-align: center;
+	width: 100%;
+  display:block;
+}
+.module_events div.calendar table {
+	overflow: hidden;
+  width:100%;
+}
+.module_events div.calendar td,
+.module_events div.calendar th {
+	border: 0;
+	text-align: center;
+	width:12%;
+	padding:2px 1%;
+}
+.module_events div.calendar td {cursor: default;}
+.xg_2col .module_events div.calendar {
+  float:left;
+  width: 154px;
+}
+.xg_2col .module_events .body_calendar .tb {
+  margin-left:168px;
+}
+
+.xg_2col .calendarWrap {width:163px;float:left;}
+* html .xg_1col .calendarWrap {width:163px;}
+* html .xg_widget_main .xg_3col .xg_1col .calendarWrap {width:210px;}
+* html .module_events div.calendar table {width:165px;}
+* html .xg_widget_main .xg_3col .xg_1col div.calendar table {width:212px;}

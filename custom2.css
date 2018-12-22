@@ -1,0 +1,23 @@
+
+/* Page Title */
+#xg_body h1,
+#xg_body ul.navigation a,
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover,
+.navigation-solo,
+.navigation-solo a {
+  color: #222 !important;
+}
+/* Page */
+#xg_body,
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+  background-color: #bed6e3;
+}
+/* Module Body: Background & Text */
+.xg_module_body, .xg_module_foot {
+  background-color: #FFF;
+}
+.xg_module_head {
+  border-top:1px solid #9faaaf;
+}

@@ -1,0 +1,56 @@
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_navigation {
+    margin-top:55px;
+}
+#xg_navigation ul li a {
+	color: #FF9700;
+    background-color: #005292;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+    color: #DDEEFF;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg #xg_body h1 {
+    color: #ddeeff;
+}
+.xg_module_head {
+    background-image: url(/xn_resources/widgets/index/gfx/themes/8-Bit/xg_module_head.gif);
+    background-repeat: repeat-x;
+}
+.xg_module_head h2 {
+	font-weight: normal;
+	font-size: 120%;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #00DBF6;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #005292;
+}
+#xg_body ul.navigation a {
+	color: #def;
+}
+ul.pagination li.this span {
+    background-color: #005292;
+    border-color: #005292;
+    color: #FFFFFF;
+}
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+	color: #ccc;
+}

@@ -1,0 +1,1 @@
+@java -cp "%~dp0\src;%~dp0\bin;E:/Java/gwt-windows-1.4.61/gwt-user.jar;E:/Java/gwt-windows-1.4.61/gwt-dev-windows.jar" com.google.gwt.dev.GWTShell -out "%~dp0\www" %* com.ning.NoteEditor/NoteEditor.html

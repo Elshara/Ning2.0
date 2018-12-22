@@ -1,0 +1,15 @@
+/*----------------------------------------------------------------------
+	Videos
+----------------------------------------------------------------------*/
+/* video */
+div.module_video ul.clist li {
+	width:136px;
+	text-align:center;
+  margin:0px 21px 8px;
+}
+.module_video img.rating {
+	margin-top:.2em;
+}
+div.xg_widget_profiles_profile .xg_3col .xg_1col .module_video .body_large ul.clist li, .xg_span-4 .module_video .body_large ul.clist li, .xg_1col .module_video .body_large ul.clist li {width:160px;margin:0 0 8px 4px;}
+.xg_3col .xg_1col .module_video .body_large ul.clist li {width:160px;margin:0 0 8px 30px}
+.xg_widget_main .xg_2col .module_video .body_large ul.clist li {margin:0px 14px 8px 13px;}

@@ -1,0 +1,17 @@
+#xg, .xg_floating_module {font-size:1em}
+a.button {
+	*padding:.28em .57em .4em;
+}
+p.buttongroup a.button, p.buttongroup input.button, p.buttongroup button {
+  _font-size:12px !important;
+}
+p.buttongroup input.button, p.buttongroup button {
+  _padding:4px 5px 3px !important;
+}
+p.buttongroup a.button {
+  _line-height:12px !important;
+  _position:relative;
+  _margin-bottom:0 !important;
+  _padding:5px 5px 5px !important;
+  _bottom:-2px !important;
+}

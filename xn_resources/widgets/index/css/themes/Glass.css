@@ -1,0 +1,107 @@
+/*----------------------------------------------------------------------
+    This file is generated whenever you customize the appearance of your
+    app. We recommend that you avoid editing this file directly; instead,
+    simply use or not use these styles in your app as desired.
+    For more information, contact support@ning.com.
+----------------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------------
+    Fonts
+----------------------------------------------------------------------*/
+/* Font (Body Text) */
+body, select, input, button, textarea, .xg_bodyfont {
+	font-family:/* %textFont% */ "Lucida Grande", "Lucida Sans Unicode", Arial, clean, sans-serif;
+}
+/* Font (Headings) */
+h1, h2, h3, h4, h5, h6,
+#xg_sitename,
+.xg_headingfont {
+    font-family:/* %headingFont% */ "Lucida Grande", "Lucida Sans Unicode", Arial, clean, sans-serif;
+}
+
+
+/*----------------------------------------------------------------------
+    Colors
+----------------------------------------------------------------------*/
+/* Main Color */
+body,
+#xg_navigation li.this a,
+.xg_bodytexgcolor {
+	color:/* %moduleBodyTextColor% */ #666666;
+}
+a, .xg_linkcolor {
+	color:/* %siteLinkColor% */ #333333;
+}
+a.button, button, input.button,
+a.button:hover, button:hover, input.button:hover {
+    color:/* %buttonTextColor% */ #fff;
+    background:/* %siteLinkColor% */ #333333;
+}
+/* Margins */
+body, .xg_marginbg {
+    background-color:/* %siteBgColor% */ #333333;
+    background-image:/* %siteBgImage% */ url(/xn_resources/widgets/index/gfx/themes/Glass/sides-v2.jpg);
+    background-repeat:/* %siteBgImage_repeat% */ repeat-x;
+}
+/* Header Background Color/Image */
+#xg_head,
+#xg_head a,
+.xg_headertextcolor {
+	color:/* %pageHeaderTextColor% */ #ffffff;
+}
+#xg, .xg_headerbg {
+    background-color:/* %headBgColor% */ #000000;
+    background-image:/* %headBgImage% */ none;
+    background-repeat:/* %headBgImage_repeat% */ no-repeat;
+}
+/* Page */
+#xg_body,
+.xg_bodybg,
+.xg_floating_container {
+    background-color:/* %pageBgColor% */ #ffffff;
+    background-image:/* %pageBgImage% */ url(/xn_resources/widgets/index/gfx/themes/Glass/xg_body-v2.jpg);
+    background-repeat:/* %pageBgImage_repeat% */ no-repeat;
+}
+#xg_navigation ul li.this a,
+ul.page_tabs li.this {
+    background-color:/* %pageBgColor% */ #ffffff;
+}
+/* Module Headers */
+.xg_module_head {
+	color:/* %moduleHeadTextColor% */ #ffffff;
+	background-color:/* %moduleHeadBgColor% */ #333333;
+}
+/* Ningbar */
+/* %ningbarInvert% */ 
+#xn_bar,
+.xg_ningbarbg {
+    background-color:/* %ningbarColor% */ #000000!important;
+}
+/* Footer */
+#xg_foot {
+    background-color:/* %ningbarColor% */ #000000;
+}
+
+
+/*----------------------------------------------------------------------
+    Misc
+----------------------------------------------------------------------*/
+#xn_brand,
+.xg_displaybrand {
+	display:/* %ningLogoDisplay% */ block!important;
+}
+
+/* this color is the average between moduleBodyTextColor and pageBgColor: */
+.xg_lightfont {
+	color:#b2b2b2;
+}
+hr {
+	color:#b2b2b2;
+	background-color:#b2b2b2;
+}
+/* this color is (moduleBodyTextColor + (2 * pageBgColor))/3 */
+.xg_lightborder {
+	border-style:solid;
+	border-color:#bbbbbb;
+}

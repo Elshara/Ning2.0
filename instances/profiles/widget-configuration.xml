@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<widget id="7" root="profiles">
+<name>profiles</name>
+<config>
+        <version type="string" checkState="true">0.1</version>
+    <title>Blog</title>
+    <displayName>Blog</displayName>
+    <description>Show blog posts written by you or others.</description>
+    <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+    <isPermanent type="number">1</isPermanent>
+    <isEnabledDefault type="number">1</isEnabledDefault>
+    <profileQuestions>a%3A0%3A%7B%7D</profileQuestions>
+    <questionCounter>32</questionCounter>
+<indexing_BlogArchive>set</indexing_BlogArchive></config>
+<privateConfig>
+    <isEnabled/>
+    <feedKey type="string"/>
+</privateConfig>
+</widget>

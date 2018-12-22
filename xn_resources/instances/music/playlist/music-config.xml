@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+            <config>
+                <backgroundColor>3F484B</backgroundColor>
+                <backgroundImageUrl></backgroundImageUrl>
+                <networkName>VloggerClub</networkName>
+                <networkNameCss>h1 { font-family: Georgia, &quot;Times New Roman&quot;, Times, serif; color: #FFFFFF; }</networkNameCss>
+                <logoUrl></logoUrl>
+                <logoWidth></logoWidth>
+                <logoHeight></logoHeight>
+                <logo_link>http://vloggerclub.ning.com</logo_link>
+                <brandFormat>name</brandFormat>
+                <l_feature>Feature</l_feature>
+                <l_featuring>Featuring…</l_featuring>
+                <l_success_feature>Now Featured</l_success_feature>
+                <l_unfeature>Stop Featuring</l_unfeature>
+                <l_unfeaturing>Removing…</l_unfeaturing>
+                <l_success_unfeature>Not Featured</l_success_unfeature>
+                <l_add_to_my_page>Add to My Page</l_add_to_my_page>
+                <l_success_add>Added!</l_success_add>
+                <l_error>Error</l_error>
+                <l_adding>Adding…</l_adding>
+                <l_failure_track_load>Song could not be loaded</l_failure_track_load>
+                <l_added_by_colon>Added by:</l_added_by_colon>
+                <l_embed_code>Embed Code</l_embed_code>
+                <l_copy_to_clipboard>Copy to Clipboard</l_copy_to_clipboard>
+                <l_success_copy_to_clipboard>Copied to Clipboard!</l_success_copy_to_clipboard>
+                <l_cancel>Cancel</l_cancel>
+                <l_invalid_url>Invalid URL</l_invalid_url>
+                <l_playback_normal>Normal Playback: On</l_playback_normal>
+                <l_playback_repeat>Repeat Playback: On</l_playback_repeat>
+                <l_playback_shuffle>Shuffle Playback: On</l_playback_shuffle>
+                <l_open_popup_window>Open Popup Window</l_open_popup_window>
+                <l_loading_playlist>Loading Playlist…</l_loading_playlist>
+            </config>

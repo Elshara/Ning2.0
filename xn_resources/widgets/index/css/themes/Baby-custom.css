@@ -1,0 +1,88 @@
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+    background-color:transparent;
+}
+
+#xg_masthead {
+    min-height:98px;
+    padding-top:10px;
+}
+
+* html #xg_masthead {
+	height:98px;
+}
+
+	#xg_masthead p,
+	#xg_sitename {
+	    margin:0;
+	    padding:0.2em 0 0 15px;
+	    font-size:3em;
+	}
+
+	#xg_navigation {
+	    height:1%;
+	    margin: 0 0 0.5em 0;
+	}
+
+		#xg_navigation ul li a,
+		#xg_navigation ul li.this a,
+		#xg_navigation ul li a:hover {
+		    background:url(/xn_resources/widgets/index/gfx/themes/Baby/xg_navigation_ul_li_a.gif) repeat-x;
+		    border:1px dashed #f8daa8; 
+		    color:#cca86b;
+		}
+
+		#xg_navigation ul li.this a,
+		#xg_navigation ul li a:hover {
+		    background:url(/xn_resources/widgets/index/gfx/themes/Baby/xg_navigation_ul_li_ahover.gif) repeat-x;
+		    color:#b37f27;
+		}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg #xg_body h1,
+.xg_module_body h3,
+.xg_module_body caption {
+	color: #b37f27;
+}
+
+.xg_module_head {
+    background-image: url(/xn_resources/widgets/index/gfx/themes/Baby/xg_module_head.gif);
+}
+
+.xg_module_body,
+.xg_module_foot,
+ul.page_tabs li.this {
+    background: #f5f5f5 url(/xn_resources/widgets/index/gfx/themes/Baby/xg_module_body.gif) repeat-x;
+}
+
+ul.pagination li.this span {
+    color: #b37f27;
+	background-color: #D4E4FB;
+    border-color: #D4E4FB;
+}
+
+#xg_module_account .manage {
+	border-style:solid;
+}
+
+div.activityitem {
+	border: none;
+}
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot {
+    color: #333;
+    padding-top:12px;
+    background:transparent url(/xn_resources/widgets/index/gfx/themes/Baby/xg_foot.gif) no-repeat!important;
+}
+
+#xg_foot a {
+    color: #333;
+}

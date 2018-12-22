@@ -1,0 +1,1 @@
+&ratingAverage=<%=$this->ratingAverage;%>&

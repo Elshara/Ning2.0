@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<privateConfigWrapper>
+<config>
+        <version type="string">0.1</version>
+        <title>Photos</title>
+        <displayName>Photo Sharing</displayName>
+        <description>Add this feature to your site and allow members to upload and share photos!</description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">1</isEnabledDefault>
+        <embedPhotoSet>all</embedPhotoSet>
+        <addPhotoPermission type="string">all</addPhotoPermission>
+        <defaultVisibility type="string">all</defaultVisibility>
+        <headerImageUrl type="string">/images/theme/custom-header-image-1161796416.gif</headerImageUrl>
+        <headerImageHeight type="number">79</headerImageHeight>
+        <scaleHeaderImageIfNecessary type="string">Y</scaleHeaderImageIfNecessary>
+        <scaledHeaderImageHeight type="number">65</scaledHeaderImageHeight>
+        <headerFont type="string">deliciousheavy</headerFont>
+        <theme type="string">green-on-white</theme>
+        <headerLayout type="string">text</headerLayout>
+        <headerTextColor type="string">#339900</headerTextColor>
+        <headerBackgroundColor type="string">#EBF7E2</headerBackgroundColor>
+        <headerGradient type="string">Y</headerGradient>
+        <ningbarBackgroundColor type="string">#339900</ningbarBackgroundColor>
+        <ningbarTextColor type="string">white</ningbarTextColor>
+        <updatedOn type="number" checkState="true">1161796416</updatedOn>
+        <app type="string">devbazjon</app>
+        <logoImageUrl type="string"/>
+    </config><privateConfig>
+<isEnabled type="string">0</isEnabled>
+<embeddableAccessCode type="string"/>
+<addPhotoApprovalRequired type="string"/>
+<privacyType type="string"/>
+<invitedPeopleCanInviteOthers type="string"/>
+<aboutHeading type="string"/>
+<aboutText type="string"/>
+<flickrKey type="string"/>
+<flickrSecret type="string"/>
+<flickrEnabled type="string"/>
+<promptOwnerForFlickr type="string"/>
+<playerImageUrl type="string"/>
+<playerLogoType type="string"/>
+<playerHeaderBackground type="string"/>
+</privateConfig>
+</privateConfigWrapper>

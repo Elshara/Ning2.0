@@ -1,0 +1,13 @@
+/* ningbar-invert.css - Overrides Default 'White Text' Styles */
+#xg_foot,
+#xg_foot a {
+  color:#333;
+}
+#xn_bar #xn_bar_menu * {
+	color:#333 !important;
+}
+#xn_bar fieldset {
+	border-color:#aaa;
+}
+#xn_bar #xn_brand a { background-image:url(../gfx/ningbar/logo-inverted.png) !important; }
+* html #xn_bar #xn_brand a { background:none; filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/xn_resources/widgets/index/gfx/ningbar/logo-inverted.png',sizingMethod='crop') !important;}

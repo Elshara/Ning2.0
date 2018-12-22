@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<widget id="49" root="chat">
+    <name>chat</name>
+    <config>
+        <version type="string" checkState="true">0.1</version>
+        <title>Chat</title>
+        <displayName>Chat</displayName>
+        <description></description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">0</isEnabledDefault>
+        
+    </config>
+    <privateConfig>
+        <isEnabled/>
+    </privateConfig>
+</widget>

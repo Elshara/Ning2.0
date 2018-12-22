@@ -1,0 +1,102 @@
+body {
+	background-attachment: fixed;
+	background-position: center top;
+}
+#xg {
+	background-position: 0px -10px;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    height: 135px;
+	min-height: 135px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+#xg_masthead p#xg_sitename {
+	font-size: 4em;
+	line-height: 110%;
+	padding:70px 0pt 0pt 205px;
+}
+#xg_masthead p#xg_sitedesc {
+	padding:0pt 0pt 0pt 205px;
+}
+#xg_navigation {
+	width: 160px;
+	position:relative;
+	right:-590px;
+	top:-85px;
+	margin-bottom: -45px;
+}
+#xg_navigation ul li {
+	border-bottom:1px #C7B493;
+	float:none;
+	font-size:90%;
+	margin:0pt;
+	text-align:right;
+	width:160px;
+}
+#xg_navigation ul li a {
+	color: #FA596C;
+	background: transparent;
+	display:block;
+	text-decoration:none;
+	line-height:130%;
+}
+#xg_navigation ul li.this a, #xg_navigation ul li a:hover {
+	background:transparent none;
+}
+#xg_navigation ul li a:hover {
+	background-color:transparent;
+	color:#ae404d;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+	font-size: 1.1em;
+}
+#xg_body h1 {
+    color: #255D66;
+}
+ul.pagination li.this span {
+    background-color: #E1FBF5;
+    border-color: #E1FBF5;
+    color: #255D66;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #255D66;
+}
+.xg_module_head {
+	margin-bottom:0pt;
+	border: 2px solid #9fc611;
+	border-width: 0 0 2px 2px;
+} 
+#xg_body {
+	background-color:transparent;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #1dd5f0;
+}
+#xg_body ul.navigation a {
+	color: #255d66;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#333;
+	background: #1dd5f0 none;
+}

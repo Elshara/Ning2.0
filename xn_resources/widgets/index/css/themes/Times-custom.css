@@ -1,0 +1,77 @@
+#xn_bar {
+	border-bottom: 5px solid #004276;
+}
+#xg_head {
+	text-align: center;
+}
+#xg_masthead p#xg_sitename {
+	font-size: 550%;
+	font-weight: bold;
+	letter-spacing: -0.05em;
+	line-height: 120%;
+	padding-top: .4em;
+}
+#xg_masthead p#xg_sitedesc {
+	color: #333;
+	font: 120% Georgia, "Times New Roman", Times, serif;
+	padding-bottom: 1.5em;
+}
+#xg_navigation {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-style: normal;
+	font-variant: small-caps;
+}
+#xg_navigation ul {
+	display: inline-block;
+	float: none;
+	width: 955px;
+	white-space: nowrap;
+	margin: 0 auto;
+}
+#xg_navigation > ul {
+	display: table;
+}
+#xg_navigation ul li {
+	display: inline;
+	float: none;
+	padding: 0;
+}
+#xg_navigation ul > li {
+	display: table-cell;
+}
+*:first-child+html #xg_navigation ul > li { /* IE7 */
+	display: inline;
+}
+#xg_navigation ul li a {
+	display: inline-block;
+	background-color: #ddd;
+	color: #333;
+	padding: 0 .8em;
+	margin-right: 1px;
+}
+#xg_navigation ul li > a {
+	display: block;
+}
+*:first-child+html #xg_navigation ul li > a { /* IE7 */
+	display: inline-block;
+}
+#xg_navigation ul li a:hover {
+	background-color: #ccc;
+}
+#xg_navigation ul li.this a {
+	background-color: #004276;
+	color: #fff;
+}
+#xg_body {
+	width: 943px;
+	border: 1px solid #ddd;
+}
+.xg_module_head {
+	border-bottom: 2px solid #ddd;
+}
+.xg_module_head h2 {
+	font-size: 1.4em;
+}
+#xg_foot, #xg_foot a {
+	color: #aaa;
+}

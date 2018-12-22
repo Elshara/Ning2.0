@@ -1,0 +1,112 @@
+/* Edit Details */
+img.swatch {
+	width:auto;
+}
+.edit_item {
+	border-bottom:1px solid #ddd;
+	float:left; clear:left;
+	margin:2em 0pt 1em;
+	padding-bottom:1em;
+	width:100%;
+}
+fieldset.toggle {
+	margin-top:0;
+	border:none;
+}
+legend.toggle {
+	font-weight:normal;
+}
+legend.toggle, legend.toggle span {
+	padding-right:1ex;
+}
+dl.right {
+	clear:none;
+}
+select.license {
+	width:200px;
+}
+ul.details li {
+	margin-left:0;
+	list-style:none;
+	font-size:.9em;
+}
+div.artwork {
+	float:right;
+	width:265px;
+}
+.image_picker {
+	left:-52px !important;
+}
+.image_picker ul.options li {
+	float:none;
+}
+
+/* Edit Playlist */
+ol.playlist li {
+	clear:both;
+	margin:3px 0 0;
+	padding:4px;	
+	background-color:#fff;
+	list-style:none;
+	color:#333;
+	zoom:1;
+}
+ol.playlist li.alt {
+	background-color:#eee;
+}
+ol.playlist li.draggable {
+	cursor:move;
+	background-image:url(../gfx/drag.gif);
+	background-repeat:repeat-y;
+}
+ol.playlist li.notshared {
+	text-decoration:line-through;
+	color:#666;
+}
+ol.playlist li a {
+	color:#06c;
+}
+ol.playlist .time {
+	position:absolute; right:54px;
+	margin-right:5em;
+	font-size:.9em;
+}
+ol.playlist .number {
+	display:block;
+	float:left;
+	width:2em;
+	margin-right:5px;
+	text-align:right;
+}
+ol.playlist a.right {
+	margin-left:5px;
+}
+ol.playlist a.left {
+	margin-right:5px;
+}
+ol.playlist a.desc {
+	margin-left:10px;
+	font-size:.95em;
+}
+ul.options li {
+	float:left;
+	padding-right:3em;
+}
+div.track_drop_indicator {
+	width:441px;
+	border-top:3px solid #6cf;
+	position:absolute;
+	z-index:999;
+}
+li.dragged_track {
+	display:none;
+}
+abbr.explicit {
+	margin-left:0.5em;
+	padding:0.1em 0.3em;
+	border:1px solid #c00;
+	font-size:9px; font-weight:bold;
+	letter-spacing:0.15em; text-transform:uppercase;
+	vertical-align:top;
+	color:#c00;
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<privateConfigWrapper>
+<config>
+        <version type="string" checkState="true">0.1</version>
+        <title>OpenSocial</title>
+        <displayName>OpenSocial</displayName>
+        <description>OpenSocial Tester</description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">0</isEnabledDefault>
+    </config><privateConfig>
+<isEnabled type="string">1</isEnabled>
+</privateConfig>
+</privateConfigWrapper>

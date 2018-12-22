@@ -1,0 +1,19 @@
+body {
+    background-position: 50% top;
+    background-attachment:fixed;
+	background-repeat: repeat-y;
+}
+#xg_masthead {
+    min-height:120px;
+}
+* html #xg_masthead {
+    height:120px;
+}
+#xg_navigation ul li a {
+    color:#fff;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+    background-color:#f3f3f3;
+	color: #270013;
+}

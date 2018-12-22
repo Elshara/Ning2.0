@@ -1,0 +1,73 @@
+#xg {
+    background-position:top right;
+}
+
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead a {
+    font-size:150%;
+    font-weight:bold;
+}
+#xg_navigation ul li a {
+    font-weight:normal;
+}
+#xg_navigation ul li.this a,
+#xg_navigation ul li a:hover {
+    background-color:transparent;
+    color:#464648;
+    border-bottom:3px solid #e27616;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+    background-color:transparent;
+}
+#xg #xg_body h1 {
+    color: #830;
+}
+.xg_module_head {
+    background: transparent url(/xn_resources/widgets/index/gfx/themes/Active/xg_module_head.gif) repeat-x top left;
+    border-bottom:1px solid #000000;
+}
+ul.pagination li.this span {
+    background-color: #333;
+    border-color: #333;
+    color: #999;
+}
+.xg_module_body,
+.xg_module_foot {
+    background: transparent url(/xn_resources/widgets/index/gfx/themes/Active/xg_module_body.gif) repeat;
+}
+ul.page_tabs li.this {
+	background-color: #fda659;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+	color: #121212;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #ff7400;
+}
+#xg_body ul.navigation a {
+	color: #830;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot {
+	color:#ff8f2b;
+    border-top:4px solid #000;
+}
+#xg_foot a {
+    color:#eee;
+}

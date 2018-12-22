@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<widget id="41" root="forum">
+    <name>forum</name>
+    <config>
+        <version type="string" checkState="true">0.1</version>
+        <title>Forum</title>
+        <displayName>Forum</displayName>
+        <description>A discussion board in which people can post topics and replies.</description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">1</isEnabledDefault>
+        <order type="string">ascending</order>
+    </config>
+    <privateConfig>
+        <isEnabled/>
+    </privateConfig>
+</widget>

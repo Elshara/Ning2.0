@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Module>
+<ModulePrefs title="YouTube Top 15">
+<Require feature="opensocial-0.7" />
+</ModulePrefs>
+<Content type="html">
+<![CDATA[
+
+<div id="handler">
+<iframe src="http://www.bkserv.net/YTS/Top15Banner.aspx?headcolor=lightgreen&gridcolor=lightyellow" frameborder="0" width="320" scrolling="no" height="191">
+    <a href="http://www.bkserv.net/YTS/Top15Banner.aspx?headcolor=lightgreen&gridcolor=lightyellow">YouTube's Most Popular Channels</a>
+</iframe>
+</div>
+]]>
+</Content>
+</Module>

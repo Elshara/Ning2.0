@@ -1,0 +1,1 @@
+<?php W_Cache::getWidget('main')->dispatch('embeddable', 'embeddableProper', array($this->args)); ?>

@@ -1,0 +1,65 @@
+#xg, .xg_headerbg {
+	background-repeat: repeat-x;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_navigation {
+    border-bottom:2px solid #77b422;
+}
+#xg_navigation ul li a {
+	color: #76B41C;
+}
+#xg_navigation ul li.this {
+    background: url(/xn_resources/widgets/index/gfx/themes/Gamer/xg_navigation_ul_li.gif) no-repeat left top;
+}
+#xg_navigation ul li.this a {
+	color: #fff;
+    background: url(/xn_resources/widgets/index/gfx/themes/Gamer/xg_navigation_ul_li_a.gif) no-repeat right top;
+	padding:0 0.7em;
+}
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+#xg_body {
+    border-top:2px solid #558011;
+}
+.xg_module_head {
+    border-bottom:1px solid #2F2F2F;
+	margin-bottom:0;
+}
+#xg #xg_body h1 {
+    color: #fff;
+}
+.xg_module_body,
+.xg_module_foot {
+	background-color: #0a0a0a;
+}
+ul.pagination li.this span {
+    background-color: #0A0A0A;
+    border-color: #0A0A0A;
+    color: #FFFFFF;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #76B41C;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #0a0a0a;
+}
+#xg_body ul.navigation a {
+	color: #fff;
+}
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#CCCCCC;
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<widget id="4" root="photo">
+    <name>photo</name>
+    <config>
+        <version type="string">0.1</version>
+        <title>Photos</title>
+        <displayName>Photo Sharing</displayName>
+        <description>Add this feature to your site and allow members to upload and share photos!</description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">1</isEnabledDefault>
+        <embedPhotoSet>all</embedPhotoSet>
+        <addPhotoPermission type="string">all</addPhotoPermission>
+        <defaultVisibility type="string">all</defaultVisibility>
+        <headerImageUrl type="string">/images/theme/custom-header-image-1161796416.gif</headerImageUrl>
+        <headerImageHeight type="number">79</headerImageHeight>
+        <scaleHeaderImageIfNecessary type="string">Y</scaleHeaderImageIfNecessary>
+        <scaledHeaderImageHeight type="number">65</scaledHeaderImageHeight>
+        <headerFont type="string">deliciousheavy</headerFont>
+        <theme type="string">green-on-white</theme>
+        <headerLayout type="string">text</headerLayout>
+        <headerTextColor type="string">#339900</headerTextColor>
+        <headerBackgroundColor type="string">#EBF7E2</headerBackgroundColor>
+        <headerGradient type="string">Y</headerGradient>
+        <ningbarBackgroundColor type="string">#339900</ningbarBackgroundColor>
+        <ningbarTextColor type="string">white</ningbarTextColor>
+        <updatedOn type="number" checkState="true">1161796416</updatedOn>
+        <app type="string">devbazjon</app>
+        <logoImageUrl type="string"></logoImageUrl>
+    </config>
+    <privateConfig>
+        <isEnabled/>
+        <embeddableAccessCode/>
+        <addPhotoApprovalRequired/>
+        <privacyType/>
+        <invitedPeopleCanInviteOthers/>
+        <aboutHeading/>
+        <aboutText/>
+        <flickrKey/>
+        <flickrSecret/>
+        <flickrEnabled/>
+        <promptOwnerForFlickr type="string">Y</promptOwnerForFlickr>
+        <playerImageUrl type="string"/>
+        <playerLogoType type="string">header_text</playerLogoType>
+        <playerHeaderBackground type="string"/>
+    </privateConfig>
+</widget>

@@ -1,0 +1,123 @@
+body, .xg_marginbg,
+#xg, .xg_headerbg {
+	background-repeat: repeat-x;
+}
+
+/*----------------------------------------------------------------------
+    Header & Navigation (#xg_head and descendants)
+----------------------------------------------------------------------*/
+#xg_masthead {
+    height: 238px;
+	min-height: 238px;
+}
+#xg_head > #xg_masthead {
+	height: auto;
+}
+
+#xg_masthead p#xg_sitename {
+    margin:0;
+    padding:48px 0pt 0pt 55px;
+    line-height:1.1em;
+    font-size:4em;
+}
+#xg_masthead p#xg_sitedesc {
+    padding:0pt 0pt 0em 58px;
+    color:#261716;
+}
+#xg_navigation {
+    height: 30px;
+    padding-left:59px;
+}
+#xg_navigation ul {
+    margin: 0;
+}
+#xg_navigation ul li {
+    text-transform:uppercase;
+    font-size:.9em;
+    letter-spacing:.1em;
+}
+#xg_navigation ul li a {
+    background-color:transparent;
+    color:#b8292f;
+}
+#xg_navigation ul li a:hover {
+    background-color:transparent;
+    color:#FFF;
+	background: url(/xn_resources/widgets/index/gfx/themes/Guild/xg_navigation_ul_li.gif) no-repeat 0 50%;
+}
+#xg_navigation ul li.this {
+    background: url(/xn_resources/widgets/index/gfx/themes/Guild/xg_navigation_ul_li.gif) no-repeat 0 50%;
+}
+#xg_navigation ul li.this a {
+    background: url(/xn_resources/widgets/index/gfx/themes/Guild/xg_navigation_ul_li.gif) no-repeat 0% 50%;
+    color:#FFF;
+    padding:0pt .4em 0 1.1em;
+}
+#xg_navigation ul li a, #xg_navigation ul li span {
+    padding:0pt .4em 0 1.1em;
+}
+
+
+/*----------------------------------------------------------------------
+    Body (#xg_body and descendants)
+----------------------------------------------------------------------*/
+.xg_module {
+	margin-bottom: 1.5em;
+}
+#xg #xg_body h1 {
+    color: #261716;
+    font-size:1.8em;
+    font-weight:lighter;
+    line-height:1.6em;
+    margin-bottom:0.2em;
+}
+ul.pagination li.this span {
+    background-color: #E2D2B4;
+    border-color: #E2D2B4;
+    color: #0A0100;
+}
+.xg_module_head {
+    margin-bottom:0;
+    border-bottom:1px dotted #99836b;
+    padding:3px 22px;
+    background:transparent url(/xn_resources/widgets/index/gfx/themes/Guild/xg_module_head.gif) no-repeat 0 0%;
+}
+.xg_module_head h2 {
+	letter-spacing:0.1em;
+    text-transform:uppercase;
+}
+.xg_module_body,
+.xg_module_foot {
+    background: transparent url(/xn_resources/widgets/index/gfx/themes/Guild/xg_module_body-v2.jpg) repeat;
+}
+.xg_module_body h3,
+.xg_module_body caption {
+    color: #261716;
+}
+p.buttongroup {
+   border-top:1px dotted #99836b;
+}
+#xg_body ul.navigation {
+	position: static;
+	float: left;
+	clear: both;
+	border-bottom: 1px solid #cab89b;
+}
+#xg_body ul.navigation a {
+	color: #261716;
+}
+ul.page_tabs li.this {
+	background-image: none;
+}
+
+
+/*----------------------------------------------------------------------
+    Footer (#xg_foot and descendants)
+----------------------------------------------------------------------*/
+#xg_foot,
+#xg_foot a {
+    color:#643c3a;
+}
+#xg_foot {
+    border-top:3px solid #643C3A;
+}

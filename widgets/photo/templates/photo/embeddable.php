@@ -1,0 +1,1 @@
+<?php $this->renderPartial('fragment_slideshowPlayer','photo', $this->args); ?>

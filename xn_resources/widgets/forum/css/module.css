@@ -1,0 +1,15 @@
+/*----------------------------------------------------------------------
+	Discussion Summary
+----------------------------------------------------------------------*/
+
+.module_forum img.photo {
+	margin:2px 8px 0 0;
+}
+.module_forum .indent {
+  margin:0 0 0 40px;
+}
+.module_forum .indent .indent {margin-left:0;}
+.module_forum h3 a {margin-right:8px;}
+.module_forum h3 .small {font-size:95%;}
+.module_forum p {margin-bottom:0;}
+.module_forum .category, .module_forum .discussion {margin-bottom:.8em;}

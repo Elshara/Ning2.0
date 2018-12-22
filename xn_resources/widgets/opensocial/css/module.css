@@ -1,0 +1,15 @@
+/*----------------------------------------------------------------------
+	OpenSocial
+----------------------------------------------------------------------*/
+
+
+/* Container frame */
+.xg_2col ._opensocial_container {width:502px;margin:0 auto;}
+
+/* Gadget frame */
+._opensocial-gadget-title {
+  display:block;
+}
+._opensocial-gadget-titlebar {
+  display: none;
+}

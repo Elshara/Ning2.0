@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<widget id="48" root="music">
+    <name>music</name>
+    <config>
+        <version type="string" checkState="true">0.1</version>
+        <title>Music</title>
+        <displayName>Music</displayName>
+        <description></description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">1</isEnabledDefault>
+        <addMusicPermission>all</addMusicPermission>
+    </config>
+    <privateConfig>
+        <isEnabled/>
+        <mainPlaylist/>
+    </privateConfig>
+</widget>

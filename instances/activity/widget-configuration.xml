@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<widget id="50" root="activity">
+<name>activity</name>
+  <config>
+        <version type="string" checkState="true">0.1</version>
+        <title>Latest Activity</title>
+        <displayName>Latest Activity</displayName>
+        <description></description>
+        <isMozzle type="number">1</isMozzle>
+        <isFirstOrderFeature type="number">1</isFirstOrderFeature>
+        <isPermanent type="number">0</isPermanent>
+        <isEnabledDefault type="number">1</isEnabledDefault>
+        <logNewContent type="string">Y</logNewContent>
+        <logNewComments type="string">Y</logNewComments>
+        <logNewMembers type="string">Y</logNewMembers>
+        <logProfileUpdates type="string">Y</logProfileUpdates>
+  <indexing_ActivityLogItem>set</indexing_ActivityLogItem></config>
+	<privateConfig>
+		<isEnabled/>
+	</privateConfig>
+</widget>

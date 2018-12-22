@@ -1,0 +1,73 @@
+/* Display: Photo Slideshow */
+.xg_module_embed .xg_module_body {
+	padding:0;
+	margin:0;
+}
+.xg_module_embed .xg_module_body embed {
+	display:block;
+	margin-bottom:0;
+}
+
+
+
+
+/* photo thumbnails*/
+.module_photo .body_list .clist li {
+	text-align:center;
+	width:141px;
+}
+.module_photo .body_list .clist .ib {
+	position:relative;
+	width:141px;
+  height:141px;
+	line-height:141px;
+}
+.module_photo .body_list .clist .ib a {
+	position:absolute;
+	bottom:0;
+	left:0;
+	width:141px;
+}
+.module_photo .body_list .clist img {
+	vertical-align:bottom;
+	border:1px solid #ccc;
+}
+.xg_widget_profiles_profile .xg_2col .module_photo .body_list .clist .ib {width:126px;height:126px;line-height:126px;}
+.xg_widget_profiles_profile .xg_2col .module_photo .body_list .clist .ib a {width:126px;}
+
+.xg_widget_profiles_profile .xg_3col .xg_1col .module_photo .body_list .clist li, .xg_span-4 .module_photo .body_list .clist li, .xg_1col .module_photo .body_list .clist li {margin:0 0 12px 15px;}
+.xg_3col .xg_1col .module_photo .body_list .clist li {margin:0 0 12px 36px}
+.xg_widget_profiles_profile .xg_2col .module_photo .body_list .clist li {margin:0 4px 12px; width:126px;}
+.xg_widget_profiles_profile .xg_2col .module_photo .body_list .clist {padding:0 1px;}
+.xg_2col .module_photo .body_list .clist li {margin:0 11px 12px;}
+
+.xg_widget_profiles_profile .xg_3col .xg_1col .module_photo .body_list .clist .ib, .xg_span-4 .module_photo .body_list .clist .ib, .xg_1col .module_photo .body_list .clist .ib {height:auto;line-height:1em;}
+.xg_widget_profiles_profile .xg_3col .xg_1col .module_photo .body_list .clist .ib a, .xg_span-4 .module_photo .body_list .clist .ib a, .xg_1col .module_photo .body_list .clist .ib a {position:relative;bottom:auto;left:auto;width:auto;}
+
+
+/* albums */
+.body_albums .clist li {width:148px;margin:0 8px;}
+.body_albums .clist li .ib a {
+  border-width:1px 1px 3px;
+  padding:3px;
+  border-style:solid;
+  height:139px;
+  width:139px;
+  line-height:136px;
+  *font-family:Arial !important;
+  *font-size:119px;
+  display:block;
+  background:#FFF;
+  text-align:center;
+}
+.body_albums .clist li .ib a img {
+  border:0;
+  vertical-align:middle;
+}
+.xg_span-4 .body_albums .clist li, .xg_1col .body_albums .clist li {width:173px;margin:0 0 12px;float:none;}
+.xg_span-4 .body_albums .clist li .ib a, .xg_1col .body_albums .clist li .ib a {height:165px;width:165px;line-height:162px;*font-size:135px;}
+
+.xg_2col .body_albums .clist li {margin:0 8px 12px 7px;}
+.xg_widget_profiles_profile .xg_2col .body_albums .clist li {width:173px;margin:0 3px 12px;}
+.xg_widget_profiles_profile .xg_2col .body_albums .clist li .ib a {height:165px;width:165px;line-height:162px;*font-size:135px;}
+.xg_widget_main .xg_3col .xg_1col .body_albums .clist li {margin:0 0 12px 23px}

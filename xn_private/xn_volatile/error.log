@@ -1,0 +1,111 @@
+[11-Oct-2008 07:45:37] getParentLocale got exception: <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description" content="" />
+	<meta name="keywords" content=""/>
+	<title>Ning: Page Not Found</title>
+
+
+	<link rel="icon" href="http://www.ning.com/favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="http://www.ning.com/favicon.ico" type="image/x-icon" />
+
+	<link rel="stylesheet" type="text/css" href="http://www.ning.com/xn/css?href=%2Fxn%2Fstatic%2Fsystem%2Fcss%2Fsystem.css"/>
+    <script type="text/javascript" src="/xn/static/system/js/xn.js"></script>
+</head>
+
+<body class="change-email">
+	<div id="xs">
+		<div id="xs_header">
+	<a href="http://www.ning.com" id="ning-logo"><img src="http://www.ning.com/xn/static/system/images/design/logo.gif" alt="Ning" /></a>
+	<div id="xs_toolbar">
+		<form method="get" action="http://www.ning.com">
+
+			<fieldset>
+				<input type="hidden" name="view" value="search" />
+				<input type="text" name="term" value="Search popular networks" onfocus="xn_js_focusTextfield(event, 'Search popular networks', 'subtle')" onblur="xn_js_blurTextfield(event, 'Search popular networks', 'subtle')" />
+			</fieldset>
+		</form>
+			<ul id="linklist" class="loggedout"><li class="sign-in">
+			<a href="https://www.ning.com/main/profile/signUp?target=http%3A%2F%2Fwww.ning.com">Sign Up</a><span class="or">or</span><a href="https://www.ning.com/main/authorization/signOut?target=https%3A%2F%2Fwww.ning.com%2Fmain%2Fauthorization%2FsignIn%3Ftarget%3Dhttp%253A%252F%252Fsocialnetwork.ning.com%252Fmain%252Findex%252FgetLocale">Sign In</a></li><li class="popular">
+			<a href="http://www.ning.com/home/networks">Popular Social Networks</a></li></ul>
+		</div>
+</div>
+		<div id="xs_feature">
+			<div id="xs_intro">
+				<h1>This social network has been taken offline <br/> by its owner</h1>
+				<p>It&#8217;s likely that the owner will bring it back online shortly.</p>
+			</div>
+		</div>
+
+		<div id="xs_main">
+			<p>In the mean time, you can <a href="http://www.ning.com">create your own social network</a>, view <a href="http://www.ning.com/home/networks">popular social networks</a> or check out the <a href="http://blog.ning.com">Ning Blog</a>.</p>
+			<p>If you are the owner of this network, <a href="https://www.ning.com/main/authorization/signOut?target=https%3A%2F%2Fwww.ning.com%2Fmain%2Fauthorization%2FsignIn%3Ftarget%3Dhttp%253A%252F%252Fsocialnetwork.ning.com%252Fmain%252Findex%252FgetLocale">sign in</a> to see your network.</p>
+			<div class="clear"></div>
+		</div>
+</div>
+	<div id="xs_footer">
+	<div class="column-group">
+		<div class="column first-child">
+						<h3 class="get-started">Get Started</h3>
+			<ul>
+
+				<li><a href="http://www.ning.com/">Create a Social Network</a></li>
+				<li><a href="https://www.ning.com/main/profile/signUp?target=http%3A%2F%2Fwww.ning.com">Get a Ning ID</a></li>
+				<li><a href="https://www.ning.com/main/authorization/signOut?target=https%3A%2F%2Fwww.ning.com%2Fmain%2Fauthorization%2FsignIn%3Ftarget%3Dhttp%253A%252F%252Fsocialnetwork.ning.com%252Fmain%252Findex%252FgetLocale">Sign In</a></li>
+			</ul>
+				<h3 class="explore">Explore</h3>
+			<ul>
+				<li><a href="http://www.ning.com/home/networks">Popular Social Networks</a></li>
+				<li><a href="http://blog.ning.com/">Ning Blog</a></li>
+			</ul>
+		</div>
+		<div class="column">
+			<h3 class="about">About</h3>
+			<ul>
+				<li><a href="http://about.ning.com/index.php">Our Company</a></li>
+				<li><a href="http://about.ning.com/product.php">Product Overview</a></li>
+				<li><a href="http://about.ning.com/why.php">Why Create a Social Network?</a></li>
+				<li><a href="http://about.ning.com/press.php">Press</a></li>
+				<li><a href="http://about.ning.com/jobs.php">Jobs at Ning</a></li>
+				<li><a href="http://blog.ning.com/">Ning Blog</a></li>
+			</ul>
+
+		</div>
+		<div class="column">
+			<h3 class="resources">Resources</h3>
+			<ul>
+				<li><a href="http://networkcreators.ning.com/">Network Creators</a></li>
+				<li><a href="http://developer.ning.com/">Developer Network</a></li>
+				<li><a href="http://blog.ning.com/">Ning Blog</a></li>
+				<li><a href="http://help.ning.com/">Help</a></li>
+			</ul>
+		</div>
+		<div class="column last-child">
+			<p>Copyright &copy; 2008 Ning, Inc.</p>
+			<ul>
+				<li><a href="http://about.ning.com/tos.php">Terms of Service</a></li>
+				<li><a href="http://about.ning.com/privacy.php">Privacy</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="clear"></div>
+</div>
+<script type="text/javascript" charset="utf-8">
+if (top != self) { top.location.replace('http://www.ning.com'); }
+</script>
+</body>
+</html>
+[11-Oct-2008 07:47:01] updateLocaleConfig
+[11-Oct-2008 07:47:02] PHP Warning:  W_WidgetApp::include(/apps/socialnetworkmain/widgets/gadgets/controllers/EmbedController.php) [<a href='function.W-WidgetApp-include'>function.W-WidgetApp-include</a>]: failed to open stream: No such file or directory in /php/includes/XN/WWF/lib/W_WidgetApp.php on line 210
+[11-Oct-2008 07:47:02] PHP Warning:  W_WidgetApp::include() [<a href='function.include'>function.include</a>]: Failed opening '/apps/socialnetworkmain/widgets/gadgets/controllers/EmbedController.php' for inclusion (include_path='.:/php/includes/XN:/php/includes/PEAR:/php/includes/other') in /php/includes/XN/WWF/lib/W_WidgetApp.php on line 210
+[11-Oct-2008 07:49:41] PHP Warning:  W_WidgetApp::include(/apps/socialnetworkmain/widgets/gadgets/controllers/EmbedController.php) [<a href='function.W-WidgetApp-include'>function.W-WidgetApp-include</a>]: failed to open stream: No such file or directory in /php/includes/XN/WWF/lib/W_WidgetApp.php on line 210
+[11-Oct-2008 07:49:41] PHP Warning:  W_WidgetApp::include() [<a href='function.include'>function.include</a>]: Failed opening '/apps/socialnetworkmain/widgets/gadgets/controllers/EmbedController.php' for inclusion (include_path='.:/php/includes/XN:/php/includes/PEAR:/php/includes/other') in /php/includes/XN/WWF/lib/W_WidgetApp.php on line 210
+[11-Oct-2008 08:09:19] PHP Warning:  W_WidgetApp::include(/apps/socialnetworkmain/widgets/gadgets/controllers/EmbedController.php) [<a href='function.W-WidgetApp-include'>function.W-WidgetApp-include</a>]: failed to open stream: No such file or directory in /php/includes/XN/WWF/lib/W_WidgetApp.php on line 210
+[11-Oct-2008 08:09:19] PHP Warning:  W_WidgetApp::include() [<a href='function.include'>function.include</a>]: Failed opening '/apps/socialnetworkmain/widgets/gadgets/controllers/EmbedController.php' for inclusion (include_path='.:/php/includes/XN:/php/includes/PEAR:/php/includes/other') in /php/includes/XN/WWF/lib/W_WidgetApp.php on line 210
+[11-Oct-2008 09:39:37] Basic Flows: doSignIn. password:Wrong password.  Is Caps Lock on? trace:a0da923c-ceb9-4a1a-83b1-a314841f8498 remote-addr:72.146.129.216
+[18-Oct-2008 23:01:27] Basic Flows: doSignIn. password:Wrong password.  Is Caps Lock on? trace:28b113dc-b1a8-4a06-a398-6517483b27fe remote-addr:72.146.170.127
+[18-Oct-2008 23:02:08] Basic Flows: doSignIn. password:Wrong password.  Is Caps Lock on? trace:c3eecd87-61a6-4e0f-b14e-de9f09aef495 remote-addr:72.146.170.127
+[18-Oct-2008 23:03:09] Basic Flows: requestPasswordReset. trace:d6603dd2-4086-4d8f-ad87-937cd6b1912c remote-addr:72.146.170.127
+[19-Oct-2008 08:53:28] Basic Flows: doSignIn. password:Wrong password.  Is Caps Lock on? trace:822470bb-268c-4916-a0eb-9ea4d73cea87 remote-addr:72.146.129.216

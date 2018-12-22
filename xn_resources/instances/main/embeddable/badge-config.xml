@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+            <config>
+                <backgroundColor>3F484B</backgroundColor>
+                <backgroundImageUrl></backgroundImageUrl>
+                <networkName>VloggerClub</networkName>
+                <networkNameCss>h1 { font-family: Georgia, &quot;Times New Roman&quot;, Times, serif; color: #EEEEEE; }</networkNameCss>
+                <description>A community of videomakers - vloggers and more!</description>
+                <logoUrl></logoUrl>
+                <logoWidth></logoWidth>
+                <logoHeight></logoHeight>
+                <avatarGridImageUrl></avatarGridImageUrl>
+                <memberCountText>1 member</memberCountText>
+                <joinUsText>Join Us</joinUsText>
+                <iAmMemberText>I&#039;m a member of:</iAmMemberText>
+                <createdByText>Created By:</createdByText>
+                <networkCreatorName>James</networkCreatorName>
+            </config>
