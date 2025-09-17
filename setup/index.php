@@ -1595,6 +1595,38 @@ class SetupWizard
 
     private function detectBasePath(): string
     {
+        $candidates = [];
+
+        $forwardedPrefix = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_PREFIX'] ?? ''));
+        if ($forwardedPrefix !== '') {
+            $candidates[] = $forwardedPrefix;
+        }
+
+        $forwardedPath = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_PATH'] ?? ''));
+        if ($forwardedPath !== '') {
+            $candidates[] = $forwardedPath;
+        }
+
+        $forwardedUri = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_URI'] ?? ''));
+        if ($forwardedUri !== '') {
+            $uriPath = parse_url($forwardedUri, PHP_URL_PATH);
+            if (is_string($uriPath) && $uriPath !== '') {
+                $candidates[] = $uriPath;
+            }
+        }
+
+        $contextPrefix = (string) ($_SERVER['CONTEXT_PREFIX'] ?? '');
+        if ($contextPrefix !== '') {
+            $candidates[] = $contextPrefix;
+        }
+
+        foreach ($candidates as $candidate) {
+            $normalizedCandidate = $this->normalizeBasePath($candidate);
+            if ($normalizedCandidate !== null && $normalizedCandidate !== '/') {
+                return $normalizedCandidate;
+            }
+        }
+
         $scriptName = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
         if ($scriptName === '') {
             return '/';
