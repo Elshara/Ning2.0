@@ -1,4 +1,6 @@
 <?php
+require_once dirname(__DIR__) . '/../bootstrap.php';
+
 
 if (! XN_Profile::current()->isOwner()) {
     error_log('rebuildBroadcastAliases - user is not app owner, aborting');

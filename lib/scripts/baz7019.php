@@ -1,4 +1,6 @@
 <?php
+require_once dirname(__DIR__) . '/../bootstrap.php';
+
 define('NF_BASE_URL', '/index.php');
 define('NF_APP_BASE',$_SERVER['DOCUMENT_ROOT']);
 //define('W_INCLUDE_PREFIX', dirname(__FILE__));
