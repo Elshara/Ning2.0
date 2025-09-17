@@ -94,6 +94,9 @@ final class RequestContext
      */
     private function initialise(array $server): void
     {
+
+        $metadata = \nf_detect_request_metadata($server);
+
         $forwardedHeader = $this->parseForwardedHeader((string) ($server['HTTP_FORWARDED'] ?? ''));
 
         $forwardedProto = $this->firstHeaderValue((string) ($server['HTTP_X_FORWARDED_PROTO'] ?? ''));
@@ -169,6 +172,7 @@ final class RequestContext
 
         $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
 
+
         $extensions = get_loaded_extensions();
         $extensions = is_array($extensions) ? array_map('strval', $extensions) : [];
         if ($extensions !== []) {
@@ -178,10 +182,18 @@ final class RequestContext
 
         $this->extensions = $extensions;
 
+
+        $this->httpsDetected = $metadata['https'];
+        $this->host = $metadata['host'];
+        $this->port = $metadata['port'];
+        $this->baseUrl = $metadata['base_url'];
+        $this->basePath = $metadata['base_path'];
+
         $this->httpsDetected = $https;
         $this->host = $host;
         $this->port = $port;
         $this->baseUrl = $normalizedBaseUrl ?? $baseUrl;
         $this->basePath = $basePath;
+
     }
 }

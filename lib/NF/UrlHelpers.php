@@ -55,12 +55,24 @@ if (!function_exists('nf_base_url_from_config')) {
 
     /**
      * @param array<string,mixed> $server
+
+     * @return array{https:bool,host:string,port:int,base_path:string,base_url:string}
+     */
+    function nf_detect_request_metadata(array $server): array
+
      */
     function nf_detect_base_url_from_server(array $server): string
+
     {
         $forwarded = nf_parse_forwarded_header((string) ($server['HTTP_FORWARDED'] ?? ''));
 
         $forwardedProto = nf_first_header_value((string) ($server['HTTP_X_FORWARDED_PROTO'] ?? ''));
+
+        if ($forwardedProto === '') {
+            $forwardedProto = nf_first_header_value((string) ($server['HTTP_X_ORIGINAL_PROTO'] ?? ''));
+        }
+
+
         if ($forwardedProto === '' && $forwarded['proto'] !== null) {
             $forwardedProto = $forwarded['proto'];
         }
@@ -71,18 +83,39 @@ if (!function_exists('nf_base_url_from_config')) {
         }
 
         $forwardedHost = nf_first_header_value((string) ($server['HTTP_X_FORWARDED_HOST'] ?? ''));
+
+        if ($forwardedHost === '') {
+            $forwardedHost = nf_first_header_value((string) ($server['HTTP_X_ORIGINAL_HOST'] ?? ''));
+        }
+
+
         if ($forwardedHost === '' && $forwarded['host'] !== null) {
             $forwardedHost = $forwarded['host'];
         }
 
         $forwardedPort = nf_first_header_value((string) ($server['HTTP_X_FORWARDED_PORT'] ?? ''));
+
+        if ($forwardedPort === '') {
+            $forwardedPort = nf_first_header_value((string) ($server['HTTP_X_ORIGINAL_PORT'] ?? ''));
+        }
+
+
         if ($forwardedPort === '' && $forwarded['port'] !== null) {
             $forwardedPort = (string) $forwarded['port'];
         }
 
+
+        $forwardedSsl = (string) ($server['HTTP_X_FORWARDED_SSL'] ?? '');
+        $frontEndHttps = (string) ($server['HTTP_FRONT_END_HTTPS'] ?? '');
+
+        $https = (!empty($server['HTTPS']) && $server['HTTPS'] !== 'off')
+            || nf_is_truthy_proxy_flag($forwardedSsl)
+            || nf_is_truthy_proxy_flag($frontEndHttps)
+
         $https = (!empty($server['HTTPS']) && $server['HTTPS'] !== 'off')
             || nf_is_truthy_proxy_flag((string) ($server['HTTP_X_FORWARDED_SSL'] ?? ''))
             || nf_is_truthy_proxy_flag((string) ($server['HTTP_FRONT_END_HTTPS'] ?? ''))
+
             || ((isset($server['SERVER_PORT']) && (int) $server['SERVER_PORT'] === 443))
             || (($server['REQUEST_SCHEME'] ?? '') === 'https')
             || ($forwardedProto !== '' && strtolower($forwardedProto) === 'https')
@@ -109,24 +142,60 @@ if (!function_exists('nf_base_url_from_config')) {
         }
 
         $scheme = $https ? 'https' : 'http';
+
+        $basePath = nf_detect_base_path($server);
+
+
+
         $baseUrl = $scheme . '://' . nf_format_host_for_url($host);
         if (!nf_is_default_port($https, $port)) {
             $baseUrl .= ':' . $port;
         }
 
+
+
         $basePath = nf_detect_base_path($server);
+
         if ($basePath !== '/' && $basePath !== '') {
             $baseUrl .= $basePath;
         }
 
         $normalized = nf_normalize_base_url($baseUrl);
         if ($normalized !== null) {
+
+            $baseUrl = $normalized;
+        } else {
+            $baseUrl = rtrim($baseUrl, '/');
+            if ($baseUrl === '') {
+                $baseUrl = $scheme . '://localhost';
+            }
+        }
+
+        return [
+            'https' => $https,
+            'host' => $host,
+            'port' => $port,
+            'base_path' => $basePath,
+            'base_url' => $baseUrl,
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $server
+     */
+    function nf_detect_base_url_from_server(array $server): string
+    {
+        $metadata = nf_detect_request_metadata($server);
+
+        return $metadata['base_url'];
+
             return $normalized;
         }
 
         $fallback = rtrim($baseUrl, '/');
 
         return $fallback === '' ? ($scheme . '://localhost') : $fallback;
+
     }
 
     /**

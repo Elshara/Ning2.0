@@ -3,10 +3,18 @@ declare(strict_types=1);
 
 namespace Setup\Environment;
 
+
+require_once dirname(__DIR__, 3) . '/lib/NF/UrlHelpers.php';
+
+
+
 trait DetectionHelpers
 {
     private function firstHeaderValue(string $value): string
     {
+
+        return \nf_first_header_value($value);
+
         $value = trim($value);
         if ($value === '') {
             return '';
@@ -15,6 +23,7 @@ trait DetectionHelpers
         $parts = explode(',', $value);
 
         return trim((string) $parts[0]);
+
     }
 
     /**
@@ -22,6 +31,9 @@ trait DetectionHelpers
      */
     protected function extractHostAndPort(string $value): array
     {
+
+        return \nf_extract_host_and_port($value);
+
         $value = trim($value);
         if ($value === '') {
             return ['', null];
@@ -60,6 +72,7 @@ trait DetectionHelpers
         $port = ctype_digit($portPart) ? (int) $portPart : null;
 
         return [$host, $port];
+
     }
 
     /**
@@ -67,6 +80,9 @@ trait DetectionHelpers
      */
     private function parseForwardedHeader(string $header): array
     {
+
+        return \nf_parse_forwarded_header($header);
+
         $result = [
             'proto' => null,
             'host' => null,
@@ -126,10 +142,14 @@ trait DetectionHelpers
         }
 
         return $result;
+
     }
 
     private function extractCloudflareScheme(string $header): ?string
     {
+
+        return \nf_extract_cloudflare_scheme($header);
+
         $header = trim($header);
         if ($header === '') {
             return null;
@@ -146,20 +166,28 @@ trait DetectionHelpers
         }
 
         return strtolower($scheme);
+
     }
 
     private function isTruthyProxyFlag(string $value): bool
     {
+
+        return \nf_is_truthy_proxy_flag($value);
+
         $normalized = strtolower(trim($value));
         if ($normalized === '') {
             return false;
         }
 
         return in_array($normalized, ['on', 'true', '1', 'yes'], true);
+
     }
 
     private function detectBasePath(array $server): string
     {
+
+        return \nf_detect_base_path($server);
+
         $candidates = [];
 
         $forwardedPrefix = $this->firstHeaderValue((string) ($server['HTTP_X_FORWARDED_PREFIX'] ?? ''));
@@ -226,10 +254,14 @@ trait DetectionHelpers
         }
 
         return $scriptDir;
+
     }
 
     private function normalizeBaseUrl(string $baseUrl): ?string
     {
+
+        return \nf_normalize_base_url($baseUrl);
+
         $trimmed = trim($baseUrl);
         if ($trimmed === '') {
             return null;
@@ -272,10 +304,14 @@ trait DetectionHelpers
         }
 
         return $scheme . '://' . $authority . $path;
+
     }
 
     private function normalizeBasePath(string $basePath): ?string
     {
+
+        return \nf_normalize_base_path($basePath);
+
         $trimmed = trim($basePath);
         if ($trimmed === '' || $trimmed === '/') {
             return '/';
@@ -295,10 +331,14 @@ trait DetectionHelpers
         }
 
         return $normalized === '' ? '/' : $normalized;
+
     }
 
     private function sanitizeDetectedHost(string $host): string
     {
+
+        return \nf_sanitize_detected_host($host);
+
         $host = strtolower(trim($host));
 
         if ($host === '' || $host === '.') {
@@ -319,10 +359,14 @@ trait DetectionHelpers
         }
 
         return $host;
+
     }
 
     private function isValidHost(string $host): bool
     {
+
+        return \nf_is_valid_host($host);
+
         if ($host === '') {
             return false;
         }
@@ -336,20 +380,32 @@ trait DetectionHelpers
         }
 
         return (bool) preg_match('/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$/i', $host);
+
     }
 
     private function isIpAddress(string $value): bool
     {
+
+        return \nf_is_ip_address($value);
+
         return filter_var($value, FILTER_VALIDATE_IP) !== false;
+
     }
 
     private function isDefaultPort(bool $https, int $port): bool
     {
+
+        return \nf_is_default_port($https, $port);
+
         return ($https && $port === 443) || (!$https && $port === 80);
+
     }
 
     private function formatHostForUrl(string $host): string
     {
+
+        return \nf_format_host_for_url($host);
+
         if ($host === '') {
             return 'localhost';
         }
@@ -359,5 +415,6 @@ trait DetectionHelpers
         }
 
         return $host;
+
     }
 }

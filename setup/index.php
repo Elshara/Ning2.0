@@ -16,6 +16,8 @@ class SetupWizard
     private string $baseDir;
     private string $configPath;
 
+
+
 session_start();
 
 $baseDir = dirname(__DIR__);
@@ -37,6 +39,7 @@ class SetupWizard
 
     private string $baseDir;
     private string $configPath;
+
 
     /**
      * @var array<string,mixed>
@@ -209,6 +212,9 @@ class SetupWizard
             'suggested_base_url' => $normalizedBaseUrl ?? $baseUrl,
 
         ];
+
+
+        ];
         if (!isset($_SESSION[self::SESSION_KEY])) {
             $detected = $this->detectEnvironment();
             $_SESSION[self::SESSION_KEY] = [
@@ -222,6 +228,7 @@ class SetupWizard
         }
 
         $this->state = &$_SESSION[self::SESSION_KEY];
+
 
     }
 
@@ -263,7 +270,11 @@ class SetupWizard
 
         if ($step < 1 || $step > 5) {
 
+
+        if ($step < 1 || $step > 5) {
+
         if ($step < 1 || $step > 4) {
+
 
             $step = 1;
         }
@@ -283,7 +294,10 @@ class SetupWizard
 
         if ($currentStep >= 5) {
 
+
+
         if ($currentStep >= 4) {
+
 
             return 'complete';
         }
@@ -294,6 +308,9 @@ class SetupWizard
     private function redirectToStep(string $step): void
     {
 
+
+
+
         $location = '?step=' . urlencode($step);
         if (PHP_SAPI !== 'cli' && !headers_sent()) {
             header('Location: ' . $location);
@@ -301,7 +318,10 @@ class SetupWizard
             echo 'Continue setup at: ' . $location . PHP_EOL;
         }
 
+
+
         header('Location: ?step=' . urlencode($step));
+
 
         exit;
     }
@@ -322,13 +342,19 @@ class SetupWizard
                 return $this->handleDatabaseStep();
             case 3:
 
+
+
+
                 return $this->handleAdministratorsStep();
             case 4:
                 return $this->handleNetworkAndAutomationStep();
             case 5:
 
+
+
                 return $this->handleAdminStep();
             case 4:
+
 
                 return $this->handleFinalizeStep();
             default:
@@ -347,6 +373,9 @@ class SetupWizard
 
         $errors = [];
 
+
+
+
         $normalizedBaseUrl = null;
 
         if ($siteName === '') {
@@ -356,11 +385,17 @@ class SetupWizard
         if ($baseUrl === '' || !filter_var($baseUrl, FILTER_VALIDATE_URL)) {
             $errors['base_url'] = 'Please provide a valid base URL (e.g. https://example.com).';
 
+
+
+
         } else {
             $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
             if ($normalizedBaseUrl === null) {
                 $errors['base_url'] = 'Please provide a valid base URL (e.g. https://example.com).';
             }
+
+
+
 
         }
 
@@ -372,7 +407,11 @@ class SetupWizard
 
         $this->state['environment']['base_url'] = $normalizedBaseUrl ?? $baseUrl;
 
+
+        $this->state['environment']['base_url'] = $normalizedBaseUrl ?? $baseUrl;
+
         $this->state['environment']['base_url'] = $baseUrl;
+
 
         $this->state['environment']['force_https'] = $forceHttps;
         $this->state['environment']['detected'] = $this->detectEnvironment();
@@ -445,6 +484,9 @@ class SetupWizard
         return [];
     }
 
+
+
+
     /**
      * @return array<string,string>
      */
@@ -504,6 +546,9 @@ class SetupWizard
     /**
      * @return array<string,string>
      */
+
+
+
 
     private function handleNetworkAndAutomationStep(): array
     {
@@ -614,6 +659,8 @@ class SetupWizard
         if ($schedulerInterval < 1 || $schedulerInterval > 1440) {
             $errors['scheduler_interval'] = 'Scheduler interval must be between 1 and 1440 minutes.';
 
+
+
     private function handleAdminStep(): array
     {
         $email = trim($_POST['admin_email'] ?? '');
@@ -632,6 +679,7 @@ class SetupWizard
 
         if (!hash_equals($password, $confirm)) {
             $errors['admin_password_confirm'] = 'The password confirmation does not match.';
+
 
         }
 
@@ -659,9 +707,12 @@ class SetupWizard
             'scheduler_mode' => $schedulerMode,
             'scheduler_interval' => $schedulerInterval,
 
+
+
         $this->state['admin'] = [
             'email' => $email,
             'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+
 
         ];
 
@@ -688,8 +739,11 @@ class SetupWizard
         if (empty($this->state['network']['name']) || empty($this->state['network']['slug']) || empty($this->state['network']['base_domain'])) {
             return ['config' => 'Network settings are incomplete. Please confirm the network domain and subdomain selections.'];
 
+
+
         if (empty($this->state['admin']['email']) || empty($this->state['admin']['password_hash'])) {
             return ['config' => 'Administrator details are missing. Please provide the administrator email and password.'];
+
 
         }
 
@@ -701,6 +755,9 @@ class SetupWizard
         }
 
 
+
+
+
         if (is_file($this->configPath)) {
             if (!is_writable($this->configPath)) {
                 return ['config' => 'The existing configuration file is not writable: ' . $this->configPath];
@@ -708,6 +765,9 @@ class SetupWizard
         } elseif (!is_writable($configDir)) {
             return ['config' => 'The configuration directory is not writable: ' . $configDir];
         }
+
+
+
 
 
 
@@ -721,6 +781,9 @@ class SetupWizard
 
         $this->state['completed'] = true;
 
+
+
+
         unset($this->state['database']);
         if (isset($this->state['super_admin']['password_hash'])) {
             $this->state['super_admin']['password_hash'] = '[stored]';
@@ -729,7 +792,10 @@ class SetupWizard
             $this->state['network_admin']['password_hash'] = '[stored]';
         }
 
+
+
         unset($this->state['database'], $this->state['admin']);
+
 
 
         return [];
@@ -742,6 +808,9 @@ class SetupWizard
     {
         $environment = $this->state['environment'] ?? [];
         $database = $this->state['database'] ?? [];
+
+
+
 
         $superAdmin = $this->state['super_admin'] ?? [];
         $networkAdmin = $this->state['network_admin'] ?? [];
@@ -796,7 +865,10 @@ class SetupWizard
 
         $aliases = $network['aliases'] ?? [];
 
+
+
         $admin = $this->state['admin'] ?? [];
+
 
 
         return [
@@ -820,6 +892,9 @@ class SetupWizard
                     $database['name'] ?? ''
                 ),
             ],
+
+
+
 
             'super_admin' => $superAdmin,
             'networks' => [
@@ -859,9 +934,12 @@ class SetupWizard
         ];
     }
 
+
+
             'admin' => $admin,
         ];
     }
+
 
 
     /**
@@ -869,6 +947,9 @@ class SetupWizard
      */
     private function detectEnvironment(): array
     {
+
+        return RequestContext::fromGlobals($_SERVER)->toArray();
+
 
         return RequestContext::fromGlobals($_SERVER)->toArray();
 
@@ -894,6 +975,7 @@ class SetupWizard
             'base_url' => $baseUrl,
         ];
 
+
     }
 
     /**
@@ -902,6 +984,9 @@ class SetupWizard
      */
     private function render($step, array $errors): void
     {
+
+
+
 
         if (PHP_SAPI === 'cli') {
             $this->renderCli($step, $errors);
@@ -913,7 +998,10 @@ class SetupWizard
         }
 
 
+
+
         header('Content-Type: text/html; charset=utf-8');
+
 
         $title = 'Setup Wizard';
 
@@ -940,6 +1028,9 @@ class SetupWizard
         echo '</body>';
         echo '</html>';
     }
+
+
+
 
 
     /**
@@ -1006,11 +1097,14 @@ TEXT;
             echo '<p>Your platform is configured with multi-network management enabled.</p>';
             echo '<p><a class="button" href="../">Launch the Control Panel</a></p>';
 
+
+
     private function renderCompletion(): void
     {
         if (!empty($this->state['completed'])) {
             echo '<p>Your network is configured and ready to go.</p>';
             echo '<p><a class="button" href="../">Launch My Network</a></p>';
+
 
         } else {
             echo '<p>The setup wizard has already been completed.</p>';
@@ -1028,8 +1122,14 @@ TEXT;
             4 => 'Network & Automation',
             5 => 'Finalize',
 
+
+            3 => 'Administrators',
+            4 => 'Network & Automation',
+            5 => 'Finalize',
+
             3 => 'Administrator',
             4 => 'Finalize',
+
 
         ];
 
@@ -1055,6 +1155,9 @@ TEXT;
                 break;
             case 3:
 
+
+
+
                 $this->renderAdministratorsStep($errors);
                 break;
             case 4:
@@ -1062,9 +1165,12 @@ TEXT;
                 break;
             case 5:
 
+
+
                 $this->renderAdminStep($errors);
                 break;
             case 4:
+
 
                 $this->renderFinalizeStep($errors);
                 break;
@@ -1082,6 +1188,9 @@ TEXT;
         $baseUrl = $environment['base_url'] ?? ($detected['base_url'] ?? '');
         $forceHttps = array_key_exists('force_https', $environment) ? (bool) $environment['force_https'] : (!empty($detected['https_detected']));
 
+
+
+
         $networkDefaults = $this->defaultNetworkConfiguration($detected);
 
         echo '<form method="post">';
@@ -1096,6 +1205,8 @@ TEXT;
         echo ' Always enforce HTTPS for all requests';
 
 
+
+
         echo '<form method="post">';
         echo '<h2>Environment</h2>';
         echo '<p>We detected the following environment details. Update them if needed.</p>';
@@ -1106,6 +1217,7 @@ TEXT;
         echo '<label class="checkbox">';
         echo '<input type="checkbox" name="force_https" value="1"' . ($forceHttps ? ' checked' : '') . '>'; 
         echo ' Always use HTTPS';
+
 
         echo '</label>';
 
@@ -1119,6 +1231,11 @@ TEXT;
 
         echo '<li>Suggested Base Domain: ' . htmlspecialchars($networkDefaults['base_domain'], ENT_QUOTES, 'UTF-8') . '</li>';
         echo '<li>Suggested Subdomain: ' . htmlspecialchars($networkDefaults['default_slug'], ENT_QUOTES, 'UTF-8') . '</li>';
+
+
+        echo '<li>Suggested Base Domain: ' . htmlspecialchars($networkDefaults['base_domain'], ENT_QUOTES, 'UTF-8') . '</li>';
+        echo '<li>Suggested Subdomain: ' . htmlspecialchars($networkDefaults['default_slug'], ENT_QUOTES, 'UTF-8') . '</li>';
+
 
 
         echo '</ul>';
@@ -1166,11 +1283,16 @@ TEXT;
         echo $this->renderField('Username', 'db_user', (string) $database['user'], $errors['db_user'] ?? null);
 
 
+
+
+
         echo '<label>';
         echo '<span>Password</span>';
         echo '<input type="password" name="db_password" value="' . htmlspecialchars((string) $database['password'], ENT_QUOTES, 'UTF-8') . '">';
         if (isset($errors['db_password'])) {
             echo '<small class="error">' . htmlspecialchars($errors['db_password'], ENT_QUOTES, 'UTF-8') . '</small>';
+
+
 
         $passwordError = $errors['db_password'] ?? null;
         echo '<label>';
@@ -1178,6 +1300,7 @@ TEXT;
         echo '<input type="password" name="db_password" value="' . htmlspecialchars((string) $database['password'], ENT_QUOTES, 'UTF-8') . '">';
         if ($passwordError) {
             echo '<small class="error">' . htmlspecialchars($passwordError, ENT_QUOTES, 'UTF-8') . '</small>';
+
 
         }
         echo '</label>';
@@ -1191,7 +1314,11 @@ TEXT;
 
         echo '<button type="submit">Continue to Administrators</button>';
 
+
+        echo '<button type="submit">Continue to Administrators</button>';
+
         echo '<button type="submit">Continue to Administrator</button>';
+
 
         echo '</div>';
         echo '</form>';
@@ -1201,6 +1328,9 @@ TEXT;
      * @param array<string,string> $errors
      */
 
+
+
+
     private function renderAdministratorsStep(array $errors): void
     {
         $superAdmin = $this->state['super_admin'] ?? [
@@ -1208,14 +1338,20 @@ TEXT;
         ];
         $networkAdmin = $this->state['network_admin'] ?? [
 
+
+
     private function renderAdminStep(array $errors): void
     {
         $admin = $this->state['admin'] ?? [
+
 
             'email' => '',
         ];
 
         echo '<form method="post">';
+
+
+
 
         echo '<h2>Administrators</h2>';
         echo '<p>Define the global super administrator and the initial network administrator.</p>';
@@ -1231,6 +1367,8 @@ TEXT;
         if (isset($errors['super_admin_password'])) {
             echo '<small class="error">' . htmlspecialchars($errors['super_admin_password'], ENT_QUOTES, 'UTF-8') . '</small>';
 
+
+
         echo '<h2>Administrator Account</h2>';
         echo '<p>Set up the initial administrator account for your network.</p>';
 
@@ -1242,11 +1380,15 @@ TEXT;
         if (isset($errors['admin_password'])) {
             echo '<small class="error">' . htmlspecialchars($errors['admin_password'], ENT_QUOTES, 'UTF-8') . '</small>';
 
+
         }
         echo '</label>';
 
         echo '<label>';
         echo '<span>Confirm Password</span>';
+
+
+
 
         echo '<input type="password" name="super_admin_password_confirm" value="">';
         if (isset($errors['super_admin_password_confirm'])) {
@@ -1384,6 +1526,8 @@ TEXT;
         echo '<div class="actions">';
         echo '<a class="button secondary" href="?step=3">Back</a>';
 
+
+
         echo '<input type="password" name="admin_password_confirm" value="">';
         if (isset($errors['admin_password_confirm'])) {
             echo '<small class="error">' . htmlspecialchars($errors['admin_password_confirm'], ENT_QUOTES, 'UTF-8') . '</small>';
@@ -1392,6 +1536,7 @@ TEXT;
 
         echo '<div class="actions">';
         echo '<a class="button secondary" href="?step=2">Back</a>';
+
 
         echo '<button type="submit">Continue to Finalize</button>';
         echo '</div>';
@@ -1405,6 +1550,9 @@ TEXT;
     {
         $config = $this->buildConfiguration();
 
+
+
+
         $networkSummary = [];
         if (!empty($config['networks']) && is_array($config['networks'])) {
             foreach ($config['networks'] as $candidate) {
@@ -1414,6 +1562,9 @@ TEXT;
                 }
             }
         }
+
+
+
 
 
 
@@ -1429,7 +1580,11 @@ TEXT;
 
         echo '<h3>Platform</h3>';
 
+
+        echo '<h3>Platform</h3>';
+
         echo '<h3>Application</h3>';
+
 
         echo '<ul>';
         echo '<li>Name: ' . htmlspecialchars((string) ($config['app']['name'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
@@ -1444,6 +1599,9 @@ TEXT;
         echo '<li>Name: ' . htmlspecialchars((string) ($config['database']['name'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
         echo '<li>Username: ' . htmlspecialchars((string) ($config['database']['user'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
         echo '</ul>';
+
+
+
 
 
         echo '<h3>Super Administrator</h3>';
@@ -1473,9 +1631,12 @@ TEXT;
         echo '<li>Scheduler Mode: ' . htmlspecialchars((string) ($config['scheduler']['mode'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
         echo '<li>Scheduler Interval: ' . htmlspecialchars((string) ($config['scheduler']['interval_minutes'] ?? ''), ENT_QUOTES, 'UTF-8') . ' minutes</li>';
 
+
+
         echo '<h3>Administrator</h3>';
         echo '<ul>';
         echo '<li>Email: ' . htmlspecialchars((string) ($config['admin']['email'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
+
 
         echo '</ul>';
         echo '</div>';
@@ -1484,12 +1645,19 @@ TEXT;
 
         echo '<a class="button secondary" href="?step=4">Back</a>';
 
+
+        echo '<a class="button secondary" href="?step=4">Back</a>';
+
         echo '<a class="button secondary" href="?step=3">Back</a>';
+
 
         echo '<button type="submit">Finish Setup</button>';
         echo '</div>';
         echo '</form>';
     }
+
+
+
 
     private function renderField(string $label, string $name, string $value, ?string $error = null, string $type = 'text', bool $required = true, array $attributes = []): string
     {
@@ -1575,6 +1743,8 @@ TEXT;
         $html .= '<textarea ' . implode(' ', $parts) . '>' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '</textarea>';
 
 
+
+
     private function renderField(string $label, string $name, string $value, ?string $error = null, string $type = 'text', bool $required = true): string
     {
         $html = '<label>';
@@ -1595,6 +1765,7 @@ TEXT;
         }
 
         $html .= '<input ' . implode(' ', $attributes) . '>';
+
 
         if ($error) {
             $html .= '<small class="error">' . htmlspecialchars($error, ENT_QUOTES, 'UTF-8') . '</small>';
@@ -1624,9 +1795,15 @@ TEXT;
         }
 
 
+
+
+
         if (!extension_loaded('mbstring')) {
             $warnings[] = 'The mbstring extension is recommended for multi-byte text handling.';
         }
+
+
+
 
 
 
@@ -1648,7 +1825,11 @@ TEXT;
 
             max-width: 820px;
 
+
+            max-width: 820px;
+
             max-width: 720px;
+
 
             margin: 0 auto;
             background: #fff;
@@ -1672,7 +1853,11 @@ TEXT;
 
             gap: 1.5rem;
 
+
+            gap: 1.5rem;
+
             gap: 1.25rem;
+
 
         }
 
@@ -1696,7 +1881,13 @@ TEXT;
         textarea,
         select {
 
+
+        input[type="number"],
+        textarea,
+        select {
+
         input[type="number"] {
+
 
             padding: 0.75rem 1rem;
             border-radius: 8px;
@@ -1705,10 +1896,16 @@ TEXT;
         }
 
 
+
+
+
         textarea {
             min-height: 120px;
             resize: vertical;
         }
+
+
+
 
 
 
@@ -1721,7 +1918,13 @@ TEXT;
         textarea:focus,
         select:focus {
 
+
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+
         input[type="number"]:focus {
+
 
             outline: none;
             border-color: #2563eb;
@@ -1729,9 +1932,15 @@ TEXT;
         }
 
 
+
+
+
         select {
             background: #fff;
         }
+
+
+
 
 
 
@@ -1745,6 +1954,9 @@ TEXT;
         .checkbox input {
             width: auto;
         }
+
+
+
 
 
         .section {
@@ -1770,6 +1982,9 @@ TEXT;
 
 
 
+
+
+
         .actions {
             display: flex;
             justify-content: space-between;
@@ -1777,6 +1992,11 @@ TEXT;
 
             flex-wrap: wrap;
             gap: 1rem;
+
+
+            flex-wrap: wrap;
+            gap: 1rem;
+
 
 
         }
@@ -1819,7 +2039,11 @@ TEXT;
 
             grid-template-columns: repeat(5, minmax(0, 1fr));
 
+
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+
             grid-template-columns: repeat(4, minmax(0, 1fr));
+
 
             list-style: none;
             padding: 0;
@@ -1888,6 +2112,9 @@ TEXT;
 
             .actions {
                 flex-direction: column;
+
+
+
 
                 align-items: stretch;
             }
@@ -2019,6 +2246,8 @@ if (is_file($configPath) && !$completed) {
 $wizard = new SetupWizard($baseDir, $configPath);
 $wizard->handle();
 
+
+
                 gap: 1rem;
             }
 
@@ -2033,4 +2262,5 @@ $wizard->handle();
         CSS;
     }
 }
+
 
