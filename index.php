@@ -8,6 +8,23 @@ if (!is_file($configPath)) {
     exit;
 }
 
+if (!is_readable($configPath)) {
+    $message = 'The configuration file at "' . $configPath . '" is not readable by PHP. '
+        . 'Adjust the file permissions so the web server and CLI can access it, or rerun the '
+        . 'setup wizard to regenerate the configuration.';
+
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, $message . PHP_EOL);
+    } else {
+        if (!headers_sent()) {
+            header('Content-Type: text/plain; charset=utf-8', true, 500);
+        }
+        echo $message;
+    }
+
+    exit(1);
+}
+
 $config = require $configPath;
 
 if (!is_array($config)) {
