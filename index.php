@@ -15,4 +15,8 @@ if (!is_file($configPath)) {
 
 $GLOBALS['nf_app_config'] = require $configPath;
 
+if (!defined('XN_INCLUDE_PREFIX')) {
+    define('XN_INCLUDE_PREFIX', NF_APP_BASE);
+}
+
 require_once NF_APP_BASE . '/lib/index.php';

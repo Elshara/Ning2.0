@@ -49,8 +49,9 @@ class SetupWizard
     public function handle(): void
     {
         $step = $this->getRequestedStep();
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($method === 'POST') {
             $errors = $this->processStep($step);
             if (empty($errors)) {
                 $next = $this->getNextStep($step);
