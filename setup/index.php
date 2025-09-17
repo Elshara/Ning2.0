@@ -647,15 +647,39 @@ class SetupWizard
      */
     private function detectEnvironment(): array
     {
+        $forwardedProto = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
+        $forwardedHost = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? ''));
+        $forwardedPort = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_PORT'] ?? ''));
+
         $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
-            || (($_SERVER['REQUEST_SCHEME'] ?? '') === 'https');
+            || (($_SERVER['REQUEST_SCHEME'] ?? '') === 'https')
+            || ($forwardedProto !== '' && strtolower($forwardedProto) === 'https');
 
-        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
-        $port = isset($_SERVER['SERVER_PORT']) ? (int) $_SERVER['SERVER_PORT'] : ($https ? 443 : 80);
+        $hostHeader = $forwardedHost !== ''
+            ? $forwardedHost
+            : ($_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost'));
+
+        [$host, $portFromHeader] = $this->extractHostAndPort((string) $hostHeader);
+        if ($host === '') {
+            $host = 'localhost';
+        }
+
+        $port = null;
+        if ($forwardedPort !== '' && ctype_digit($forwardedPort)) {
+            $port = (int) $forwardedPort;
+        } elseif ($portFromHeader !== null) {
+            $port = $portFromHeader;
+        } elseif (isset($_SERVER['SERVER_PORT']) && ctype_digit((string) $_SERVER['SERVER_PORT'])) {
+            $port = (int) $_SERVER['SERVER_PORT'];
+        }
+
+        if ($port === null || $port <= 0) {
+            $port = $https ? 443 : 80;
+        }
 
         $scheme = $https ? 'https' : 'http';
-        $baseUrl = $scheme . '://' . $host;
+        $baseUrl = $scheme . '://' . $this->formatHostForUrl($host);
         if (!$this->isDefaultPort($https, $port)) {
             $baseUrl .= ':' . $port;
         }
@@ -1580,5 +1604,74 @@ class SetupWizard
     private function isDefaultPort(bool $https, int $port): bool
     {
         return ($https && $port === 443) || (!$https && $port === 80);
+    }
+
+    private function firstHeaderValue(string $value): string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return '';
+        }
+
+        $parts = explode(',', $value);
+        return trim((string) $parts[0]);
+    }
+
+    /**
+     * @return array{0:string,1:int|null}
+     */
+    private function extractHostAndPort(string $value): array
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return ['', null];
+        }
+
+        if (str_starts_with($value, '[')) {
+            $end = strpos($value, ']');
+            if ($end !== false) {
+                $host = substr($value, 1, $end - 1);
+                $portPart = substr($value, $end + 1);
+                if (str_starts_with($portPart, ':')) {
+                    $portPart = substr($portPart, 1);
+                }
+                $port = ctype_digit($portPart) ? (int) $portPart : null;
+
+                return [$host, $port];
+            }
+        }
+
+        if (substr_count($value, ':') > 1) {
+            return [$value, null];
+        }
+
+        $colonPos = strrpos($value, ':');
+        if ($colonPos === false) {
+            return [$value, null];
+        }
+
+        $host = substr($value, 0, $colonPos);
+        $portPart = substr($value, $colonPos + 1);
+        if ($host === '') {
+            $host = $value;
+            $portPart = '';
+        }
+
+        $port = ctype_digit($portPart) ? (int) $portPart : null;
+
+        return [$host, $port];
+    }
+
+    private function formatHostForUrl(string $host): string
+    {
+        if ($host === '') {
+            return 'localhost';
+        }
+
+        if ($this->isIpAddress($host) && str_contains($host, ':')) {
+            return '[' . $host . ']';
+        }
+
+        return $host;
     }
 }
