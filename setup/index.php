@@ -767,6 +767,11 @@ class SetupWizard
             $forwardedProto = $forwardedHeader['proto'];
         }
 
+        $cloudflareScheme = $this->extractCloudflareScheme((string) ($_SERVER['HTTP_CF_VISITOR'] ?? ''));
+        if ($forwardedProto === '' && $cloudflareScheme !== null) {
+            $forwardedProto = $cloudflareScheme;
+        }
+
         $forwardedHost = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? ''));
         if ($forwardedHost === '' && $forwardedHeader['host'] !== null) {
             $forwardedHost = $forwardedHeader['host'];
@@ -785,7 +790,8 @@ class SetupWizard
             || $this->isTruthyProxyFlag($frontEndHttps)
             || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
             || (($_SERVER['REQUEST_SCHEME'] ?? '') === 'https')
-            || ($forwardedProto !== '' && strtolower($forwardedProto) === 'https');
+            || ($forwardedProto !== '' && strtolower($forwardedProto) === 'https')
+            || ($cloudflareScheme !== null && $cloudflareScheme === 'https');
 
         $hostHeader = $forwardedHost !== ''
             ? $forwardedHost
@@ -2020,6 +2026,26 @@ class SetupWizard
         }
 
         return $result;
+    }
+
+    private function extractCloudflareScheme(string $header): ?string
+    {
+        $header = trim($header);
+        if ($header === '') {
+            return null;
+        }
+
+        $data = json_decode($header, true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
+            return null;
+        }
+
+        $scheme = $data['scheme'] ?? $data['proto'] ?? null;
+        if (!is_string($scheme) || $scheme === '') {
+            return null;
+        }
+
+        return strtolower($scheme);
     }
 
     private function formatHostForUrl(string $host): string
