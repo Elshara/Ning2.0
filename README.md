@@ -8,12 +8,14 @@ This codebase is in the process of being modernized to run on current versions o
    that the `pdo_mysql`, `mbstring`, and `openssl` extensions are available.
 2. Upload or extract the repository into the document root of your preferred PHP-compatible web
    server. All required libraries are included with the project.
-3. Visit the root URL in your browser. The guided setup wizard launches automatically when no
+3. Confirm the `config/` directory (or whichever location you deploy as your application root)
+   is writable by the PHP process so the installer can persist `config/app.php`.
+4. Visit the root URL in your browser. The guided setup wizard launches automatically when no
    configuration exists.
-4. Complete the wizard to describe your environment, connect to MySQL, define the global super
+5. Complete the wizard to describe your environment, connect to MySQL, define the global super
    administrator, appoint the first network administrator, and choose the addressing and automation
    strategy for the initial network.
-5. After completion the installer writes `config/app.php` (ignored by version control) and redirects
+6. After completion the installer writes `config/app.php` (ignored by version control) and redirects
    back to the application bootstrap so you can sign in as either the super administrator or the
    network owner.
 

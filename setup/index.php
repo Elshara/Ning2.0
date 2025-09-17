@@ -574,6 +574,14 @@ class SetupWizard
             return ['config' => 'Unable to create configuration directory: ' . $configDir];
         }
 
+        if (is_file($this->configPath)) {
+            if (!is_writable($this->configPath)) {
+                return ['config' => 'The existing configuration file is not writable: ' . $this->configPath];
+            }
+        } elseif (!is_writable($configDir)) {
+            return ['config' => 'The configuration directory is not writable: ' . $configDir];
+        }
+
         $configContents = "<?php\nreturn " . var_export($config, true) . ";\n";
 
         if (@file_put_contents($this->configPath, $configContents) === false) {
