@@ -17,7 +17,7 @@ class CmdlineTestGroupRunner extends TestGroupRunner {
 
     public function run() {
     	$testname = (count($this->files) <= 3) ? ('Specific tests: '.join(',',$this->files).'...') : ('All Cmdline Tests in '.$this->dir.'...');
-		$grouptest = &new GroupTest($testname);
+        $grouptest = new GroupTest($testname);
     	foreach ($this->files as $file) {
 //    		print $file."\n";
 			$grouptest->addTestFile($file);
