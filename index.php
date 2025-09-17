@@ -1,6 +1,31 @@
 <?php
+codex/modernize-codebase-for-php-8.4-compatibility
+
 require_once dirname(__FILE__) . '/bootstrap.php';
 
 define('NF_APP_BASE', dirname(__FILE__));
 require_once NF_APP_BASE . '/lib/index.php';
+master
 
+define('NF_APP_BASE', __DIR__);
+
+$autoloadPath = NF_APP_BASE . '/vendor/autoload.php';
+if (is_file($autoloadPath)) {
+    require_once $autoloadPath;
+}
+
+$configPath = NF_APP_BASE . '/config/app.php';
+if (!is_file($configPath)) {
+    require NF_APP_BASE . '/setup/index.php';
+    exit;
+}
+
+$GLOBALS['nf_app_config'] = require $configPath;
+
+require_once NF_APP_BASE . '/bootstrap.php';
+
+if (!defined('XN_INCLUDE_PREFIX')) {
+    define('XN_INCLUDE_PREFIX', NF_APP_BASE);
+}
+
+require_once NF_APP_BASE . '/lib/index.php';

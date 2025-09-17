@@ -1,0 +1,29 @@
+{
+    "name": "ning/social-platform",
+    "description": "Legacy Ning 2.0 application bootstrap for modernization.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "classmap": [
+            "lib/",
+            "widgets/"
+        ],
+        "exclude-from-classmap": [
+            "widgets/page/controllers/CommentControllerORIG.php"
+        ]
+    },
+    "autoload-dev": {
+        "classmap": [
+            "test/"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
