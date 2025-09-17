@@ -1,4 +1,5 @@
 <?php
+
 /* NF_APP_BASE should have been defined by the time this page is included.
  * This page just does everything else to initialize the app
  */
