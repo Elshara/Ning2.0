@@ -1,6 +1,12 @@
 <?php
 declare(strict_types=1);
 
+use Setup\Environment\DetectionHelpers;
+use Setup\Environment\RequestContext;
+
+require_once __DIR__ . '/src/Environment/DetectionHelpers.php';
+require_once __DIR__ . '/src/Environment/RequestContext.php';
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -25,6 +31,8 @@ $wizard->handle();
 
 class SetupWizard
 {
+    use DetectionHelpers;
+
     public const SESSION_KEY = 'nf_setup_wizard';
 
     private string $baseDir;
@@ -760,81 +768,7 @@ class SetupWizard
      */
     private function detectEnvironment(): array
     {
-        $forwardedHeader = $this->parseForwardedHeader((string) ($_SERVER['HTTP_FORWARDED'] ?? ''));
-
-        $forwardedProto = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
-        if ($forwardedProto === '' && $forwardedHeader['proto'] !== null) {
-            $forwardedProto = $forwardedHeader['proto'];
-        }
-
-        $cloudflareScheme = $this->extractCloudflareScheme((string) ($_SERVER['HTTP_CF_VISITOR'] ?? ''));
-        if ($forwardedProto === '' && $cloudflareScheme !== null) {
-            $forwardedProto = $cloudflareScheme;
-        }
-
-        $forwardedHost = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? ''));
-        if ($forwardedHost === '' && $forwardedHeader['host'] !== null) {
-            $forwardedHost = $forwardedHeader['host'];
-        }
-
-        $forwardedPort = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_PORT'] ?? ''));
-        if ($forwardedPort === '' && $forwardedHeader['port'] !== null) {
-            $forwardedPort = (string) $forwardedHeader['port'];
-        }
-
-        $forwardedSsl = (string) ($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '');
-        $frontEndHttps = (string) ($_SERVER['HTTP_FRONT_END_HTTPS'] ?? '');
-
-        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || $this->isTruthyProxyFlag($forwardedSsl)
-            || $this->isTruthyProxyFlag($frontEndHttps)
-            || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
-            || (($_SERVER['REQUEST_SCHEME'] ?? '') === 'https')
-            || ($forwardedProto !== '' && strtolower($forwardedProto) === 'https')
-            || ($cloudflareScheme !== null && $cloudflareScheme === 'https');
-
-        $hostHeader = $forwardedHost !== ''
-            ? $forwardedHost
-            : ($_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost'));
-
-        [$host, $portFromHeader] = $this->extractHostAndPort((string) $hostHeader);
-        $host = $this->sanitizeDetectedHost($host);
-
-        $port = null;
-        if ($forwardedPort !== '' && ctype_digit($forwardedPort)) {
-            $port = (int) $forwardedPort;
-        } elseif ($portFromHeader !== null) {
-            $port = $portFromHeader;
-        } elseif (isset($_SERVER['SERVER_PORT']) && ctype_digit((string) $_SERVER['SERVER_PORT'])) {
-            $port = (int) $_SERVER['SERVER_PORT'];
-        }
-
-        if ($port === null || $port <= 0) {
-            $port = $https ? 443 : 80;
-        }
-
-        $scheme = $https ? 'https' : 'http';
-        $baseUrl = $scheme . '://' . $this->formatHostForUrl($host);
-        if (!$this->isDefaultPort($https, $port)) {
-            $baseUrl .= ':' . $port;
-        }
-
-        $basePath = $this->detectBasePath();
-        if ($basePath !== '/' && $basePath !== '') {
-            $baseUrl .= $basePath;
-        }
-
-        $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
-
-        return [
-            'php_version' => PHP_VERSION,
-            'extensions' => get_loaded_extensions(),
-            'https_detected' => $https,
-            'host' => $host,
-            'port' => $port,
-            'base_url' => $normalizedBaseUrl ?? $baseUrl,
-            'base_path' => $basePath,
-        ];
+        return RequestContext::fromGlobals($_SERVER)->toArray();
     }
 
     /**
@@ -1617,140 +1551,6 @@ class SetupWizard
         CSS;
     }
 
-    private function detectBasePath(): string
-    {
-        $candidates = [];
-
-        $forwardedPrefix = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_PREFIX'] ?? ''));
-        if ($forwardedPrefix !== '') {
-            $candidates[] = $forwardedPrefix;
-        }
-
-        $forwardedPath = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_PATH'] ?? ''));
-        if ($forwardedPath !== '') {
-            $candidates[] = $forwardedPath;
-        }
-
-        $forwardedUri = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_URI'] ?? ''));
-        if ($forwardedUri !== '') {
-            $uriPath = parse_url($forwardedUri, PHP_URL_PATH);
-            if (is_string($uriPath) && $uriPath !== '') {
-                $candidates[] = $uriPath;
-            }
-        }
-
-        $contextPrefix = (string) ($_SERVER['CONTEXT_PREFIX'] ?? '');
-        if ($contextPrefix !== '') {
-            $candidates[] = $contextPrefix;
-        }
-
-        foreach ($candidates as $candidate) {
-            $normalizedCandidate = $this->normalizeBasePath($candidate);
-            if ($normalizedCandidate !== null && $normalizedCandidate !== '/') {
-                return $normalizedCandidate;
-            }
-        }
-
-        $scriptName = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
-        if ($scriptName === '') {
-            return '/';
-        }
-
-        $scriptName = str_replace('\\', '/', $scriptName);
-        $scriptDir = trim(dirname($scriptName), '/');
-        if ($scriptDir === '' || $scriptDir === '.') {
-            $scriptDir = '';
-        } else {
-            $scriptDir = '/' . $scriptDir;
-        }
-
-        if ($scriptDir !== '' && str_ends_with($scriptDir, '/setup')) {
-            $scriptDir = substr($scriptDir, 0, -strlen('/setup'));
-            $scriptDir = rtrim($scriptDir, '/');
-            if ($scriptDir !== '') {
-                $scriptDir = '/' . ltrim($scriptDir, '/');
-            }
-        }
-
-        if ($scriptDir === '' || $scriptDir === '/') {
-            return '/';
-        }
-
-        return $scriptDir;
-    }
-
-    /**
-     * @return string|null
-     */
-    private function normalizeBaseUrl(string $baseUrl): ?string
-    {
-        $trimmed = trim($baseUrl);
-        if ($trimmed === '') {
-            return null;
-        }
-
-        $parts = parse_url($trimmed);
-        if ($parts === false || !is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {
-            return null;
-        }
-
-        $scheme = strtolower((string) $parts['scheme']);
-        $host = strtolower((string) $parts['host']);
-        $https = $scheme === 'https';
-
-        $port = null;
-        if (isset($parts['port'])) {
-            $port = (int) $parts['port'];
-            if ($port <= 0) {
-                $port = null;
-            }
-        }
-
-        if ($port !== null && $this->isDefaultPort($https, $port)) {
-            $port = null;
-        }
-
-        $path = (string) ($parts['path'] ?? '');
-        if ($path !== '') {
-            $path = rtrim($path, '/');
-            if ($path === '' || $path === '/') {
-                $path = '';
-            } elseif ($path[0] !== '/') {
-                $path = '/' . $path;
-            }
-        }
-
-        $authority = $this->formatHostForUrl($host);
-        if ($port !== null) {
-            $authority .= ':' . $port;
-        }
-
-        return $scheme . '://' . $authority . $path;
-    }
-
-    private function normalizeBasePath(string $basePath): ?string
-    {
-        $trimmed = trim($basePath);
-        if ($trimmed === '' || $trimmed === '/') {
-            return '/';
-        }
-
-        if ($trimmed[0] !== '/') {
-            $trimmed = '/' . $trimmed;
-        }
-
-        $normalized = rtrim($trimmed, '/');
-        if ($normalized === '') {
-            $normalized = '/';
-        }
-
-        if (!preg_match('~^/[A-Za-z0-9/_\-\.]*$~', $normalized)) {
-            return null;
-        }
-
-        return $normalized === '' ? '/' : $normalized;
-    }
-
     /**
      * @return list<string>
      */
@@ -1782,47 +1582,6 @@ class SetupWizard
         }
 
         return array_values(array_unique($aliases));
-    }
-
-    private function isValidHost(string $host): bool
-    {
-        if ($host === '') {
-            return false;
-        }
-
-        if ($host === 'localhost' || $this->isIpAddress($host)) {
-            return true;
-        }
-
-        if (str_contains($host, '/')) {
-            return false;
-        }
-
-        return (bool) preg_match('/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$/i', $host);
-    }
-
-    private function sanitizeDetectedHost(string $host): string
-    {
-        $host = strtolower(trim($host));
-
-        if ($host === '' || $host === '.') {
-            return 'localhost';
-        }
-
-        $host = rtrim($host, '.');
-        if ($host === '') {
-            return 'localhost';
-        }
-
-        if ($host === 'localhost' || $this->isIpAddress($host)) {
-            return $host;
-        }
-
-        if (!$this->isValidHost($host)) {
-            return 'localhost';
-        }
-
-        return $host;
     }
 
     private function deriveBaseDomain(string $host): string
@@ -1886,178 +1645,4 @@ class SetupWizard
         return strtolower($candidate);
     }
 
-    private function isIpAddress(string $value): bool
-    {
-        return filter_var($value, FILTER_VALIDATE_IP) !== false;
-    }
-
-    private function isTruthyProxyFlag(string $value): bool
-    {
-        $normalized = strtolower(trim($value));
-        if ($normalized === '') {
-            return false;
-        }
-
-        return in_array($normalized, ['on', 'true', '1', 'yes'], true);
-    }
-
-    private function isDefaultPort(bool $https, int $port): bool
-    {
-        return ($https && $port === 443) || (!$https && $port === 80);
-    }
-
-    private function firstHeaderValue(string $value): string
-    {
-        $value = trim($value);
-        if ($value === '') {
-            return '';
-        }
-
-        $parts = explode(',', $value);
-        return trim((string) $parts[0]);
-    }
-
-    /**
-     * @return array{0:string,1:int|null}
-     */
-    private function extractHostAndPort(string $value): array
-    {
-        $value = trim($value);
-        if ($value === '') {
-            return ['', null];
-        }
-
-        if (str_starts_with($value, '[')) {
-            $end = strpos($value, ']');
-            if ($end !== false) {
-                $host = substr($value, 1, $end - 1);
-                $portPart = substr($value, $end + 1);
-                if (str_starts_with($portPart, ':')) {
-                    $portPart = substr($portPart, 1);
-                }
-                $port = ctype_digit($portPart) ? (int) $portPart : null;
-
-                return [$host, $port];
-            }
-        }
-
-        if (substr_count($value, ':') > 1) {
-            return [$value, null];
-        }
-
-        $colonPos = strrpos($value, ':');
-        if ($colonPos === false) {
-            return [$value, null];
-        }
-
-        $host = substr($value, 0, $colonPos);
-        $portPart = substr($value, $colonPos + 1);
-        if ($host === '') {
-            $host = $value;
-            $portPart = '';
-        }
-
-        $port = ctype_digit($portPart) ? (int) $portPart : null;
-
-        return [$host, $port];
-    }
-
-    /**
-     * @return array{proto:string|null,host:string|null,port:int|null}
-     */
-    private function parseForwardedHeader(string $header): array
-    {
-        $result = [
-            'proto' => null,
-            'host' => null,
-            'port' => null,
-        ];
-
-        $header = trim($header);
-        if ($header === '') {
-            return $result;
-        }
-
-        $segments = explode(',', $header);
-        foreach ($segments as $segment) {
-            $segment = trim($segment);
-            if ($segment === '') {
-                continue;
-            }
-
-            $directives = explode(';', $segment);
-            foreach ($directives as $directive) {
-                $directive = trim($directive);
-                if ($directive === '') {
-                    continue;
-                }
-
-                $equalsPos = strpos($directive, '=');
-                if ($equalsPos === false) {
-                    continue;
-                }
-
-                $name = strtolower(trim(substr($directive, 0, $equalsPos)));
-                $value = trim(substr($directive, $equalsPos + 1));
-                if ($value === '') {
-                    continue;
-                }
-
-                if ($value[0] === '"' && str_ends_with($value, '"')) {
-                    $value = substr($value, 1, -1);
-                }
-
-                if ($name === 'proto' && $result['proto'] === null) {
-                    $result['proto'] = strtolower($value);
-                } elseif ($name === 'host' && $result['host'] === null) {
-                    [$host, $port] = $this->extractHostAndPort($value);
-                    if ($host !== '') {
-                        $result['host'] = $host;
-                    }
-                    if ($port !== null) {
-                        $result['port'] = $port;
-                    }
-                }
-
-                if ($result['proto'] !== null && $result['host'] !== null) {
-                    break 2;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    private function extractCloudflareScheme(string $header): ?string
-    {
-        $header = trim($header);
-        if ($header === '') {
-            return null;
-        }
-
-        $data = json_decode($header, true);
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
-            return null;
-        }
-
-        $scheme = $data['scheme'] ?? $data['proto'] ?? null;
-        if (!is_string($scheme) || $scheme === '') {
-            return null;
-        }
-
-        return strtolower($scheme);
-    }
-
-    private function formatHostForUrl(string $host): string
-    {
-        if ($host === '') {
-            return 'localhost';
-        }
-
-        if ($this->isIpAddress($host) && str_contains($host, ':')) {
-            return '[' . $host . ']';
-        }
-
-        return $host;
-    }
 }
