@@ -760,9 +760,22 @@ class SetupWizard
      */
     private function detectEnvironment(): array
     {
+        $forwardedHeader = $this->parseForwardedHeader((string) ($_SERVER['HTTP_FORWARDED'] ?? ''));
+
         $forwardedProto = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
+        if ($forwardedProto === '' && $forwardedHeader['proto'] !== null) {
+            $forwardedProto = $forwardedHeader['proto'];
+        }
+
         $forwardedHost = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? ''));
+        if ($forwardedHost === '' && $forwardedHeader['host'] !== null) {
+            $forwardedHost = $forwardedHeader['host'];
+        }
+
         $forwardedPort = $this->firstHeaderValue((string) ($_SERVER['HTTP_X_FORWARDED_PORT'] ?? ''));
+        if ($forwardedPort === '' && $forwardedHeader['port'] !== null) {
+            $forwardedPort = (string) $forwardedHeader['port'];
+        }
 
         $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
@@ -1926,6 +1939,72 @@ class SetupWizard
         $port = ctype_digit($portPart) ? (int) $portPart : null;
 
         return [$host, $port];
+    }
+
+    /**
+     * @return array{proto:string|null,host:string|null,port:int|null}
+     */
+    private function parseForwardedHeader(string $header): array
+    {
+        $result = [
+            'proto' => null,
+            'host' => null,
+            'port' => null,
+        ];
+
+        $header = trim($header);
+        if ($header === '') {
+            return $result;
+        }
+
+        $segments = explode(',', $header);
+        foreach ($segments as $segment) {
+            $segment = trim($segment);
+            if ($segment === '') {
+                continue;
+            }
+
+            $directives = explode(';', $segment);
+            foreach ($directives as $directive) {
+                $directive = trim($directive);
+                if ($directive === '') {
+                    continue;
+                }
+
+                $equalsPos = strpos($directive, '=');
+                if ($equalsPos === false) {
+                    continue;
+                }
+
+                $name = strtolower(trim(substr($directive, 0, $equalsPos)));
+                $value = trim(substr($directive, $equalsPos + 1));
+                if ($value === '') {
+                    continue;
+                }
+
+                if ($value[0] === '"' && str_ends_with($value, '"')) {
+                    $value = substr($value, 1, -1);
+                }
+
+                if ($name === 'proto' && $result['proto'] === null) {
+                    $result['proto'] = strtolower($value);
+                } elseif ($name === 'host' && $result['host'] === null) {
+                    [$host, $port] = $this->extractHostAndPort($value);
+                    if ($host !== '') {
+                        $result['host'] = $host;
+                    }
+                    if ($port !== null) {
+                        $result['port'] = $port;
+                    }
+                }
+
+                if ($result['proto'] !== null && $result['host'] !== null) {
+                    break 2;
+                }
+            }
+        }
+
+        return $result;
     }
 
     private function formatHostForUrl(string $host): string
