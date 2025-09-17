@@ -8,7 +8,25 @@ if (!is_file($configPath)) {
     exit;
 }
 
-$GLOBALS['nf_app_config'] = require $configPath;
+$config = require $configPath;
+
+if (!is_array($config)) {
+    $message = 'The configuration file at "' . $configPath . '" must return an array. '
+        . 'Re-run the setup wizard to regenerate a valid configuration.';
+
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, $message . PHP_EOL);
+    } else {
+        if (!headers_sent()) {
+            header('Content-Type: text/plain; charset=utf-8', true, 500);
+        }
+        echo $message;
+    }
+
+    exit(1);
+}
+
+$GLOBALS['nf_app_config'] = $config;
 
 require_once NF_APP_BASE . '/bootstrap.php';
 
