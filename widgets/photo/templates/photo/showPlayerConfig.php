@@ -15,7 +15,7 @@ $textColor = 'ffffff';
 $slideshowCss =  xnhtmlentities(urlencode( ('h1{font-family: '.$this->selectedFont.';color:#'.$textColor.';}')));
 
 ?>
-<?xml version="1.0" encoding="UTF-8" ?>
+<?php echo '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
 <config>
     <logoUrl><%= xg_xmlentities(XG_EmbeddableHelper::getPlayerLogoUrl()) %></logoUrl>
     <logoWidth><%= xg_xmlentities(XG_EmbeddableHelper::getPlayerLogoWidth()) %></logoWidth>

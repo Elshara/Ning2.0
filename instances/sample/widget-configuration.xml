@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<widget id="sample" root="sample">
+  <name>sample</name>
+  <config>
+    <version>1.0</version>
+  </config>
+</widget>

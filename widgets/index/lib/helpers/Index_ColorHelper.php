@@ -88,7 +88,7 @@ class Index_ColorHelper {
 	    $g=(( $g > 0.04045 )?pow(( $g + 0.055 ) / 1.055,2.4):($g/12.92))*100;
 	    $b=(( $b > 0.04045 )?pow(( $b + 0.055 ) / 1.055,2.4):($b/12.92))*100;
 	    
-	    //Observer. = 2ก, Illuminant = D65
+	    //Observer. = 2ยก, Illuminant = D65
 	    $x = $r * 0.4124 + $g * 0.3576 + $b * 0.1805;
 	    $y = $r * 0.2126 + $g * 0.7152 + $b * 0.0722;
 	    $z = $r * 0.0193 + $g * 0.1192 + $b * 0.9505;
@@ -111,14 +111,14 @@ class Index_ColorHelper {
 	    
 	    return array($r,$g,$b);
 	}
-	public static function xyz_luv($x,$y,$z) { // XYZ ั> CIE-L*uv
+	public static function xyz_luv($x,$y,$z) { // XYZ ร‘> CIE-L*uv
 	    $var_U = ( 4 * $x ) / ( $x + ( 15 * $y ) + ( 3 * $z ) );
 	    $var_V = ( 9 * $y ) / ( $x + ( 15 * $y ) + ( 3 * $z ) );
 	
 	    $var_Y = $y / 100;
 	    $var_Y=( $var_Y > 0.008856 )?pow( $var_Y , 1/3 ):( 7.787*$var_Y  + 16/116 );
 	        
-	    $ref_X =  95.047;        //Observer= 2ก, Illuminant= D65
+	    $ref_X =  95.047;        //Observer= 2ยก, Illuminant= D65
 	    $ref_Y = 100.000;
 	    $ref_Z = 108.883;
 	    
@@ -130,12 +130,12 @@ class Index_ColorHelper {
 	    $v = 13 * $l * ( $var_V - $ref_V );
 	    return array($l,$u,$v);
 	}
-	public static function luv_xyz($l,$u,$v) { // CIE-L*uv ั> XYZ
+	public static function luv_xyz($l,$u,$v) { // CIE-L*uv ร‘> XYZ
 	
 	    $var_Y = ( $l + 16 ) / 116;
 	    $var_Y= ( pow($var_Y,3) > 0.008856 )?pow($var_Y,3):(( $var_Y - 16/116 ) / 7.787);
 	    
-	    $ref_X =  95.047;      //Observer= 2ก, Illuminant= D65
+	    $ref_X =  95.047;      //Observer= 2ยก, Illuminant= D65
 	    $ref_Y = 100.000;
 	    $ref_Z = 108.883;
 	    
@@ -287,7 +287,8 @@ class Index_ColorHelper {
 	        $this->b=Index_ColorHelper::bound_value($b,0,255);
 	    }
 	    function set_from_rgbhex($hex) {
-	        $delta=((mb_strlen($hex)==7)&&($hex{0}=="#"))?1:0;
+	        $hasPrefix = (mb_strlen($hex) == 7) && isset($hex[0]) && $hex[0] == "#";
+	        $delta = $hasPrefix ? 1 : 0;
 	        $this->set_from_rgb(hexdec(mb_substr($hex,$delta,2)),
 	                            hexdec(mb_substr($hex,$delta+2,2)),
 	                            hexdec(mb_substr($hex,$delta+4,2)));

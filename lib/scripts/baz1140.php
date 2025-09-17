@@ -1,4 +1,6 @@
 <?php
+require_once dirname(__DIR__) . '/../bootstrap.php';
+
 
 /**
  * TODO this has been an option under manage since 1.9 (?) so we should remove this now outdated script, I think.

@@ -1,4 +1,6 @@
 <?php
+require_once dirname(__DIR__) . '/../bootstrap.php';
+
 // So that Job callback URL construction works properly
 define('NF_BASE_URL', '/index.php');
 
