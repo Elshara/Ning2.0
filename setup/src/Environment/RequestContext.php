@@ -97,6 +97,9 @@ final class RequestContext
         $forwardedHeader = $this->parseForwardedHeader((string) ($server['HTTP_FORWARDED'] ?? ''));
 
         $forwardedProto = $this->firstHeaderValue((string) ($server['HTTP_X_FORWARDED_PROTO'] ?? ''));
+        if ($forwardedProto === '') {
+            $forwardedProto = $this->firstHeaderValue((string) ($server['HTTP_X_ORIGINAL_PROTO'] ?? ''));
+        }
         if ($forwardedProto === '' && $forwardedHeader['proto'] !== null) {
             $forwardedProto = $forwardedHeader['proto'];
         }
@@ -107,11 +110,17 @@ final class RequestContext
         }
 
         $forwardedHost = $this->firstHeaderValue((string) ($server['HTTP_X_FORWARDED_HOST'] ?? ''));
+        if ($forwardedHost === '') {
+            $forwardedHost = $this->firstHeaderValue((string) ($server['HTTP_X_ORIGINAL_HOST'] ?? ''));
+        }
         if ($forwardedHost === '' && $forwardedHeader['host'] !== null) {
             $forwardedHost = $forwardedHeader['host'];
         }
 
         $forwardedPort = $this->firstHeaderValue((string) ($server['HTTP_X_FORWARDED_PORT'] ?? ''));
+        if ($forwardedPort === '') {
+            $forwardedPort = $this->firstHeaderValue((string) ($server['HTTP_X_ORIGINAL_PORT'] ?? ''));
+        }
         if ($forwardedPort === '' && $forwardedHeader['port'] !== null) {
             $forwardedPort = (string) $forwardedHeader['port'];
         }

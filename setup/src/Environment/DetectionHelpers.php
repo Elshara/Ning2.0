@@ -180,6 +180,14 @@ trait DetectionHelpers
             }
         }
 
+        $originalUrl = $this->firstHeaderValue((string) ($server['HTTP_X_ORIGINAL_URL'] ?? ''));
+        if ($originalUrl !== '') {
+            $originalPath = parse_url($originalUrl, PHP_URL_PATH);
+            if (is_string($originalPath) && $originalPath !== '') {
+                $candidates[] = $originalPath;
+            }
+        }
+
         $contextPrefix = (string) ($server['CONTEXT_PREFIX'] ?? '');
         if ($contextPrefix !== '') {
             $candidates[] = $contextPrefix;
