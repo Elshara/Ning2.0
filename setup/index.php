@@ -35,6 +35,39 @@ class SetupWizard
      */
     private array $state;
 
+    /**
+     * TLD suffixes that represent controlled registries where the registrable domain
+     * includes an additional label (for example, "example.co.uk").
+     *
+     * @var list<string>
+     */
+    private const MULTI_LEVEL_TLDS = [
+        'com.au',
+        'net.au',
+        'org.au',
+        'edu.au',
+        'gov.au',
+        'asn.au',
+        'id.au',
+        'com.br',
+        'com.cn',
+        'co.jp',
+        'or.jp',
+        'ne.jp',
+        'ac.jp',
+        'go.jp',
+        'co.nz',
+        'org.nz',
+        'govt.nz',
+        'ac.nz',
+        'co.uk',
+        'org.uk',
+        'gov.uk',
+        'ac.uk',
+        'net.uk',
+        'sch.uk',
+    ];
+
     public function __construct(string $baseDir, string $configPath)
     {
         $this->baseDir = $baseDir;
@@ -1628,7 +1661,19 @@ class SetupWizard
             return $host;
         }
 
-        return $second . '.' . $tld;
+        $candidate = $second . '.' . $tld;
+
+        if (!empty($parts)) {
+            $suffix = strtolower($candidate);
+            if (in_array($suffix, self::MULTI_LEVEL_TLDS, true)) {
+                $thirdLevel = array_pop($parts);
+                if ($thirdLevel !== null && $thirdLevel !== '') {
+                    return $thirdLevel . '.' . $candidate;
+                }
+            }
+        }
+
+        return $candidate;
     }
 
     private function deriveSlugFromHost(string $host, string $baseDomain): string
