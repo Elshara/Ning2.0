@@ -1,4 +1,11 @@
 <?php
+codex/modernize-codebase-for-php-8.4-compatibility
+
+require_once dirname(__FILE__) . '/bootstrap.php';
+
+define('NF_APP_BASE', dirname(__FILE__));
+require_once NF_APP_BASE . '/lib/index.php';
+master
 
 define('NF_APP_BASE', __DIR__);
 
