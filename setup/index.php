@@ -725,10 +725,7 @@ class SetupWizard
             : ($_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost'));
 
         [$host, $portFromHeader] = $this->extractHostAndPort((string) $hostHeader);
-        $host = strtolower($host);
-        if ($host === '') {
-            $host = 'localhost';
-        }
+        $host = $this->sanitizeDetectedHost($host);
 
         $port = null;
         if ($forwardedPort !== '' && ctype_digit($forwardedPort)) {
@@ -1697,6 +1694,30 @@ class SetupWizard
         }
 
         return (bool) preg_match('/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$/i', $host);
+    }
+
+    private function sanitizeDetectedHost(string $host): string
+    {
+        $host = strtolower(trim($host));
+
+        if ($host === '' || $host === '.') {
+            return 'localhost';
+        }
+
+        $host = rtrim($host, '.');
+        if ($host === '') {
+            return 'localhost';
+        }
+
+        if ($host === 'localhost' || $this->isIpAddress($host)) {
+            return $host;
+        }
+
+        if (!$this->isValidHost($host)) {
+            return 'localhost';
+        }
+
+        return $host;
     }
 
     private function deriveBaseDomain(string $host): string
