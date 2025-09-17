@@ -777,7 +777,12 @@ class SetupWizard
             $forwardedPort = (string) $forwardedHeader['port'];
         }
 
+        $forwardedSsl = (string) ($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '');
+        $frontEndHttps = (string) ($_SERVER['HTTP_FRONT_END_HTTPS'] ?? '');
+
         $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || $this->isTruthyProxyFlag($forwardedSsl)
+            || $this->isTruthyProxyFlag($frontEndHttps)
             || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
             || (($_SERVER['REQUEST_SCHEME'] ?? '') === 'https')
             || ($forwardedProto !== '' && strtolower($forwardedProto) === 'https');
@@ -1878,6 +1883,16 @@ class SetupWizard
     private function isIpAddress(string $value): bool
     {
         return filter_var($value, FILTER_VALIDATE_IP) !== false;
+    }
+
+    private function isTruthyProxyFlag(string $value): bool
+    {
+        $normalized = strtolower(trim($value));
+        if ($normalized === '') {
+            return false;
+        }
+
+        return in_array($normalized, ['on', 'true', '1', 'yes'], true);
     }
 
     private function isDefaultPort(bool $https, int $port): bool
