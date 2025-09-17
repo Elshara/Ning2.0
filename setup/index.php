@@ -7,28 +7,6 @@ use Setup\Environment\RequestContext;
 require_once __DIR__ . '/src/Environment/DetectionHelpers.php';
 require_once __DIR__ . '/src/Environment/RequestContext.php';
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
-$baseDir = dirname(__DIR__);
-$configPath = $baseDir . '/config/app.php';
-$sessionKey = 'nf_setup_wizard';
-$completed = !empty($_SESSION[$sessionKey]['completed']);
-
-if (is_file($configPath) && !$completed) {
-    $redirectUrl = '../';
-    if (PHP_SAPI !== 'cli' && !headers_sent()) {
-        header('Location: ' . $redirectUrl);
-    } else {
-        echo "Configuration already exists. Visit {$redirectUrl} to launch the application." . PHP_EOL;
-    }
-    exit;
-}
-
-$wizard = new SetupWizard($baseDir, $configPath);
-$wizard->handle();
-
 class SetupWizard
 {
     use DetectionHelpers;
@@ -1616,7 +1594,7 @@ class SetupWizard
         return $candidate;
     }
 
-    private function deriveSlugFromHost(string $host, string $baseDomain): string
+private function deriveSlugFromHost(string $host, string $baseDomain): string
     {
         if ($host === '' || $host === $baseDomain || $this->isIpAddress($host)) {
             return 'network';
@@ -1646,3 +1624,26 @@ class SetupWizard
     }
 
 }
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+$baseDir = dirname(__DIR__);
+$configPath = $baseDir . '/config/app.php';
+$sessionKey = SetupWizard::SESSION_KEY;
+$sessionState = $_SESSION[$sessionKey] ?? [];
+$completed = !empty($sessionState['completed']);
+
+if (is_file($configPath) && !$completed) {
+    $redirectUrl = '../';
+    if (PHP_SAPI !== 'cli' && !headers_sent()) {
+        header('Location: ' . $redirectUrl);
+    } else {
+        echo "Configuration already exists. Visit {$redirectUrl} to launch the application." . PHP_EOL;
+    }
+    exit;
+}
+
+$wizard = new SetupWizard($baseDir, $configPath);
+$wizard->handle();
