@@ -15,6 +15,8 @@ if (!is_file($configPath)) {
 
 $GLOBALS['nf_app_config'] = require $configPath;
 
+require_once NF_APP_BASE . '/bootstrap.php';
+
 if (!defined('XN_INCLUDE_PREFIX')) {
     define('XN_INCLUDE_PREFIX', NF_APP_BASE);
 }
