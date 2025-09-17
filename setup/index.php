@@ -769,9 +769,15 @@ class SetupWizard
      */
     private function render($step, array $errors): void
     {
-        if (PHP_SAPI !== 'cli' && !headers_sent()) {
+        if (PHP_SAPI === 'cli') {
+            $this->renderCli($step, $errors);
+            return;
+        }
+
+        if (!headers_sent()) {
             header('Content-Type: text/html; charset=utf-8');
         }
+
         $title = 'Setup Wizard';
 
         echo '<!DOCTYPE html>';
@@ -796,6 +802,64 @@ class SetupWizard
         echo '</div>';
         echo '</body>';
         echo '</html>';
+    }
+
+    /**
+     * @param int|string $step
+     * @param array<string,string> $errors
+     */
+    private function renderCli($step, array $errors): void
+    {
+        $title = 'Setup Wizard';
+        $steps = [
+            1 => 'Environment',
+            2 => 'Database',
+            3 => 'Administrators',
+            4 => 'Network & Automation',
+            5 => 'Finalize',
+        ];
+
+        $separator = str_repeat('=', strlen($title));
+        fwrite(STDOUT, $title . PHP_EOL . $separator . PHP_EOL);
+
+        if ($step === 'complete') {
+            if (!empty($this->state['completed'])) {
+                fwrite(STDOUT, "Setup complete. Launch the application from index.php." . PHP_EOL);
+            } else {
+                fwrite(STDOUT, "The setup wizard has already been completed." . PHP_EOL);
+            }
+
+            return;
+        }
+
+        $stepNumber = (int) $step;
+        $totalSteps = count($steps);
+        $label = $steps[$stepNumber] ?? 'Unknown Step';
+        fwrite(STDOUT, sprintf('Step %d/%d: %s', $stepNumber, $totalSteps, $label) . PHP_EOL . PHP_EOL);
+
+        if (!empty($errors)) {
+            fwrite(STDOUT, "Errors detected:" . PHP_EOL);
+            foreach ($errors as $message) {
+                fwrite(STDOUT, ' - ' . $message . PHP_EOL);
+            }
+            fwrite(STDOUT, PHP_EOL);
+        }
+
+        $detected = $this->state['environment']['detected'] ?? $this->detectEnvironment();
+        $baseUrl = $this->state['environment']['base_url'] ?? ($detected['base_url'] ?? '');
+        if (!is_string($baseUrl) || $baseUrl === '') {
+            $baseUrl = 'http://localhost';
+        }
+
+        $setupUrl = rtrim($baseUrl, '/') . '/setup/';
+
+        $instructions = <<<TEXT
+Complete the installation from a web browser.
+Open: {$setupUrl}
+
+TEXT;
+
+        fwrite(STDOUT, $instructions);
     }
 
     private function renderCompletion(): void
