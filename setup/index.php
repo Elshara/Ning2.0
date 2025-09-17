@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 $baseDir = dirname(__DIR__);
 $configPath = $baseDir . '/config/app.php';
@@ -9,7 +11,12 @@ $sessionKey = 'nf_setup_wizard';
 $completed = !empty($_SESSION[$sessionKey]['completed']);
 
 if (is_file($configPath) && !$completed) {
-    header('Location: ../');
+    $redirectUrl = '../';
+    if (PHP_SAPI !== 'cli' && !headers_sent()) {
+        header('Location: ' . $redirectUrl);
+    } else {
+        echo "Configuration already exists. Visit {$redirectUrl} to launch the application." . PHP_EOL;
+    }
     exit;
 }
 
@@ -198,7 +205,12 @@ class SetupWizard
 
     private function redirectToStep(string $step): void
     {
-        header('Location: ?step=' . urlencode($step));
+        $location = '?step=' . urlencode($step);
+        if (PHP_SAPI !== 'cli' && !headers_sent()) {
+            header('Location: ' . $location);
+        } else {
+            echo 'Continue setup at: ' . $location . PHP_EOL;
+        }
         exit;
     }
 
@@ -664,7 +676,9 @@ class SetupWizard
      */
     private function render($step, array $errors): void
     {
-        header('Content-Type: text/html; charset=utf-8');
+        if (PHP_SAPI !== 'cli' && !headers_sent()) {
+            header('Content-Type: text/html; charset=utf-8');
+        }
         $title = 'Setup Wizard';
 
         echo '<!DOCTYPE html>';
