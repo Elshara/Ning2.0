@@ -490,6 +490,26 @@ class SetupWizard
         }
 
         $aliases = $this->normalizeAliases($aliasesRaw);
+
+        $this->state['network'] = [
+            'name' => $networkName,
+            'slug' => $networkSlug,
+            'base_domain' => $baseDomain,
+            'base_path' => $basePath,
+            'use_subdomain' => $useSubdomain,
+            'aliases' => $aliases,
+            'auto_updates' => $networkAutoUpdates,
+            'allow_super_admin_updates' => $allowSuperAdminUpdates,
+        ];
+
+        $this->state['automation'] = [
+            'auto_updates' => $globalAutoUpdates,
+            'allow_network_override' => $allowNetworkOverride,
+            'updates_branch' => $updatesBranch,
+            'scheduler_mode' => $schedulerMode,
+            'scheduler_interval' => $schedulerInterval,
+        ];
+
         $invalidAliases = [];
         foreach ($aliases as $alias) {
             if (!$this->isValidHost($alias)) {
@@ -504,6 +524,25 @@ class SetupWizard
         $primaryHost = $useSubdomain ? $networkSlug . '.' . $baseDomain : $baseDomain;
         if (in_array($primaryHost, $aliases, true)) {
             $errors['network_aliases'] = 'Alias domains may not duplicate the primary host.';
+        }
+
+        $duplicateAliases = [];
+        if (!empty($aliases)) {
+            $aliasCounts = array_count_values($aliases);
+            foreach ($aliasCounts as $alias => $count) {
+                if ($count > 1) {
+                    $duplicateAliases[] = $alias;
+                }
+            }
+        }
+
+        if (!empty($duplicateAliases)) {
+            $message = 'Alias domains must be unique. Remove duplicates: ' . implode(', ', $duplicateAliases) . '.';
+            if (isset($errors['network_aliases'])) {
+                $errors['network_aliases'] .= ' ' . $message;
+            } else {
+                $errors['network_aliases'] = $message;
+            }
         }
 
         if ($updatesBranch === '') {
@@ -524,13 +563,15 @@ class SetupWizard
             return $errors;
         }
 
+        $uniqueAliases = array_values(array_unique($aliases));
+
         $this->state['network'] = [
             'name' => $networkName,
             'slug' => $networkSlug,
             'base_domain' => $baseDomain,
             'base_path' => $normalizedBasePath ?? '/',
             'use_subdomain' => $useSubdomain,
-            'aliases' => $aliases,
+            'aliases' => $uniqueAliases,
             'auto_updates' => $networkAutoUpdates,
             'allow_super_admin_updates' => $allowSuperAdminUpdates,
         ];
