@@ -63,11 +63,16 @@ class SetupWizard
     private function buildDefaultState(array $detected): array
     {
         $networkDefaults = $this->defaultNetworkConfiguration($detected);
+        $baseUrl = $networkDefaults['suggested_base_url'];
+        $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
+        if ($normalizedBaseUrl !== null) {
+            $baseUrl = $normalizedBaseUrl;
+        }
 
         return [
             'environment' => [
                 'site_name' => 'My Network',
-                'base_url' => $networkDefaults['suggested_base_url'],
+                'base_url' => $baseUrl,
                 'force_https' => !empty($detected['https_detected']),
                 'detected' => $detected,
             ],
@@ -135,12 +140,13 @@ class SetupWizard
                 $baseUrl .= ':' . $port;
             }
         }
+        $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
 
         return [
             'base_domain' => $baseDomain,
             'use_subdomain' => $useSubdomain,
             'default_slug' => $defaultSlug,
-            'suggested_base_url' => $baseUrl,
+            'suggested_base_url' => $normalizedBaseUrl ?? $baseUrl,
         ];
     }
 
@@ -249,6 +255,7 @@ class SetupWizard
         $forceHttps = isset($_POST['force_https']) && $_POST['force_https'] === '1';
 
         $errors = [];
+        $normalizedBaseUrl = null;
 
         if ($siteName === '') {
             $errors['site_name'] = 'Please enter a name for your network.';
@@ -256,6 +263,11 @@ class SetupWizard
 
         if ($baseUrl === '' || !filter_var($baseUrl, FILTER_VALIDATE_URL)) {
             $errors['base_url'] = 'Please provide a valid base URL (e.g. https://example.com).';
+        } else {
+            $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
+            if ($normalizedBaseUrl === null) {
+                $errors['base_url'] = 'Please provide a valid base URL (e.g. https://example.com).';
+            }
         }
 
         if (!empty($errors)) {
@@ -263,7 +275,7 @@ class SetupWizard
         }
 
         $this->state['environment']['site_name'] = $siteName;
-        $this->state['environment']['base_url'] = $baseUrl;
+        $this->state['environment']['base_url'] = $normalizedBaseUrl ?? $baseUrl;
         $this->state['environment']['force_https'] = $forceHttps;
         $this->state['environment']['detected'] = $this->detectEnvironment();
 
@@ -661,6 +673,7 @@ class SetupWizard
             : ($_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost'));
 
         [$host, $portFromHeader] = $this->extractHostAndPort((string) $hostHeader);
+        $host = strtolower($host);
         if ($host === '') {
             $host = 'localhost';
         }
@@ -684,13 +697,15 @@ class SetupWizard
             $baseUrl .= ':' . $port;
         }
 
+        $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
+
         return [
             'php_version' => PHP_VERSION,
             'extensions' => get_loaded_extensions(),
             'https_detected' => $https,
             'host' => $host,
             'port' => $port,
-            'base_url' => $baseUrl,
+            'base_url' => $normalizedBaseUrl ?? $baseUrl,
         ];
     }
 
@@ -1472,6 +1487,55 @@ class SetupWizard
             }
         }
         CSS;
+    }
+
+    /**
+     * @return string|null
+     */
+    private function normalizeBaseUrl(string $baseUrl): ?string
+    {
+        $trimmed = trim($baseUrl);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        $parts = parse_url($trimmed);
+        if ($parts === false || !is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {
+            return null;
+        }
+
+        $scheme = strtolower((string) $parts['scheme']);
+        $host = strtolower((string) $parts['host']);
+        $https = $scheme === 'https';
+
+        $port = null;
+        if (isset($parts['port'])) {
+            $port = (int) $parts['port'];
+            if ($port <= 0) {
+                $port = null;
+            }
+        }
+
+        if ($port !== null && $this->isDefaultPort($https, $port)) {
+            $port = null;
+        }
+
+        $path = (string) ($parts['path'] ?? '');
+        if ($path !== '') {
+            $path = rtrim($path, '/');
+            if ($path === '' || $path === '/') {
+                $path = '';
+            } elseif ($path[0] !== '/') {
+                $path = '/' . $path;
+            }
+        }
+
+        $authority = $this->formatHostForUrl($host);
+        if ($port !== null) {
+            $authority .= ':' . $port;
+        }
+
+        return $scheme . '://' . $authority . $path;
     }
 
     private function normalizeBasePath(string $basePath): ?string
