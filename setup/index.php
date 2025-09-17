@@ -128,7 +128,7 @@ class SetupWizard
                 'name' => 'My Network',
                 'slug' => $networkDefaults['default_slug'],
                 'base_domain' => $networkDefaults['base_domain'],
-                'base_path' => '/',
+                'base_path' => $networkDefaults['default_base_path'],
                 'use_subdomain' => $networkDefaults['use_subdomain'],
                 'aliases' => [],
                 'auto_updates' => true,
@@ -146,7 +146,7 @@ class SetupWizard
 
     /**
      * @param array<string,mixed> $detected
-     * @return array{base_domain:string,use_subdomain:bool,default_slug:string,suggested_base_url:string}
+     * @return array{base_domain:string,use_subdomain:bool,default_slug:string,default_base_path:string,suggested_base_url:string}
      */
     private function defaultNetworkConfiguration(array $detected): array
     {
@@ -174,11 +174,30 @@ class SetupWizard
             }
         }
         $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
+        $baseUrlForPath = $normalizedBaseUrl ?? $baseUrl;
+
+        $defaultBasePath = '/';
+        if (!$useSubdomain) {
+            $parsedPath = parse_url($baseUrlForPath, PHP_URL_PATH);
+            if (is_string($parsedPath) && $parsedPath !== '') {
+                $normalizedPath = $this->normalizeBasePath($parsedPath);
+                if ($normalizedPath !== null) {
+                    $defaultBasePath = $normalizedPath;
+                }
+            }
+            if ($defaultBasePath === '/' && isset($detected['base_path'])) {
+                $fallbackPath = $this->normalizeBasePath((string) $detected['base_path']);
+                if ($fallbackPath !== null) {
+                    $defaultBasePath = $fallbackPath;
+                }
+            }
+        }
 
         return [
             'base_domain' => $baseDomain,
             'use_subdomain' => $useSubdomain,
             'default_slug' => $defaultSlug,
+            'default_base_path' => $defaultBasePath,
             'suggested_base_url' => $normalizedBaseUrl ?? $baseUrl,
         ];
     }
@@ -730,6 +749,11 @@ class SetupWizard
             $baseUrl .= ':' . $port;
         }
 
+        $basePath = $this->detectBasePath();
+        if ($basePath !== '/' && $basePath !== '') {
+            $baseUrl .= $basePath;
+        }
+
         $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
 
         return [
@@ -739,6 +763,7 @@ class SetupWizard
             'host' => $host,
             'port' => $port,
             'base_url' => $normalizedBaseUrl ?? $baseUrl,
+            'base_path' => $basePath,
         ];
     }
 
@@ -1520,6 +1545,36 @@ class SetupWizard
             }
         }
         CSS;
+    }
+
+    private function detectBasePath(): string
+    {
+        $scriptName = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
+        if ($scriptName === '') {
+            return '/';
+        }
+
+        $scriptName = str_replace('\\', '/', $scriptName);
+        $scriptDir = trim(dirname($scriptName), '/');
+        if ($scriptDir === '' || $scriptDir === '.') {
+            $scriptDir = '';
+        } else {
+            $scriptDir = '/' . $scriptDir;
+        }
+
+        if ($scriptDir !== '' && str_ends_with($scriptDir, '/setup')) {
+            $scriptDir = substr($scriptDir, 0, -strlen('/setup'));
+            $scriptDir = rtrim($scriptDir, '/');
+            if ($scriptDir !== '') {
+                $scriptDir = '/' . ltrim($scriptDir, '/');
+            }
+        }
+
+        if ($scriptDir === '' || $scriptDir === '/') {
+            return '/';
+        }
+
+        return $scriptDir;
     }
 
     /**
