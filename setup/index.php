@@ -449,7 +449,7 @@ class SetupWizard
         $networkSlug = strtolower(trim($_POST['network_slug'] ?? ''));
         $baseDomain = strtolower(trim($_POST['network_base_domain'] ?? ''));
         $useSubdomain = isset($_POST['network_use_subdomain']) && $_POST['network_use_subdomain'] === '1';
-        $basePath = trim($_POST['network_base_path'] ?? '/');
+        $basePathInput = trim($_POST['network_base_path'] ?? '/');
         $aliasesRaw = trim((string) ($_POST['network_aliases'] ?? ''));
         $networkAutoUpdates = isset($_POST['network_auto_updates']) && $_POST['network_auto_updates'] === '1';
         $allowSuperAdminUpdates = isset($_POST['network_allow_super_updates']) && $_POST['network_allow_super_updates'] === '1';
@@ -476,18 +476,20 @@ class SetupWizard
             $errors['network_base_domain'] = 'The base domain contains invalid characters.';
         }
 
-        $normalizedBasePath = $this->normalizeBasePath($basePath);
+        $normalizedBasePath = $this->normalizeBasePath($basePathInput);
         if ($normalizedBasePath === null) {
             $errors['network_base_path'] = 'The base path may only contain letters, numbers, dashes, underscores, and forward slashes.';
         }
 
         $aliases = $this->normalizeAliases($aliasesRaw);
 
+        $basePathForState = $normalizedBasePath ?? $basePathInput;
+
         $this->state['network'] = [
             'name' => $networkName,
             'slug' => $networkSlug,
             'base_domain' => $baseDomain,
-            'base_path' => $basePath,
+            'base_path' => $basePathForState,
             'use_subdomain' => $useSubdomain,
             'aliases' => $aliases,
             'auto_updates' => $networkAutoUpdates,
@@ -683,6 +685,12 @@ class SetupWizard
         }
 
         $basePath = $useSubdomain ? '/' : ($network['base_path'] ?? '/');
+        $normalizedPrimaryPath = $this->normalizeBasePath($basePath);
+        if ($normalizedPrimaryPath !== null) {
+            $basePath = $normalizedPrimaryPath;
+        } else {
+            $basePath = '/';
+        }
         if ($basePath !== '/' && $basePath !== '') {
             $primaryUrl .= $basePath;
         }

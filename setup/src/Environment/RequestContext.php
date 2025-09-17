@@ -161,7 +161,13 @@ final class RequestContext
         $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
 
         $extensions = get_loaded_extensions();
-        $this->extensions = array_values(array_map('strval', is_array($extensions) ? $extensions : []));
+        $extensions = is_array($extensions) ? array_map('strval', $extensions) : [];
+        if ($extensions !== []) {
+            natcasesort($extensions);
+            $extensions = array_values($extensions);
+        }
+
+        $this->extensions = $extensions;
 
         $this->httpsDetected = $https;
         $this->host = $host;
