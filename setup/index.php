@@ -333,6 +333,12 @@ class SetupWizard
 
         $errors = [];
 
+        if (!class_exists(\PDO::class) || !extension_loaded('pdo_mysql')) {
+            $errors['connection'] = 'The pdo_mysql extension must be enabled before continuing the installation.';
+
+            return $errors;
+        }
+
         if ($host === '') {
             $errors['db_host'] = 'Database host is required.';
         }
