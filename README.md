@@ -4,35 +4,36 @@ This codebase is in the process of being modernized to run on current versions o
 
 ## Getting started
 
-1. Ensure you are using PHP 8.2 or newer (the codebase is continuously verified against PHP 8.4).
-2. Install Composer dependencies:
-   ```bash
-   composer install
-   ```
-3. Upload or serve the application through your preferred PHP-compatible web server and visit the
-   root URL in your browser. The guided setup wizard will launch automatically if no configuration
-   exists.
-4. Follow the wizard to provide your site details, database credentials, and the initial
-   administrator account. The installer validates the MySQL connection, provisions the database if
-   needed, and writes a `config/app.php` file (excluded from version control) with the detected
-   environment defaults.
-5. After completion you will be redirected back to the application bootstrap, ready to sign in with
-   the administrator credentials you supplied.
+1. Ensure you are using PHP 8.2 or newer (the codebase is continuously verified against PHP 8.4) and
+   that the `pdo_mysql`, `mbstring`, and `openssl` extensions are available.
+2. Upload or extract the repository into the document root of your preferred PHP-compatible web
+   server. All required libraries are included with the project.
+3. Confirm the `config/` directory (or whichever location you deploy as your application root)
+   is writable by the PHP process so the installer can persist `config/app.php`.
+4. Visit the root URL in your browser. The guided setup wizard launches automatically when no
+   configuration exists.
+5. Complete the wizard to describe your environment, connect to MySQL, define the global super
+   administrator, appoint the first network administrator, and choose the addressing and automation
+   strategy for the initial network.
+6. After completion the installer writes `config/app.php` (ignored by version control) and redirects
+   back to the application bootstrap so you can sign in as either the super administrator or the
+   network owner.
 
 ## Setup wizard overview
 
-The installer captures the following information one step at a time while detecting as many
-defaults as possible from the current request:
+The installer walks through five focused steps while detecting as many defaults as possible from the
+current request:
 
-1. **Environment** – confirms the detected host, port, and HTTPS status, lets you name the network,
-   and opt into HTTPS enforcement.
-2. **Database** – gathers the MySQL host, port, database name, and credentials, verifies the
-   connection using PDO, and creates the database if it is missing.
-3. **Administrator** – provisions the initial administrator by storing the email and a securely
-   hashed password in the configuration.
-4. **Finalize** – summarizes the selections and writes the generated configuration to
-   `config/app.php`.
+1. **Environment** – confirms the detected host, port, HTTPS status, and recommended base domain
+   while allowing you to name the overall platform.
+2. **Database** – gathers the MySQL host, port, database name, and credentials, verifies access
+   using PDO, and creates the database when it is missing.
+3. **Administrators** – provisions both a global super administrator and the initial network
+   administrator with securely hashed passwords.
+4. **Network & Automation** – defines the primary network name, subdomain or base path, alias
+   domains, automatic update defaults, and the background task scheduler behaviour.
+5. **Finalize** – summarizes the selections and writes the generated configuration file.
 
-Composer now generates a classmap for the legacy `lib/` and `widgets/` directories, which allows
-new services and utilities to be introduced incrementally without relying on global `require`
-statements.
+Once installation is complete the platform supports multiple networks with unique domains or
+subdomains, per-network administrators, optional alias domains, GitHub-driven automatic deployments
+with opt-out controls, and either cron- or page-triggered scheduled tasks.

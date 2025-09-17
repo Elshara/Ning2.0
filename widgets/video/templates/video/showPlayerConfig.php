@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?php echo '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
 <config>
     <video_url><%= xg_xmlentities($this->videoAttachmentUrl) %></video_url>
     <frame_url><%= xg_xmlentities($this->previewFrameUrl) %></frame_url>

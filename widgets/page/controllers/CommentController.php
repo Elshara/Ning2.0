@@ -21,9 +21,6 @@ class Page_CommentController extends W_Controller {
         if (! $_POST['comment']) { throw new Exception('Empty comment (1175663871)'); }
         $page = W_Content::load($_GET['page']);
         if ($page->type != 'Page') { throw new Exception('Not a Page'); }
-		// BK  10/22/08 - A Test:
-		$_POST['comment'] = 'A COMMENT:<br />'.$_POST['comment']
-		// BK END
         $comment = Comment::createAndAttachTo($page, xg_scrub(mb_substr($_POST['comment'], 0, 4000)));
         $comment->save();
         if ($_GET['xn_out'] != 'json') { return $this->redirectTo('show', 'page', array('id' => $page->id)); }
