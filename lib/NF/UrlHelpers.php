@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
 
+
 require_once __DIR__ . '/Url/HostUtils.php';
+
+
 
 if (!function_exists('nf_base_url_from_config')) {
     /**
@@ -57,16 +60,36 @@ if (!function_exists('nf_base_url_from_config')) {
 
     /**
      * @param array<string,mixed> $server
+
      * @return array{https:bool,host:string,port:int,base_path:string,base_url:string}
      */
     function nf_detect_request_metadata(array $server): array
+
+
+     * @return array{https:bool,host:string,port:int,base_path:string,base_url:string}
+     */
+    function nf_detect_request_metadata(array $server): array
+
+     */
+    function nf_detect_base_url_from_server(array $server): string
+
+
     {
         $forwarded = nf_parse_forwarded_header((string) ($server['HTTP_FORWARDED'] ?? ''));
 
         $forwardedProto = nf_first_header_value((string) ($server['HTTP_X_FORWARDED_PROTO'] ?? ''));
+
         if ($forwardedProto === '') {
             $forwardedProto = nf_first_header_value((string) ($server['HTTP_X_ORIGINAL_PROTO'] ?? ''));
         }
+
+
+        if ($forwardedProto === '') {
+            $forwardedProto = nf_first_header_value((string) ($server['HTTP_X_ORIGINAL_PROTO'] ?? ''));
+        }
+
+
+
         if ($forwardedProto === '' && $forwarded['proto'] !== null) {
             $forwardedProto = $forwarded['proto'];
         }
@@ -77,20 +100,42 @@ if (!function_exists('nf_base_url_from_config')) {
         }
 
         $forwardedHost = nf_first_header_value((string) ($server['HTTP_X_FORWARDED_HOST'] ?? ''));
+
         if ($forwardedHost === '') {
             $forwardedHost = nf_first_header_value((string) ($server['HTTP_X_ORIGINAL_HOST'] ?? ''));
         }
+
+
+        if ($forwardedHost === '') {
+            $forwardedHost = nf_first_header_value((string) ($server['HTTP_X_ORIGINAL_HOST'] ?? ''));
+        }
+
+
+
         if ($forwardedHost === '' && $forwarded['host'] !== null) {
             $forwardedHost = $forwarded['host'];
         }
 
         $forwardedPort = nf_first_header_value((string) ($server['HTTP_X_FORWARDED_PORT'] ?? ''));
+
         if ($forwardedPort === '') {
             $forwardedPort = nf_first_header_value((string) ($server['HTTP_X_ORIGINAL_PORT'] ?? ''));
         }
+
+
+        if ($forwardedPort === '') {
+            $forwardedPort = nf_first_header_value((string) ($server['HTTP_X_ORIGINAL_PORT'] ?? ''));
+        }
+
+
+
         if ($forwardedPort === '' && $forwarded['port'] !== null) {
             $forwardedPort = (string) $forwarded['port'];
         }
+
+
+
+
 
         $forwardedSsl = (string) ($server['HTTP_X_FORWARDED_SSL'] ?? '');
         $frontEndHttps = (string) ($server['HTTP_FRONT_END_HTTPS'] ?? '');
@@ -98,6 +143,14 @@ if (!function_exists('nf_base_url_from_config')) {
         $https = (!empty($server['HTTPS']) && $server['HTTPS'] !== 'off')
             || nf_is_truthy_proxy_flag($forwardedSsl)
             || nf_is_truthy_proxy_flag($frontEndHttps)
+
+
+
+        $https = (!empty($server['HTTPS']) && $server['HTTPS'] !== 'off')
+            || nf_is_truthy_proxy_flag((string) ($server['HTTP_X_FORWARDED_SSL'] ?? ''))
+            || nf_is_truthy_proxy_flag((string) ($server['HTTP_FRONT_END_HTTPS'] ?? ''))
+
+
             || ((isset($server['SERVER_PORT']) && (int) $server['SERVER_PORT'] === 443))
             || (($server['REQUEST_SCHEME'] ?? '') === 'https')
             || ($forwardedProto !== '' && strtolower($forwardedProto) === 'https')
@@ -124,12 +177,27 @@ if (!function_exists('nf_base_url_from_config')) {
         }
 
         $scheme = $https ? 'https' : 'http';
+
         $basePath = nf_detect_base_path($server);
+
+
+
+        $basePath = nf_detect_base_path($server);
+
+
+
 
         $baseUrl = $scheme . '://' . nf_format_host_for_url($host);
         if (!nf_is_default_port($https, $port)) {
             $baseUrl .= ':' . $port;
         }
+
+
+
+
+
+        $basePath = nf_detect_base_path($server);
+
 
         if ($basePath !== '/' && $basePath !== '') {
             $baseUrl .= $basePath;
@@ -137,6 +205,10 @@ if (!function_exists('nf_base_url_from_config')) {
 
         $normalized = nf_normalize_base_url($baseUrl);
         if ($normalized !== null) {
+
+
+
+
             $baseUrl = $normalized;
         } else {
             $baseUrl = rtrim($baseUrl, '/');
@@ -162,6 +234,17 @@ if (!function_exists('nf_base_url_from_config')) {
         $metadata = nf_detect_request_metadata($server);
 
         return $metadata['base_url'];
+
+
+
+            return $normalized;
+        }
+
+        $fallback = rtrim($baseUrl, '/');
+
+        return $fallback === '' ? ($scheme . '://localhost') : $fallback;
+
+
     }
 
     /**
@@ -255,6 +338,54 @@ if (!function_exists('nf_base_url_from_config')) {
 
         return $result;
     }
+
+
+
+    /**
+     * @return array{0:string,1:int|null}
+     */
+    function nf_extract_host_and_port(string $value): array
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return ['', null];
+        }
+
+        if (str_starts_with($value, '[')) {
+            $end = strpos($value, ']');
+            if ($end !== false) {
+                $host = substr($value, 1, $end - 1);
+                $portPart = substr($value, $end + 1);
+                if (str_starts_with($portPart, ':')) {
+                    $portPart = substr($portPart, 1);
+                }
+                $port = ctype_digit($portPart) ? (int) $portPart : null;
+
+                return [$host, $port];
+            }
+        }
+
+        if (substr_count($value, ':') > 1) {
+            return [$value, null];
+        }
+
+        $colonPos = strrpos($value, ':');
+        if ($colonPos === false) {
+            return [$value, null];
+        }
+
+        $host = substr($value, 0, $colonPos);
+        $portPart = substr($value, $colonPos + 1);
+        if ($host === '') {
+            $host = $value;
+            $portPart = '';
+        }
+
+        $port = ctype_digit($portPart) ? (int) $portPart : null;
+
+        return [$host, $port];
+    }
+
 
     function nf_extract_cloudflare_scheme(string $header): ?string
     {
@@ -420,5 +551,73 @@ if (!function_exists('nf_base_url_from_config')) {
         return $scheme . '://' . $authority . $path;
     }
 
+
     // host and port helpers are loaded from Url/HostUtils.php
+
+    function nf_sanitize_detected_host(string $host): string
+    {
+        $host = strtolower(trim($host));
+
+        if ($host === '' || $host === '.') {
+            return 'localhost';
+        }
+
+        $host = rtrim($host, '.');
+        if ($host === '') {
+            return 'localhost';
+        }
+
+        if ($host === 'localhost' || nf_is_ip_address($host)) {
+            return $host;
+        }
+
+        if (!nf_is_valid_host($host)) {
+            return 'localhost';
+        }
+
+        return $host;
+    }
+
+    function nf_is_valid_host(string $host): bool
+    {
+        if ($host === '') {
+            return false;
+        }
+
+        if ($host === 'localhost' || nf_is_ip_address($host)) {
+            return true;
+        }
+
+        if (str_contains($host, '/')) {
+            return false;
+        }
+        return (bool) preg_match(
+            '/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$/i/',
+            $host
+        );
+    }
+
+    function nf_is_ip_address(string $value): bool
+    {
+        return filter_var($value, FILTER_VALIDATE_IP) !== false;
+    }
+
+    function nf_is_default_port(bool $https, int $port): bool
+    {
+        return ($https && $port === 443) || (!$https && $port === 80);
+    }
+
+    function nf_format_host_for_url(string $host): string
+    {
+        if ($host === '') {
+            return 'localhost';
+        }
+
+        if (nf_is_ip_address($host) && str_contains($host, ':')) {
+            return '[' . $host . ']';
+        }
+
+        return $host;
+    }
+
 }

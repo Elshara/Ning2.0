@@ -1,11 +1,17 @@
 <?php
 declare(strict_types=1);
 
+
 use Setup\Config\ConfigWriter;
 use Setup\Environment\DetectionHelpers;
 use Setup\Environment\RequestContext;
 
 require_once __DIR__ . '/src/Config/ConfigWriter.php';
+
+use Setup\Environment\DetectionHelpers;
+use Setup\Environment\RequestContext;
+
+
 require_once __DIR__ . '/src/Environment/DetectionHelpers.php';
 require_once __DIR__ . '/src/Environment/RequestContext.php';
 
@@ -17,6 +23,34 @@ class SetupWizard
 
     private string $baseDir;
     private string $configPath;
+
+
+
+
+
+session_start();
+
+$baseDir = dirname(__DIR__);
+$configPath = $baseDir . '/config/app.php';
+$sessionKey = 'nf_setup_wizard';
+$completed = !empty($_SESSION[$sessionKey]['completed']);
+
+if (is_file($configPath) && !$completed) {
+    header('Location: ../');
+    exit;
+}
+
+$wizard = new SetupWizard($baseDir, $configPath);
+$wizard->handle();
+
+class SetupWizard
+{
+    private const SESSION_KEY = 'nf_setup_wizard';
+
+    private string $baseDir;
+    private string $configPath;
+
+
 
     /**
      * @var array<string,mixed>
@@ -187,7 +221,30 @@ class SetupWizard
             'default_slug' => $defaultSlug,
             'default_base_path' => $defaultBasePath,
             'suggested_base_url' => $normalizedBaseUrl ?? $baseUrl,
+
         ];
+
+
+        ];
+
+
+        ];
+        if (!isset($_SESSION[self::SESSION_KEY])) {
+            $detected = $this->detectEnvironment();
+            $_SESSION[self::SESSION_KEY] = [
+                'environment' => [
+                    'site_name' => 'My Network',
+                    'base_url' => $detected['base_url'] ?? '',
+                    'force_https' => !empty($detected['https_detected']),
+                    'detected' => $detected,
+                ],
+            ];
+        }
+
+        $this->state = &$_SESSION[self::SESSION_KEY];
+
+
+
     }
 
     public function handle(): void
@@ -225,7 +282,19 @@ class SetupWizard
         }
 
         $step = (int) $step;
+
         if ($step < 1 || $step > 5) {
+
+
+        if ($step < 1 || $step > 5) {
+
+
+        if ($step < 1 || $step > 5) {
+
+        if ($step < 1 || $step > 4) {
+
+
+
             $step = 1;
         }
 
@@ -243,6 +312,15 @@ class SetupWizard
         }
 
         if ($currentStep >= 5) {
+
+
+
+
+
+        if ($currentStep >= 4) {
+
+
+
             return 'complete';
         }
 
@@ -251,12 +329,28 @@ class SetupWizard
 
     private function redirectToStep(string $step): void
     {
+
+
+
+
+
+
+
         $location = '?step=' . urlencode($step);
         if (PHP_SAPI !== 'cli' && !headers_sent()) {
             header('Location: ' . $location);
         } else {
             echo 'Continue setup at: ' . $location . PHP_EOL;
         }
+
+
+
+
+
+        header('Location: ?step=' . urlencode($step));
+
+
+
         exit;
     }
 
@@ -275,10 +369,27 @@ class SetupWizard
             case 2:
                 return $this->handleDatabaseStep();
             case 3:
+
+
+
+
+
+
+
                 return $this->handleAdministratorsStep();
             case 4:
                 return $this->handleNetworkAndAutomationStep();
             case 5:
+
+
+
+
+
+                return $this->handleAdminStep();
+            case 4:
+
+
+
                 return $this->handleFinalizeStep();
             default:
                 return [];
@@ -295,6 +406,13 @@ class SetupWizard
         $forceHttps = isset($_POST['force_https']) && $_POST['force_https'] === '1';
 
         $errors = [];
+
+
+
+
+
+
+
         $normalizedBaseUrl = null;
 
         if ($siteName === '') {
@@ -303,11 +421,25 @@ class SetupWizard
 
         if ($baseUrl === '' || !filter_var($baseUrl, FILTER_VALIDATE_URL)) {
             $errors['base_url'] = 'Please provide a valid base URL (e.g. https://example.com).';
+
+
+
+
+
+
+
         } else {
             $normalizedBaseUrl = $this->normalizeBaseUrl($baseUrl);
             if ($normalizedBaseUrl === null) {
                 $errors['base_url'] = 'Please provide a valid base URL (e.g. https://example.com).';
             }
+
+
+
+
+
+
+
         }
 
         if (!empty($errors)) {
@@ -315,7 +447,19 @@ class SetupWizard
         }
 
         $this->state['environment']['site_name'] = $siteName;
+
         $this->state['environment']['base_url'] = $normalizedBaseUrl ?? $baseUrl;
+
+
+        $this->state['environment']['base_url'] = $normalizedBaseUrl ?? $baseUrl;
+
+
+        $this->state['environment']['base_url'] = $normalizedBaseUrl ?? $baseUrl;
+
+        $this->state['environment']['base_url'] = $baseUrl;
+
+
+
         $this->state['environment']['force_https'] = $forceHttps;
         $this->state['environment']['detected'] = $this->detectEnvironment();
 
@@ -386,6 +530,13 @@ class SetupWizard
 
         return [];
     }
+
+
+
+
+
+
+
     /**
      * @return array<string,string>
      */
@@ -445,6 +596,13 @@ class SetupWizard
     /**
      * @return array<string,string>
      */
+
+
+
+
+
+
+
     private function handleNetworkAndAutomationStep(): array
     {
         $networkName = trim($_POST['network_name'] ?? '');
@@ -553,6 +711,32 @@ class SetupWizard
 
         if ($schedulerInterval < 1 || $schedulerInterval > 1440) {
             $errors['scheduler_interval'] = 'Scheduler interval must be between 1 and 1440 minutes.';
+
+
+
+
+
+    private function handleAdminStep(): array
+    {
+        $email = trim($_POST['admin_email'] ?? '');
+        $password = (string) ($_POST['admin_password'] ?? '');
+        $confirm = (string) ($_POST['admin_password_confirm'] ?? '');
+
+        $errors = [];
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['admin_email'] = 'Please provide a valid administrator email address.';
+        }
+
+        if (strlen($password) < 8) {
+            $errors['admin_password'] = 'The administrator password must be at least 8 characters long.';
+        }
+
+        if (!hash_equals($password, $confirm)) {
+            $errors['admin_password_confirm'] = 'The password confirmation does not match.';
+
+
+
         }
 
         if (!empty($errors)) {
@@ -578,6 +762,17 @@ class SetupWizard
             'updates_branch' => $updatesBranch,
             'scheduler_mode' => $schedulerMode,
             'scheduler_interval' => $schedulerInterval,
+
+
+
+
+
+        $this->state['admin'] = [
+            'email' => $email,
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+
+
+
         ];
 
         return [];
@@ -602,6 +797,7 @@ class SetupWizard
 
         if (empty($this->state['network']['name']) || empty($this->state['network']['slug']) || empty($this->state['network']['base_domain'])) {
             return ['config' => 'Network settings are incomplete. Please confirm the network domain and subdomain selections.'];
+
         }
 
         $config = $this->buildConfiguration();
@@ -612,6 +808,54 @@ class SetupWizard
         }
 
         $this->state['completed'] = true;
+
+
+
+
+        if (empty($this->state['admin']['email']) || empty($this->state['admin']['password_hash'])) {
+            return ['config' => 'Administrator details are missing. Please provide the administrator email and password.'];
+
+
+        }
+
+        $config = $this->buildConfiguration();
+        $configDir = dirname($this->configPath);
+
+        if (!is_dir($configDir) && !mkdir($configDir, 0755, true) && !is_dir($configDir)) {
+            return ['config' => 'Unable to create configuration directory: ' . $configDir];
+        }
+
+
+
+
+
+        if (is_file($this->configPath)) {
+            if (!is_writable($this->configPath)) {
+                return ['config' => 'The existing configuration file is not writable: ' . $this->configPath];
+            }
+        } elseif (!is_writable($configDir)) {
+            return ['config' => 'The configuration directory is not writable: ' . $configDir];
+        }
+
+
+
+
+
+
+        $configContents = "<?php\nreturn " . var_export($config, true) . ";\n";
+
+        if (@file_put_contents($this->configPath, $configContents) === false) {
+            return ['config' => 'Unable to write configuration file: ' . $this->configPath];
+        }
+
+        @chmod($this->configPath, 0640);
+
+        $this->state['completed'] = true;
+
+
+
+
+
         unset($this->state['database']);
         if (isset($this->state['super_admin']['password_hash'])) {
             $this->state['super_admin']['password_hash'] = '[stored]';
@@ -619,6 +863,15 @@ class SetupWizard
         if (isset($this->state['network_admin']['password_hash'])) {
             $this->state['network_admin']['password_hash'] = '[stored]';
         }
+
+
+
+
+
+        unset($this->state['database'], $this->state['admin']);
+
+
+
 
         return [];
     }
@@ -630,6 +883,13 @@ class SetupWizard
     {
         $environment = $this->state['environment'] ?? [];
         $database = $this->state['database'] ?? [];
+
+
+
+
+
+
+
         $superAdmin = $this->state['super_admin'] ?? [];
         $networkAdmin = $this->state['network_admin'] ?? [];
         $network = $this->state['network'] ?? [];
@@ -683,6 +943,15 @@ class SetupWizard
 
         $aliases = $network['aliases'] ?? [];
 
+
+
+
+
+        $admin = $this->state['admin'] ?? [];
+
+
+
+
         return [
             'app' => [
                 'name' => $environment['site_name'] ?? 'My Network',
@@ -704,6 +973,13 @@ class SetupWizard
                     $database['name'] ?? ''
                 ),
             ],
+
+
+
+
+
+
+
             'super_admin' => $superAdmin,
             'networks' => [
                 $network['slug'] ?? 'network' => [
@@ -741,12 +1017,56 @@ class SetupWizard
             ],
         ];
     }
+
+
+
+
+
+            'admin' => $admin,
+        ];
+    }
+
+
+
+
     /**
      * @return array<string,mixed>
      */
     private function detectEnvironment(): array
     {
+
         return RequestContext::fromGlobals($_SERVER)->toArray();
+
+
+        return RequestContext::fromGlobals($_SERVER)->toArray();
+
+
+        return RequestContext::fromGlobals($_SERVER)->toArray();
+
+        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
+            || (($_SERVER['REQUEST_SCHEME'] ?? '') === 'https');
+
+        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+        $port = isset($_SERVER['SERVER_PORT']) ? (int) $_SERVER['SERVER_PORT'] : ($https ? 443 : 80);
+
+        $scheme = $https ? 'https' : 'http';
+        $baseUrl = $scheme . '://' . $host;
+        if (!($https && $port === 443) && !(!$https && $port === 80)) {
+            $baseUrl .= ':' . $port;
+        }
+
+        return [
+            'php_version' => PHP_VERSION,
+            'extensions' => get_loaded_extensions(),
+            'https_detected' => $https,
+            'host' => $host,
+            'port' => $port,
+            'base_url' => $baseUrl,
+        ];
+
+
+
     }
 
     /**
@@ -755,6 +1075,13 @@ class SetupWizard
      */
     private function render($step, array $errors): void
     {
+
+
+
+
+
+
+
         if (PHP_SAPI === 'cli') {
             $this->renderCli($step, $errors);
             return;
@@ -763,6 +1090,15 @@ class SetupWizard
         if (!headers_sent()) {
             header('Content-Type: text/html; charset=utf-8');
         }
+
+
+
+
+
+
+        header('Content-Type: text/html; charset=utf-8');
+
+
 
         $title = 'Setup Wizard';
 
@@ -789,6 +1125,13 @@ class SetupWizard
         echo '</body>';
         echo '</html>';
     }
+
+
+
+
+
+
+
 
     /**
      * @param int|string $step
@@ -853,6 +1196,19 @@ TEXT;
         if (!empty($this->state['completed'])) {
             echo '<p>Your platform is configured with multi-network management enabled.</p>';
             echo '<p><a class="button" href="../">Launch the Control Panel</a></p>';
+
+
+
+
+
+    private function renderCompletion(): void
+    {
+        if (!empty($this->state['completed'])) {
+            echo '<p>Your network is configured and ready to go.</p>';
+            echo '<p><a class="button" href="../">Launch My Network</a></p>';
+
+
+
         } else {
             echo '<p>The setup wizard has already been completed.</p>';
             echo '<p><a class="button" href="../">Return to the site</a></p>';
@@ -864,9 +1220,26 @@ TEXT;
         $steps = [
             1 => 'Environment',
             2 => 'Database',
+
             3 => 'Administrators',
             4 => 'Network & Automation',
             5 => 'Finalize',
+
+
+            3 => 'Administrators',
+            4 => 'Network & Automation',
+            5 => 'Finalize',
+
+
+            3 => 'Administrators',
+            4 => 'Network & Automation',
+            5 => 'Finalize',
+
+            3 => 'Administrator',
+            4 => 'Finalize',
+
+
+
         ];
 
         echo '<ol class="progress">';
@@ -890,12 +1263,30 @@ TEXT;
                 $this->renderDatabaseStep($errors);
                 break;
             case 3:
+
+
+
+
+
+
+
                 $this->renderAdministratorsStep($errors);
                 break;
             case 4:
                 $this->renderNetworkStep($errors);
                 break;
             case 5:
+
+
+
+
+
+                $this->renderAdminStep($errors);
+                break;
+            case 4:
+
+
+
                 $this->renderFinalizeStep($errors);
                 break;
         }
@@ -911,6 +1302,13 @@ TEXT;
         $siteName = $environment['site_name'] ?? 'My Network';
         $baseUrl = $environment['base_url'] ?? ($detected['base_url'] ?? '');
         $forceHttps = array_key_exists('force_https', $environment) ? (bool) $environment['force_https'] : (!empty($detected['https_detected']));
+
+
+
+
+
+
+
         $networkDefaults = $this->defaultNetworkConfiguration($detected);
 
         echo '<form method="post">';
@@ -923,6 +1321,25 @@ TEXT;
         echo '<label class="checkbox">';
         echo '<input type="checkbox" name="force_https" value="1"' . ($forceHttps ? ' checked' : '') . '>';
         echo ' Always enforce HTTPS for all requests';
+
+
+
+
+
+
+        echo '<form method="post">';
+        echo '<h2>Environment</h2>';
+        echo '<p>We detected the following environment details. Update them if needed.</p>';
+
+        echo $this->renderField('Site Name', 'site_name', $siteName, $errors['site_name'] ?? null);
+        echo $this->renderField('Base URL', 'base_url', $baseUrl, $errors['base_url'] ?? null, 'url');
+
+        echo '<label class="checkbox">';
+        echo '<input type="checkbox" name="force_https" value="1"' . ($forceHttps ? ' checked' : '') . '>'; 
+        echo ' Always use HTTPS';
+
+
+
         echo '</label>';
 
         echo '<div class="detected">';
@@ -932,8 +1349,21 @@ TEXT;
         echo '<li>HTTPS: ' . (!empty($detected['https_detected']) ? 'Yes' : 'No') . '</li>';
         echo '<li>Host: ' . htmlspecialchars((string) ($detected['host'] ?? 'localhost'), ENT_QUOTES, 'UTF-8') . '</li>';
         echo '<li>Port: ' . htmlspecialchars((string) ($detected['port'] ?? 80), ENT_QUOTES, 'UTF-8') . '</li>';
+
         echo '<li>Suggested Base Domain: ' . htmlspecialchars($networkDefaults['base_domain'], ENT_QUOTES, 'UTF-8') . '</li>';
         echo '<li>Suggested Subdomain: ' . htmlspecialchars($networkDefaults['default_slug'], ENT_QUOTES, 'UTF-8') . '</li>';
+
+
+        echo '<li>Suggested Base Domain: ' . htmlspecialchars($networkDefaults['base_domain'], ENT_QUOTES, 'UTF-8') . '</li>';
+        echo '<li>Suggested Subdomain: ' . htmlspecialchars($networkDefaults['default_slug'], ENT_QUOTES, 'UTF-8') . '</li>';
+
+
+        echo '<li>Suggested Base Domain: ' . htmlspecialchars($networkDefaults['base_domain'], ENT_QUOTES, 'UTF-8') . '</li>';
+        echo '<li>Suggested Subdomain: ' . htmlspecialchars($networkDefaults['default_slug'], ENT_QUOTES, 'UTF-8') . '</li>';
+
+
+
+
         echo '</ul>';
 
         $requirements = $this->getRequirementWarnings();
@@ -978,11 +1408,32 @@ TEXT;
         echo $this->renderField('Database Name', 'db_name', (string) $database['name'], $errors['db_name'] ?? null);
         echo $this->renderField('Username', 'db_user', (string) $database['user'], $errors['db_user'] ?? null);
 
+
+
+
+
+
+
+
         echo '<label>';
         echo '<span>Password</span>';
         echo '<input type="password" name="db_password" value="' . htmlspecialchars((string) $database['password'], ENT_QUOTES, 'UTF-8') . '">';
         if (isset($errors['db_password'])) {
             echo '<small class="error">' . htmlspecialchars($errors['db_password'], ENT_QUOTES, 'UTF-8') . '</small>';
+
+
+
+
+
+        $passwordError = $errors['db_password'] ?? null;
+        echo '<label>';
+        echo '<span>Password</span>';
+        echo '<input type="password" name="db_password" value="' . htmlspecialchars((string) $database['password'], ENT_QUOTES, 'UTF-8') . '">';
+        if ($passwordError) {
+            echo '<small class="error">' . htmlspecialchars($passwordError, ENT_QUOTES, 'UTF-8') . '</small>';
+
+
+
         }
         echo '</label>';
 
@@ -992,7 +1443,19 @@ TEXT;
 
         echo '<div class="actions">';
         echo '<a class="button secondary" href="?step=1">Back</a>';
+
         echo '<button type="submit">Continue to Administrators</button>';
+
+
+        echo '<button type="submit">Continue to Administrators</button>';
+
+
+        echo '<button type="submit">Continue to Administrators</button>';
+
+        echo '<button type="submit">Continue to Administrator</button>';
+
+
+
         echo '</div>';
         echo '</form>';
     }
@@ -1000,16 +1463,41 @@ TEXT;
     /**
      * @param array<string,string> $errors
      */
+
+
+
+
+
+
+
     private function renderAdministratorsStep(array $errors): void
     {
         $superAdmin = $this->state['super_admin'] ?? [
             'email' => '',
         ];
         $networkAdmin = $this->state['network_admin'] ?? [
+
+
+
+
+
+    private function renderAdminStep(array $errors): void
+    {
+        $admin = $this->state['admin'] ?? [
+
+
+
             'email' => '',
         ];
 
         echo '<form method="post">';
+
+
+
+
+
+
+
         echo '<h2>Administrators</h2>';
         echo '<p>Define the global super administrator and the initial network administrator.</p>';
 
@@ -1023,11 +1511,36 @@ TEXT;
         echo '<input type="password" name="super_admin_password" value="">';
         if (isset($errors['super_admin_password'])) {
             echo '<small class="error">' . htmlspecialchars($errors['super_admin_password'], ENT_QUOTES, 'UTF-8') . '</small>';
+
+
+
+
+
+        echo '<h2>Administrator Account</h2>';
+        echo '<p>Set up the initial administrator account for your network.</p>';
+
+        echo $this->renderField('Email Address', 'admin_email', (string) ($admin['email'] ?? ''), $errors['admin_email'] ?? null, 'email');
+
+        echo '<label>';
+        echo '<span>Password</span>';
+        echo '<input type="password" name="admin_password" value="">';
+        if (isset($errors['admin_password'])) {
+            echo '<small class="error">' . htmlspecialchars($errors['admin_password'], ENT_QUOTES, 'UTF-8') . '</small>';
+
+
+
         }
         echo '</label>';
 
         echo '<label>';
         echo '<span>Confirm Password</span>';
+
+
+
+
+
+
+
         echo '<input type="password" name="super_admin_password_confirm" value="">';
         if (isset($errors['super_admin_password_confirm'])) {
             echo '<small class="error">' . htmlspecialchars($errors['super_admin_password_confirm'], ENT_QUOTES, 'UTF-8') . '</small>';
@@ -1163,6 +1676,22 @@ TEXT;
 
         echo '<div class="actions">';
         echo '<a class="button secondary" href="?step=3">Back</a>';
+
+
+
+
+
+        echo '<input type="password" name="admin_password_confirm" value="">';
+        if (isset($errors['admin_password_confirm'])) {
+            echo '<small class="error">' . htmlspecialchars($errors['admin_password_confirm'], ENT_QUOTES, 'UTF-8') . '</small>';
+        }
+        echo '</label>';
+
+        echo '<div class="actions">';
+        echo '<a class="button secondary" href="?step=2">Back</a>';
+
+
+
         echo '<button type="submit">Continue to Finalize</button>';
         echo '</div>';
         echo '</form>';
@@ -1174,6 +1703,13 @@ TEXT;
     private function renderFinalizeStep(array $errors): void
     {
         $config = $this->buildConfiguration();
+
+
+
+
+
+
+
         $networkSummary = [];
         if (!empty($config['networks']) && is_array($config['networks'])) {
             foreach ($config['networks'] as $candidate) {
@@ -1184,6 +1720,14 @@ TEXT;
             }
         }
 
+
+
+
+
+
+
+
+
         echo '<form method="post">';
         echo '<h2>Finalize Setup</h2>';
         echo '<p>Review your settings below. Click "Finish" to write the configuration file and complete the setup.</p>';
@@ -1193,7 +1737,19 @@ TEXT;
         }
 
         echo '<div class="summary">';
+
         echo '<h3>Platform</h3>';
+
+
+        echo '<h3>Platform</h3>';
+
+
+        echo '<h3>Platform</h3>';
+
+        echo '<h3>Application</h3>';
+
+
+
         echo '<ul>';
         echo '<li>Name: ' . htmlspecialchars((string) ($config['app']['name'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
         echo '<li>Base URL: ' . htmlspecialchars((string) ($config['app']['base_url'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
@@ -1207,6 +1763,13 @@ TEXT;
         echo '<li>Name: ' . htmlspecialchars((string) ($config['database']['name'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
         echo '<li>Username: ' . htmlspecialchars((string) ($config['database']['user'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
         echo '</ul>';
+
+
+
+
+
+
+
 
         echo '<h3>Super Administrator</h3>';
         echo '<ul>';
@@ -1234,15 +1797,45 @@ TEXT;
         echo '<li>Network Opt-out Allowed: ' . (!empty($config['updates']['allow_network_opt_out']) ? 'Yes' : 'No') . '</li>';
         echo '<li>Scheduler Mode: ' . htmlspecialchars((string) ($config['scheduler']['mode'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
         echo '<li>Scheduler Interval: ' . htmlspecialchars((string) ($config['scheduler']['interval_minutes'] ?? ''), ENT_QUOTES, 'UTF-8') . ' minutes</li>';
+
+
+
+
+
+        echo '<h3>Administrator</h3>';
+        echo '<ul>';
+        echo '<li>Email: ' . htmlspecialchars((string) ($config['admin']['email'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
+
+
+
         echo '</ul>';
         echo '</div>';
 
         echo '<div class="actions">';
+
         echo '<a class="button secondary" href="?step=4">Back</a>';
+
+
+        echo '<a class="button secondary" href="?step=4">Back</a>';
+
+
+        echo '<a class="button secondary" href="?step=4">Back</a>';
+
+        echo '<a class="button secondary" href="?step=3">Back</a>';
+
+
+
         echo '<button type="submit">Finish Setup</button>';
         echo '</div>';
         echo '</form>';
     }
+
+
+
+
+
+
+
     private function renderField(string $label, string $name, string $value, ?string $error = null, string $type = 'text', bool $required = true, array $attributes = []): string
     {
         $html = '<label>';
@@ -1325,6 +1918,35 @@ TEXT;
         $html = '<label>';
         $html .= '<span>' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</span>';
         $html .= '<textarea ' . implode(' ', $parts) . '>' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '</textarea>';
+
+
+
+
+
+
+    private function renderField(string $label, string $name, string $value, ?string $error = null, string $type = 'text', bool $required = true): string
+    {
+        $html = '<label>';
+        $html .= '<span>' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</span>';
+        $attributes = [
+            'type="' . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . '"',
+            'name="' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '"',
+            'value="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"',
+        ];
+
+        if ($type === 'number') {
+            $attributes[] = 'min="1"';
+            $attributes[] = 'max="65535"';
+        }
+
+        if ($required) {
+            $attributes[] = 'required';
+        }
+
+        $html .= '<input ' . implode(' ', $attributes) . '>';
+
+
+
         if ($error) {
             $html .= '<small class="error">' . htmlspecialchars($error, ENT_QUOTES, 'UTF-8') . '</small>';
         }
@@ -1352,9 +1974,24 @@ TEXT;
             $warnings[] = 'The OpenSSL extension is recommended for secure HTTPS connections.';
         }
 
+
+
+
+
+
+
+
         if (!extension_loaded('mbstring')) {
             $warnings[] = 'The mbstring extension is recommended for multi-byte text handling.';
         }
+
+
+
+
+
+
+
+
 
         return $warnings;
     }
@@ -1371,7 +2008,19 @@ TEXT;
         }
 
         .wizard {
+
             max-width: 820px;
+
+
+            max-width: 820px;
+
+
+            max-width: 820px;
+
+            max-width: 720px;
+
+
+
             margin: 0 auto;
             background: #fff;
             border-radius: 12px;
@@ -1391,7 +2040,19 @@ TEXT;
 
         form {
             display: grid;
+
             gap: 1.5rem;
+
+
+            gap: 1.5rem;
+
+
+            gap: 1.5rem;
+
+            gap: 1.25rem;
+
+
+
         }
 
         label {
@@ -1409,35 +2070,97 @@ TEXT;
         input[type="url"],
         input[type="email"],
         input[type="password"],
+
         input[type="number"],
         textarea,
         select {
+
+
+        input[type="number"],
+        textarea,
+        select {
+
+
+        input[type="number"],
+        textarea,
+        select {
+
+        input[type="number"] {
+
+
+
             padding: 0.75rem 1rem;
             border-radius: 8px;
             border: 1px solid #cbd5e1;
             font-size: 1rem;
         }
 
+
+
+
+
+
+
+
         textarea {
             min-height: 120px;
             resize: vertical;
         }
 
+
+
+
+
+
+
+
+
         input[type="text"]:focus,
         input[type="url"]:focus,
         input[type="email"]:focus,
         input[type="password"]:focus,
+
         input[type="number"]:focus,
         textarea:focus,
         select:focus {
+
+
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+
+
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+
+        input[type="number"]:focus {
+
+
+
             outline: none;
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
         }
 
+
+
+
+
+
+
+
         select {
             background: #fff;
         }
+
+
+
+
+
+
+
+
 
         .checkbox {
             flex-direction: row;
@@ -1449,6 +2172,13 @@ TEXT;
         .checkbox input {
             width: auto;
         }
+
+
+
+
+
+
+
 
         .section {
             background: #f8fafc;
@@ -1471,12 +2201,33 @@ TEXT;
             color: #475569;
         }
 
+
+
+
+
+
+
+
+
         .actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
+
             flex-wrap: wrap;
             gap: 1rem;
+
+
+            flex-wrap: wrap;
+            gap: 1rem;
+
+
+            flex-wrap: wrap;
+            gap: 1rem;
+
+
+
+
         }
 
         .actions button,
@@ -1514,7 +2265,19 @@ TEXT;
 
         .progress {
             display: grid;
+
             grid-template-columns: repeat(5, minmax(0, 1fr));
+
+
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+
+
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+
+
+
             list-style: none;
             padding: 0;
             margin: 0 0 2rem 0;
@@ -1582,6 +2345,13 @@ TEXT;
 
             .actions {
                 flex-direction: column;
+
+
+
+
+
+
+
                 align-items: stretch;
             }
 
@@ -1711,3 +2481,25 @@ if (is_file($configPath) && !$completed) {
 
 $wizard = new SetupWizard($baseDir, $configPath);
 $wizard->handle();
+
+
+
+
+
+                gap: 1rem;
+            }
+
+            .actions .button.secondary {
+                width: 100%;
+            }
+
+            .actions button {
+                width: 100%;
+            }
+        }
+        CSS;
+    }
+}
+
+
+
