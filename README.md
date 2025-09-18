@@ -40,6 +40,13 @@ Once installation is complete the platform supports multiple networks with uniqu
 subdomains, per-network administrators, optional alias domains, GitHub-driven automatic deployments
 with opt-out controls, and either cron- or page-triggered scheduled tasks.
 
+## Static assets
+
+- Legacy stylesheets now live under `assets/css/`. Update templates or themes that previously
+  referenced files in the repository root to load them from the consolidated directory. Future
+  asset types (JavaScript, images) should adopt sibling folders to keep the structure shallow and
+  predictable.
+
 The legacy runtime now bootstraps a shared PDO connection using the generated configuration and
 stores the connection metadata in `$GLOBALS['nf_runtime']['database']`. Individual modules should
 prefer this factory over bespoke MySQL adapters as database modernization continues.

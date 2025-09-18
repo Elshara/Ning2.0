@@ -71,6 +71,8 @@ address or document each reported item before completing your work.
    or create follow-up tasks in the appropriate `AGENTS.md`.
 8. Transition the runtime to PDO-based database access using the shared connection factory and map
    outstanding migrations away from flat-file configuration.
+9. Verify templates reference relocated static assets under `assets/` and record any remaining
+   legacy paths in the relevant directory guidance.
 
 ## Documentation
 - Update `README.md` or relevant docs when behaviour, requirements, or workflows change.
