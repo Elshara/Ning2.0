@@ -273,7 +273,13 @@ class Profiles_EmbedController extends XG_LockingCacheController {
 
         $screenName = $this->embed->get('screenName');
         $this->profile = mb_strlen($screenName) ? XG_Cache::profiles($screenName) : null;
-        $info = $this->getPostInfo($this->embedLayoutType, $this->embedSelected, $this->profile, $this->embed, $this->embed->isOwnedByCurrentUser() && $this->embed->get('postsSet') == 0 ? 1 : $this->embed->get('postsSet'));
+        $info = $this->getPostInfo(
+            $this->embedLayoutType,
+            $this->embedSelected,
+            $this->embed,
+            $this->profile,
+            $this->embed->isOwnedByCurrentUser() && $this->embed->get('postsSet') == 0 ? 1 : $this->embed->get('postsSet')
+        );
         $this->postInfo = $info['postInfo'];
         $this->feedUrl = $info['feedUrl'];
         $this->archiveUrl = $info['archiveUrl'];
@@ -341,7 +347,7 @@ class Profiles_EmbedController extends XG_LockingCacheController {
             }
             $screenName = $embed->get('screenName');
             $profile = mb_strlen($screenName) ? XG_Cache::profiles($screenName) : null;
-            $info = $this->getPostInfo($embed->getType(), $embed->get('selected'), $profile, $embed, $embed->get('postsSet') );
+            $info = $this->getPostInfo($embed->getType(), $embed->get('selected'), $embed, $profile, $embed->get('postsSet'));
             $this->embedTitle = $info['embedTitle'];
             $maxEmbedWidth = XG_Embed::getValueFromPostGet('maxEmbedWidth');
             list($junk, $this->moduleBodyHtml) = W_Cache::current('W_Widget')->capture('embed','blogpostsBody', array($info['postInfo']['posts'], $embed->isOwnedByCurrentUser(), $info['archiveUrl'], $info['feedUrl'], $embed, $info['showPromotionLinks'], $maxEmbedWidth));
@@ -360,7 +366,7 @@ class Profiles_EmbedController extends XG_LockingCacheController {
         $this->maxEmbedWidth = $maxEmbedWidth;
     }
 
-    private function getPostInfo($layoutType, $embedSelected, $profile = null, $embed, $end=5) {
+    private function getPostInfo($layoutType, $embedSelected, $embed, $profile = null, $end = 5) {
         $r = array();
         $r['embedTitle'] = xg_text('BLOG_POSTS');
         if ($end == 0) return $r;
@@ -373,6 +379,9 @@ class Profiles_EmbedController extends XG_LockingCacheController {
                 $r['embedTitle'] = xg_text('BLOG_POSTS');
                 $r['showPromotionLinks'] = true;
             } else {
+                if (! $profile) {
+                    throw new Exception('Profile required to load member blog posts.');
+                }
                 $r['postInfo'] = BlogPost::find(array('my->publishStatus' => 'publish', 'contributorName' => $profile->screenName), 0, $end);
                 $r['feedUrl'] = Profiles_FeedHelper::feedUrl($this->_buildUrl('blog','feed',array('user' => $profile->screenName, 'xn_auth' => 'no')));
                 $r['archiveUrl'] = $this->_buildUrl('blog','list',array('user' => $profile->screenName));

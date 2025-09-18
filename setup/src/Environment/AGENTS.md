@@ -1,0 +1,31 @@
+# Agent Guidance – `setup/src/Environment/`
+
+**Scope precedence:** Apply this file after reading `setup/src/AGENTS.md`. It overrides parent
+instructions for environment detection helpers and request metadata utilities.
+
+## Modernization Priorities
+- Keep detection helpers pure and deterministic. Any reliance on `$_SERVER` should be funnelled
+  through dedicated factory methods to simplify testing.
+- Normalise proxy headers, schemes, hosts, and paths consistently with the runtime equivalents in
+  `lib/NF/`. Document divergences that still need harmonization in the Outstanding Work Log.
+- Guard against malformed input (invalid hosts, JSON parsing failures, etc.) with defensive coding
+  and descriptive error messages suitable for CLI and HTTP output.
+
+## Structural Guidance
+- Store shared constants or enumerations in this directory. If a helper grows beyond a single
+  responsibility, split it into multiple files and record the follow-up work below.
+- Maintain symmetry between request context objects used by the wizard and those used in runtime
+  bootstrapping to avoid configuration drift.
+
+## Testing & Checks
+- Extend unit tests that cover header permutations, IPv6 parsing, Cloudflare/Forwarded support, and
+  subdirectory detection. Add fixtures representing real-world proxy configurations when issues are
+  discovered.
+- Run `php tools/detect_duplicates.php setup/src/Environment` to ensure detection logic remains
+  centralised.
+
+## Outstanding Work Log
+- Track remaining edge cases (load balancers, unusual proxy headers) and planned sync work with
+  `lib/NF/` helpers.
+- Mirror future migrations from `lib/NF/UrlHelpers.php` into `lib/NF/Url/` so both the installer and
+  runtime rely on the same host and base-path utilities.

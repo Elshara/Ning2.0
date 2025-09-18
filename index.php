@@ -1,5 +1,7 @@
 <?php
 
+
+
 define('NF_APP_BASE', __DIR__);
 
 $configPath = NF_APP_BASE . '/config/app.php';
@@ -49,6 +51,7 @@ require_once dirname(__FILE__) . '/bootstrap.php';
 
 define('NF_APP_BASE', dirname(__FILE__));
 require_once NF_APP_BASE . '/lib/index.php';
+
 
 define('NF_APP_BASE', __DIR__);
 
@@ -100,7 +103,10 @@ if (!is_array($config)) {
 
 $GLOBALS['nf_app_config'] = $config;
 
+
+
 $GLOBALS['nf_app_config'] = require $configPath;
+
 
 require_once NF_APP_BASE . '/bootstrap.php';
 

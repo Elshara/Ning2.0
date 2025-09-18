@@ -27,7 +27,7 @@ class Syntax03CmdlineTest extends CmdlineTestCase {
         foreach (array_diff(self::contentTypes(), TestSearchController03::getTypesToExclude()) as $contentType) {
             foreach(XG_TestHelper::globr(NF_APP_BASE . '/widgets', 'IndexController.php') as $indexFile) {
                 $searchHandlerFound = FALSE;
-                if (preg_match("/action_detail.*'${contentType}'/s", self::getFileContent($indexFile))) {
+                if (preg_match("/action_detail.*'{$contentType}'/s", self::getFileContent($indexFile))) {
                     $searchHandlerFound = TRUE;
                     break;
                 }

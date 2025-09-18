@@ -178,22 +178,28 @@ class Photo_UserHelper {
      * @param end     The number of the user after the last user to return
      * @return An array 'users' => the users, 'numUsers' => the total number of users that match the query
      */
-    public static function getSortedUsers($filters = null, $sort, $begin = 0, $end = 100) {
+    public static function getSortedUsers($filters = null, $sort = null, $begin = 0, $end = 100) {
         $query = XN_Query::create('Content')
                          ->filter('type', '=', 'User')
                          ->filter('owner');
 
-        if ($filters) {
-            if ($filters['searchFor']) {
-                $query->filter('my->searchText', 'likeic', $filters['searchFor']);
-            }
-            if ($filters['friendsOf']) {
-                $query->filter('contributorName', 'in', XN_Query::FRIENDS($filters['friendsOf']));
-            }
+        $filters = is_array($filters) ? $filters : array();
+        $searchFor = $filters['searchFor'] ?? null;
+        $friendsOf = $filters['friendsOf'] ?? null;
+
+        if ($searchFor) {
+            $query->filter('my->searchText', 'likeic', $searchFor);
+        }
+        if ($friendsOf) {
+            $query->filter('contributorName', 'in', XN_Query::FRIENDS($friendsOf));
+        }
+
+        if ($sort === null) {
+            $sort = self::getMostRecentSortingOrder();
         }
 
         // Don't add activity filter to friends query (BAZ-273) [Jon Aquino 2006-11-28]
-        if (! $filters || ! $filters['friendsOf']) {
+        if (! $friendsOf) {
             self::addActivityFilter($query, false);
         }
         Photo_PrivacyHelper::addBlockedFilter($query);
@@ -209,7 +215,7 @@ class Photo_UserHelper {
          * - we can cache order N queries if there's a searchFor filter
          */
         // TODO: Allow caching for the friends filter, but use XG_QueryHelper::setMaxAgeForFriendsQuery [Jon Aquino 2008-09-17]
-        if ((! $filters['friendsOf']) && ((! $filters['searchFor']) || XG_Cache::cacheOrderN())) {
+        if (! $friendsOf && ((! $searchFor) || XG_Cache::cacheOrderN())) {
             $query = XG_Query::create($query);
             $query->setCaching(XG_Cache::key('type','User'));
         }
