@@ -31,6 +31,27 @@ Before submitting changes that touch PHP or configuration logic, run:
 If a step is not applicable (e.g., `composer.json` removed), state why in your summary rather than
 skipping silently.
 
+## Planning & Workflow
+- Maintain the "Expected Work Plan" list below. Update it whenever milestones are completed or
+  new follow-up work is identified so future agents share the same roadmap.
+- Keep the worktree merge-ready: remove conflict markers immediately, and ensure each set of
+  changes is committed cleanly on top of the latest `master` so downstream merges stay painless.
+- Run the PHP lint sweep and any affected unit/integration suites after meaningful changes; record
+  the outcomes in your summary so audits remain traceable.
+- When code references missing dependencies or files, restore or implement them instead of leaving
+  gaps—fresh installs must succeed without manual patching.
+
+### Expected Work Plan
+1. Eliminate PHP 8.4 runtime notices and deprecation warnings across the legacy helpers and
+   controllers, prioritising functions with outdated signatures or optional/required parameter
+   ordering issues.
+2. Audit the command-line tooling and test harness for compatibility with modern PHP, updating
+   deprecated string interpolation, iterator interfaces, and similar language-level breaks.
+3. Expand automated coverage gradually by re-enabling or porting the historic SimpleTest suites to
+   modern PHPUnit equivalents, keeping parity with the existing behaviour during the transition.
+4. Document new conventions and configuration expectations in `README.md` or the relevant widget
+   docs whenever behaviour changes so administrators can follow along.
+
 ## Documentation
 - Update `README.md` or relevant docs when behaviour, requirements, or workflows change.
 - Describe new configuration options or environment variables so administrators can adopt them.

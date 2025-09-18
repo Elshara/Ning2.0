@@ -440,7 +440,7 @@ class Profiles_MessageController extends XG_BrowserAwareController {
      *
      * @return array  first element is array of messages, second element is total number of messages
      */
-    private function loadMessagesByFolderPage($folder = Profiles_MessageHelper::FOLDER_NAME_INBOX, $page = 1, $pageSize) {
+    private function loadMessagesByFolderPage($folder = Profiles_MessageHelper::FOLDER_NAME_INBOX, $page = 1, $pageSize = Profiles_MessageHelper::MESSAGE_LIST_PAGE_SIZE) {
         $page = intval($page);
         $page = $page > 1 ? $page - 1 : 0;
         $pageSize = intval($pageSize);

@@ -52,7 +52,7 @@ class Chat_UserHelper {
      *
      * @return Array(k=>v)  key=value pairs of chat user information
      */
-    public static function getChatUserDetails($profile = null, $userOnlineStatus) {
+    public static function getChatUserDetails($profile = null, $userOnlineStatus = null) {
         XG_App::includeFileOnce('/lib/XG_SecurityHelper.php');
         XG_App::includeFileOnce('/lib/XG_TemplateHelpers.php');
         XG_App::includeFileOnce('/lib/XG_UserHelper.php');
@@ -61,9 +61,22 @@ class Chat_UserHelper {
             $profile = XN_Profile::current();
         }
 
+        $thumbnailUrlSmall = null;
+        $profileUrl = null;
+        $fullName = null;
+        $gender = null;
+        $age = null;
+        $location = null;
+        $country = null;
+        $isPending = false;
+
         $screenName = $profile->screenName;
         W_Cache::getWidget('chat')->includeFileOnce('/lib/helpers/Chat_ConnectionHelper.php');
-        if (User::isMember($profile) && ($userOnlineStatus == Chat_ConnectionHelper::CHAT_STATUS_ONLINE)) {
+        if ($userOnlineStatus === null) {
+            $userOnlineStatus = Chat_ConnectionHelper::CHAT_STATUS_OFFLINE;
+        }
+
+        if (User::isMember($profile) && ($userOnlineStatus === Chat_ConnectionHelper::CHAT_STATUS_ONLINE)) {
             $thumbnailUrlSmall = XG_UserHelper::getThumbnailUrl($profile, 16, 16);
             $fullName = XG_UserHelper::getFullName($profile);
             $profileUrl = xg_absolute_url(User::profileUrl($screenName));
