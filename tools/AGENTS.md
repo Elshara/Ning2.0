@@ -1,0 +1,15 @@
+# Agent Guidance – `tools/`
+
+**Scope precedence:** Follow this file before the root guidance when updating repository tooling.
+
+## Modernization Priorities
+- Keep maintenance scripts self-contained with one responsibility per file.
+- Ensure tools are compatible with PHP 8.4 and avoid deprecated functions.
+- Document missing automation or checks that future agents should add.
+
+## Structural Guidance
+- Provide inline documentation and usage examples in each tool or accompanying README.
+- Add tests under `tests/` when tools grow complex.
+
+## Outstanding Work Log
+- Track planned enhancements or refactors to repository tooling here.
