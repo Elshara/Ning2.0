@@ -1,4 +1,6 @@
 <?php
+require_once dirname(__DIR__) . '/../bootstrap.php';
+
 /* The bot, for now, is just the profile widget's publish-future-posts bot */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/widgets/profiles/lib/bots/Profiles_PublishInFutureBot.php';
 

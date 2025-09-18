@@ -1,4 +1,6 @@
 <?php
+require_once dirname(__DIR__) . '/../bootstrap.php';
+
 if (! XN_Profile::current()->isOwner()) { throw new Exception('Not allowed'); }
 
 define('NF_APP_BASE',$_SERVER['DOCUMENT_ROOT']);
