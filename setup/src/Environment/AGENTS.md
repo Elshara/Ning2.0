@@ -27,3 +27,5 @@ instructions for environment detection helpers and request metadata utilities.
 ## Outstanding Work Log
 - Track remaining edge cases (load balancers, unusual proxy headers) and planned sync work with
   `lib/NF/` helpers.
+- Mirror future migrations from `lib/NF/UrlHelpers.php` into `lib/NF/Url/` so both the installer and
+  runtime rely on the same host and base-path utilities.

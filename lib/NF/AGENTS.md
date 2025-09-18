@@ -25,4 +25,7 @@ sharing detection logic with the installer and reference `widgets/` guidance for
   reintroduced elsewhere.
 
 ## Outstanding Work Log
-- Document any remaining legacy dependencies or TODO items discovered during modernization here.
+- Host and authority helpers now live in `lib/NF/Url/HostUtils.php`; continue migrating base-path
+  normalization and forwarded-header parsing routines into the dedicated subdirectory.
+- Track adoption of the database connection factory (`lib/NF/Database/ConnectionFactory.php`) and
+  note remaining legacy MySQL entry points that still bypass PDO.

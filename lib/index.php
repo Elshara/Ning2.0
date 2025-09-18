@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/NF/UrlHelpers.php';
+require_once __DIR__ . '/NF/Database/ConnectionFactory.php';
 
 if (!defined('NF_BASE_URL')) {
     $config = $GLOBALS['nf_app_config'] ?? null;
@@ -16,6 +17,18 @@ if (!defined('NF_BASE_URL')) {
     $baseUrl = nf_resolve_base_url(is_array($config) ? $config : null, $server);
 
     define('NF_BASE_URL', $baseUrl);
+}
+
+$databaseBootstrap = nf_initialize_database_connection(is_array($config) ? $config : null);
+
+if (!isset($GLOBALS['nf_runtime']) || !is_array($GLOBALS['nf_runtime'])) {
+    $GLOBALS['nf_runtime'] = [];
+}
+
+$GLOBALS['nf_runtime']['database'] = $databaseBootstrap;
+
+if ($databaseBootstrap['status'] === 'connected' && $databaseBootstrap['pdo'] instanceof \PDO) {
+    $GLOBALS['nf_database_pdo'] = $databaseBootstrap['pdo'];
 }
 
 /* Bootstrap the lightweight Ning SDK compatibility layer if the legacy SDK is unavailable. */

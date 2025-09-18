@@ -63,10 +63,14 @@ address or document each reported item before completing your work.
    modern PHPUnit equivalents, keeping parity with the existing behaviour during the transition.
 4. Replace duplicated or conflicting logic with shared helpers. Track outstanding duplicate
    cleanups in the directory-specific `AGENTS.md` files.
-5. Document new conventions and configuration expectations in `README.md` or the relevant widget
+5. Continue decomposing monolithic helpers like `lib/NF/UrlHelpers.php` into domain-specific files
+   under `lib/NF/Url/`, updating the scoped guidance as new utilities are introduced.
+6. Document new conventions and configuration expectations in `README.md` or the relevant widget
    docs whenever behaviour changes so administrators can follow along.
-6. Record missing files or functionality uncovered during modernization and either implement them
+7. Record missing files or functionality uncovered during modernization and either implement them
    or create follow-up tasks in the appropriate `AGENTS.md`.
+8. Transition the runtime to PDO-based database access using the shared connection factory and map
+   outstanding migrations away from flat-file configuration.
 
 ## Documentation
 - Update `README.md` or relevant docs when behaviour, requirements, or workflows change.

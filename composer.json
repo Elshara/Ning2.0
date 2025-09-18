@@ -1,0 +1,26 @@
+{
+    "name": "elshara/ning2",
+    "description": "Modernization scaffolding for the Ning 2.0 platform",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*"
+    },
+    "autoload": {
+        "files": [
+            "lib/NF/UrlHelpers.php",
+            "lib/NF/Database/ConnectionFactory.php"
+        ],
+        "classmap": [
+            "lib/",
+            "widgets/"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
