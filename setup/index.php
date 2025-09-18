@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
+use Setup\Config\ConfigWriter;
 use Setup\Environment\DetectionHelpers;
 use Setup\Environment\RequestContext;
 
+require_once __DIR__ . '/src/Config/ConfigWriter.php';
 require_once __DIR__ . '/src/Environment/DetectionHelpers.php';
 require_once __DIR__ . '/src/Environment/RequestContext.php';
 
@@ -603,27 +605,11 @@ class SetupWizard
         }
 
         $config = $this->buildConfiguration();
-        $configDir = dirname($this->configPath);
-
-        if (!is_dir($configDir) && !mkdir($configDir, 0755, true) && !is_dir($configDir)) {
-            return ['config' => 'Unable to create configuration directory: ' . $configDir];
+        $writer = new ConfigWriter($this->configPath);
+        $writeResult = $writer->write($config);
+        if ($writeResult !== true) {
+            return ['config' => $writeResult];
         }
-
-        if (is_file($this->configPath)) {
-            if (!is_writable($this->configPath)) {
-                return ['config' => 'The existing configuration file is not writable: ' . $this->configPath];
-            }
-        } elseif (!is_writable($configDir)) {
-            return ['config' => 'The configuration directory is not writable: ' . $configDir];
-        }
-
-        $configContents = "<?php\nreturn " . var_export($config, true) . ";\n";
-
-        if (@file_put_contents($this->configPath, $configContents) === false) {
-            return ['config' => 'Unable to write configuration file: ' . $this->configPath];
-        }
-
-        @chmod($this->configPath, 0640);
 
         $this->state['completed'] = true;
         unset($this->state['database']);

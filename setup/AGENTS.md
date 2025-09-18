@@ -22,4 +22,5 @@
 - Keep generated files like `config/app.php` ignored and note any installer automation gaps here.
 
 ## Outstanding Work Log
-- Use this section to list unfinished steps, missing functionality, or follow-up cleanup tasks.
+- Track extraction of configuration assembly logic from `setup/index.php` into the new `setup/src/Config/` scope so the wizard
+  controller focuses purely on state orchestration and validation.
