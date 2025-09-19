@@ -13,7 +13,7 @@ class BazelTestCaseLocator extends FilterIterator
         parent::__construct(new RecursiveFileIterator($this->_path));
     }
 
-    public function accept() {
+    public function accept(): bool {
         $item = $this->getInnerIterator();
         if ($item->isDir()) {
             return true;

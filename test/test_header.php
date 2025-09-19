@@ -1,4 +1,6 @@
 <?php
+require_once dirname(__FILE__) . '/../bootstrap.php';
+
 // only run this script once per processs
 if (!defined('BAZEL_UNIT_TESTS_INITIALIZED')) {
 function currentUrl() {

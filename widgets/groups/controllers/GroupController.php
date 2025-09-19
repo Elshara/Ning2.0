@@ -725,14 +725,15 @@ class Groups_GroupController extends XG_GroupEnabledController {
       * @param W_Content the group
       * @return void
       */
-    private function setGroupDisplayOptions($group, $_POST) {
+    private function setGroupDisplayOptions($group, array $postData) {
         $activeModules = array('html'=>'','forum'=>'','feed'=>'','groups'=>'');
         $xglayout = XG_Layout::load($group->id, 'groups');
         $layout = $xglayout->getLayout();
         $xpath = new DOMXPath($layout);
         $xPathActive = $xpath->query('//module[@isActive]');
         foreach ($xPathActive as $module) {
-            $isActive = $_POST[$module->getAttribute('widgetName') . 'Active'] == 'yes' ? true : false;
+            $key = $module->getAttribute('widgetName') . 'Active';
+            $isActive = isset($postData[$key]) && $postData[$key] == 'yes';
             if ($isActive) {
                 $module->setAttribute('isActive','1');
             } else {

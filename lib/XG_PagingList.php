@@ -238,7 +238,7 @@ class XG_PagingList implements IteratorAggregate, Countable, ArrayAccess {
     }
 
 //** Implementation
-    protected function __get($name) { # scalar
+    public function __get($name) { # scalar
         if ($name[0] == '_'  || !isset($this->$name)) {
             throw new Exception("Reading of undefined property `$name'");
         }
