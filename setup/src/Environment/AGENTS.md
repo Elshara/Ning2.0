@@ -36,3 +36,7 @@ instructions for environment detection helpers and request metadata utilities.
   additional regions are needed.
 - Catalogue candidate environment-detection improvements from PHPFox Legacy, Dolphin Remake, and
   Cheetah so cross-platform proxy support is analysed before implementation.
+
+## Audit Summary
+- Pending lint audit captured for `setup/src/Environment`. Run `php tools/php_lint_audit.php setup/src/Environment` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

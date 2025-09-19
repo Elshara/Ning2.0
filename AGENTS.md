@@ -45,6 +45,8 @@ Before submitting changes that touch PHP or configuration logic, run:
 3. `php tools/detect_duplicates.php`
 4. `php tests/integration/duplicate_audit_test.php` when touching setup configuration or environment
    helpers to ensure the new file-audit gate stays green.
+5. `php tools/php_lint_audit.php` to capture per-file syntax audit results. Investigate any failures
+   logged to `tmp/audit/php_lint_audit.json` before completing your work.
 
 If a step is not applicable (e.g., `composer.json` removed), state why in your summary rather than
 skipping silently. The duplicate scanner flags repeated lines and blocks that need consolidation;
@@ -98,3 +100,7 @@ address or document each reported item before completing your work.
   Note any unfinished implementations in the local `AGENTS.md` along with recommended next steps.
 
 Adhering to these guidelines will help maintain consistency while we continue modernizing Ning2.0.
+
+## Audit Summary
+- Pending lint audit captured for `repository`. Run `php tools/php_lint_audit.php` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

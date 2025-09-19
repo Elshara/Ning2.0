@@ -28,3 +28,7 @@ when modifying API responses or request generation.
 ## Outstanding Work Log
 - Track missing endpoint coverage, unimplemented filters, or serialization bugs uncovered during
   modernization.
+
+## Audit Summary
+- Pending lint audit captured for `lib/ning/SDK`. Run `php tools/php_lint_audit.php lib/ning/SDK` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

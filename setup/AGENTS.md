@@ -29,3 +29,7 @@
   coordinates flow control.
 - Catalogue wizard capabilities from PHPFox Legacy, Dolphin Remake, and Cheetah that should be
   replicated or superseded here before implementation.
+
+## Audit Summary
+- Pending lint audit captured for `setup`. Run `php tools/php_lint_audit.php setup` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

@@ -18,3 +18,7 @@ wrappers or APIs.
 
 ## Outstanding Work Log
 - Record modernization milestones, duplicate removals, and functionality gaps needing attention.
+
+## Audit Summary
+- Pending lint audit captured for `XN`. Run `php tools/php_lint_audit.php XN` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

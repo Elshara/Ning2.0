@@ -26,3 +26,7 @@
 - Backfill PHPUnit coverage for IPv6-with-port and punycode host detection edge cases.
 - Audit additional public-suffix entries that hosted networks may rely on and append them to the
   shared helper when identified.
+
+## Audit Summary
+- Pending lint audit captured for `lib/NF/Url`. Run `php tools/php_lint_audit.php lib/NF/Url` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

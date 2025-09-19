@@ -23,3 +23,7 @@ instructions. Coordinate with `lib/NF/AGENTS.md` for transcoding/storage helpers
 
 ## Outstanding Work Log
 - Track pending provider integrations, DRM considerations, and adaptive bitrate requirements.
+
+## Audit Summary
+- Pending lint audit captured for `widgets/video`. Run `php tools/php_lint_audit.php widgets/video` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

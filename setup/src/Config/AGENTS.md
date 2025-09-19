@@ -23,3 +23,7 @@
   unwritable-directory and invalid-path scenarios, so future refactors remain safe.
 - Document any PHPFox Legacy, Dolphin Remake, or Cheetah configuration concepts that should be
   ported, mapping their storage expectations before implementation.
+
+## Audit Summary
+- Pending lint audit captured for `setup/src/Config`. Run `php tools/php_lint_audit.php setup/src/Config` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

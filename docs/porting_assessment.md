@@ -35,3 +35,20 @@ Evaluate how feasible it is to bring functionality from the PHPFox Legacy, Dolph
 - Identify two representative modules (e.g., profile custom fields from PHPFox and page builder blocks from Cheetah) for pilot ports.
 - Expand automated tests around the PDO factory and environment helpers to catch regressions introduced by foreign code.
 - Plan incremental releases so the platform remains deployable on shared hosting throughout the porting effort.
+
+## Multi-Network Modernization Goals
+- Mirror a WordPress Multisite-style experience: every signup provisions a dedicated network space
+  with its own admin dashboard, optional subdomain, custom base path, and alias domain support while
+  sharing a unified identity provider.
+- Replace the single flat database with a connection registry that can point each network at either a
+  dedicated schema or an isolated database while leaving global super-admin data in the primary
+  catalog. Record compatibility notes for both MySQL and MariaDB as tooling is implemented.
+- Port PHPFox profile field editors, Dolphin/Cheetah builders, and notification systems into modular
+  Ning services so networks can enable or disable features independently without diverging from the
+  core upgrade path.
+- Expand installer automation to detect server capabilities, seed cron-friendly schedules, and stage
+  GitHub-driven automatic updates that super administrators can trigger across all networks while
+  respecting network-level opt-out flags.
+- Track gaps in real-time collaboration, AJAX widgets, and browser offloading strategies per module in
+  the scoped `AGENTS.md` files so new JavaScript helpers and REST endpoints can be introduced
+  iteratively.
