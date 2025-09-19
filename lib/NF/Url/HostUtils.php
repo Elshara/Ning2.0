@@ -49,10 +49,6 @@ if (!function_exists('nf_extract_host_and_port')) {
     }
 }
 
-if (!function_exists('nf_sanitize_detected_host')) {
-    function nf_sanitize_detected_host(string $host): string
-    {
-        $host = strtolower(trim($host));
 if (!function_exists('nf_normalize_idn_host')) {
     /**
      * Converts internationalised domain names into their ASCII representation
