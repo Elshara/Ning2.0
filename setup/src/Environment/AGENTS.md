@@ -8,6 +8,8 @@ instructions for environment detection helpers and request metadata utilities.
   through dedicated factory methods to simplify testing.
 - Normalise proxy headers, schemes, hosts, and paths consistently with the runtime equivalents in
   `lib/NF/`. Document divergences that still need harmonization in the Outstanding Work Log.
+- Ensure host sanitation accounts for internationalised domain names (IDN) by delegating to the
+  shared punycode helpers before performing validation.
 - Use the shared `nf_derive_base_domain`/`nf_derive_slug_from_host` helpers from `lib/NF/Url/`
   instead of duplicating host parsing logic inside the wizard.
 - Guard against malformed input (invalid hosts, JSON parsing failures, etc.) with defensive coding
@@ -34,6 +36,8 @@ instructions for environment detection helpers and request metadata utilities.
   runtime rely on the same host and base-path utilities.
 - Verify new public-suffix requirements during deployments and update the shared helper list when
   additional regions are needed.
+- Capture outstanding work for IDN environments lacking the intl extension so fallback
+  strategies stay coordinated with runtime helpers.
 - Catalogue candidate environment-detection improvements from PHPFox Legacy, Dolphin Remake, and
   Cheetah so cross-platform proxy support is analysed before implementation.
 

@@ -53,6 +53,43 @@ if (!function_exists('nf_sanitize_detected_host')) {
     function nf_sanitize_detected_host(string $host): string
     {
         $host = strtolower(trim($host));
+if (!function_exists('nf_normalize_idn_host')) {
+    /**
+     * Converts internationalised domain names into their ASCII representation
+     * when the intl extension is available. This mirrors the punycode
+     * normalisation helpers used by platforms such as PHPFox and Dolphin so
+     * multi-network aliases can safely store non-Latin characters.
+     */
+    function nf_normalize_idn_host(string $host): string
+    {
+        $host = strtolower(trim($host));
+
+        if ($host === '' || $host === 'localhost' || nf_is_ip_address($host)) {
+            return $host;
+        }
+
+        if (preg_match('/[^\x20-\x7e]/', $host) !== 1) {
+            return $host;
+        }
+
+        if (function_exists('idn_to_ascii')) {
+            $flags = defined('IDNA_NONTRANSITIONAL_TO_ASCII')
+                ? IDNA_NONTRANSITIONAL_TO_ASCII
+                : (defined('IDNA_DEFAULT') ? IDNA_DEFAULT : 0);
+            $ascii = idn_to_ascii($host, $flags);
+            if (is_string($ascii) && $ascii !== '') {
+                return strtolower($ascii);
+            }
+        }
+
+        return $host;
+    }
+}
+
+if (!function_exists('nf_sanitize_detected_host')) {
+    function nf_sanitize_detected_host(string $host): string
+    {
+        $host = nf_normalize_idn_host($host);
 
         if ($host === '' || $host === '.') {
             return 'localhost';
@@ -171,6 +208,7 @@ if (!function_exists('nf_derive_base_domain')) {
     function nf_derive_base_domain(string $host): string
     {
         $host = strtolower(trim($host));
+        $host = nf_normalize_idn_host($host);
 
         if ($host === '' || $host === 'localhost' || nf_is_ip_address($host)) {
             return $host === '' ? 'localhost' : $host;
@@ -212,6 +250,8 @@ if (!function_exists('nf_derive_slug_from_host')) {
     {
         $host = strtolower(trim($host));
         $baseDomain = strtolower(trim($baseDomain));
+        $host = nf_normalize_idn_host($host);
+        $baseDomain = nf_normalize_idn_host($baseDomain);
 
         if ($host === '' || $host === $baseDomain || nf_is_ip_address($host)) {
             return 'network';

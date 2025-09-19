@@ -10,6 +10,8 @@ Coordinate with the relevant runtime directory `AGENTS.md` files for behavioural
   SDK interactions.
 - Keep host/URL helper scenarios in sync with runtime expectations; expand coverage when new
   normalization helpers are introduced.
+- Include fixtures for internationalised domain names (IDN) and proxy permutations so runtime and
+  installer behaviour stays aligned when punycode handling changes.
 - Mock external services thoughtfully and document any required credentials or manual steps.
 
 ## Structural Guidance
@@ -29,6 +31,8 @@ Coordinate with the relevant runtime directory `AGENTS.md` files for behavioural
 - Track remaining legacy harness migrations, missing fixtures, and integration gaps uncovered by
   modernization work.
 - Note additional public-suffix examples here if the helper coverage requires more fixtures.
+- Record follow-up cases for IDN handling when the intl extension is unavailable so tests can assert
+  deterministic fallbacks.
 - Document upcoming duplicate-audit targets (e.g., runtime URL helpers) once the existing wizard
   directories remain clean across releases.
 

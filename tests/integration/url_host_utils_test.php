@@ -31,6 +31,24 @@ function testSlugDerivation(): void
 $tests = [
     'Base domain derivation' => 'testBaseDomainDerivation',
     'Slug derivation' => 'testSlugDerivation',
+function testIdnHostNormalisation(): void
+{
+    $idnHost = 'münich.example';
+    $sanitised = nf_sanitize_detected_host($idnHost);
+
+    if (function_exists('idn_to_ascii')) {
+        assertSame('xn--mnich-kva.example', $sanitised, 'IDN hosts should be converted to punycode when intl is available');
+        assertSame('xn--mnich-kva.example', nf_derive_base_domain($idnHost), 'Base domain detection should return punycode for IDN hosts');
+        assertSame('community', nf_derive_slug_from_host('community.' . $idnHost, $idnHost), 'Slug detection should align with punycode base domains');
+    } else {
+        assertSame('localhost', $sanitised, 'Without IDN support the host falls back to localhost');
+    }
+}
+
+$tests = [
+    'Base domain derivation' => 'testBaseDomainDerivation',
+    'Slug derivation' => 'testSlugDerivation',
+    'IDN host normalisation' => 'testIdnHostNormalisation',
 ];
 
 $failures = 0;

@@ -51,3 +51,15 @@ with opt-out controls, and either cron- or page-triggered scheduled tasks.
 The legacy runtime now bootstraps a shared PDO connection using the generated configuration and
 stores the connection metadata in `$GLOBALS['nf_runtime']['database']`. Individual modules should
 prefer this factory over bespoke MySQL adapters as database modernization continues.
+
+## Repository management and upstream coordination
+
+Operational tasks that sit outside day-to-day development now live in
+[`docs/repository_management.md`](docs/repository_management.md). Review that playbook when:
+
+- auditing which pull requests the `master` branch can see from the command line,
+- wiring in additional Git repositories that supply import candidates or shared tooling, and
+- planning how to split long-running modernization efforts into standalone repositories.
+
+The document also tracks the integration status of upstream pull requests #12 and #14 so the team
+knows when to close them on GitHub after publishing the merged commits.
