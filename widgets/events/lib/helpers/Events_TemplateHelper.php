@@ -139,7 +139,11 @@ class Events_TemplateHelper {
     public static function rsvp($event, array $status) {
         switch ($status[$event->id]) {
             case EventAttendee::NOT_INVITED:
-                return $event->my->privacy == Event::INVITED ? xg_html('YOU_ARE_NOT_INVITED') : $event->my->disableRsvp ? null : xg_html('YOU_HAVE_NOT_RSVPED');
+                if ($event->my->privacy == Event::INVITED) {
+                    return xg_html('YOU_ARE_NOT_INVITED');
+                }
+
+                return $event->my->disableRsvp ? null : xg_html('YOU_HAVE_NOT_RSVPED');
             case EventAttendee::NOT_RSVP:       return xg_html('YOU_HAVE_NOT_RSVPED');
             case EventAttendee::ATTENDING:      return xg_html('YOU_ARE_ATTENDING');
             case EventAttendee::MIGHT_ATTEND:   return xg_html('YOU_MIGHT_ATTEND');

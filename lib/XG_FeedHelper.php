@@ -36,7 +36,8 @@ class XG_FeedHelper {
          if (mb_strlen(self::$key)) {
              ob_start();
          }
-        ?><?xml version="1.0" encoding="utf-8"?>
+        echo '<?xml version="1.0" encoding="utf-8"?>';
+        ?>
         <feed xmlns="http://www.w3.org/2005/Atom">
             <title><%= xg_xmlentities($title ? $title . ' - ' : '') %><%= XN_Application::load()->name %></title>
             <link rel="self" href="<%= xg_xmlentities($feedUrl) %>"/>

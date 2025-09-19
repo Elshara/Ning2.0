@@ -1,6 +1,7 @@
 <?php
 $pubDate = strtotime($this->logItems[0]->createdDate);
-?><?xml version="1.0" encoding="UTF-8" ?>
+echo '<?xml version="1.0" encoding="UTF-8" ?>';
+?>
 <rss version="2.0"
     xmlns:media="http://search.yahoo.com/mrss/"
     xmlns:georss="http://www.w3.org/2003/01/geo/wgs84_pos#"

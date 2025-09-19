@@ -248,7 +248,8 @@ class XG_App extends XG_ConfigCachingApp {
         }
 
         if (XN_Profile::current()->isLoggedIn()) {
-            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $requestMethod = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+            if ($requestMethod === 'POST') {
                 // Note that routesExemptFromCsrfCheck will not have CSRF protection; avoid adding routes that destroy data [Jon Aquino 2008-09-10]
                 $routesExemptFromCsrfCheck = array(
                         'main/authorization/doSignIn', // BAZ-7398 [Jon Aquino 2008-06-30]
@@ -1509,7 +1510,8 @@ class XG_App extends XG_ConfigCachingApp {
     public static function dispatchRequest($route = null) {
         XG_PerfLogger::$usefulTime = microtime(true); // track the beginning of a useful work
         W_Cache::getWidget('admin')->includeFileOnce('/lib/helpers/Admin_DomainRedirectionHelper.php');
-        if ($headers = Admin_DomainRedirectionHelper::domainRedirectionHeaders(W_Cache::getWidget('main')->config['domainName'], $_SERVER['HTTP_X_NING_REQUEST_URI'], $_SERVER['REQUEST_METHOD'])) {
+        $requestMethod = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        if ($headers = Admin_DomainRedirectionHelper::domainRedirectionHeaders(W_Cache::getWidget('main')->config['domainName'], $_SERVER['HTTP_X_NING_REQUEST_URI'], $requestMethod)) {
             foreach ($headers as $header) { header($header); }
             exit;
         }
@@ -1741,15 +1743,21 @@ class XG_App extends XG_ConfigCachingApp {
      * Deal with an unhandled exception - log the problem and
      * redirect to generic error page (BAZ-6285)
      */
-    public static function fatalExceptionHandler(Exception $e) {
-    $msg = "Unhandled exception in {$e->getFile()}@{$e->getLine()}:  {$e->getMessage()}\n";
-    $msg .= $e->getTraceAsString();
-    $url = 'http://' . $_SERVER['HTTP_HOST'] . '/error.php?' .
-        http_build_query(array('code' => 500,
-                   'uri' => $_SERVER['HTTP_X_NING_REQUEST_URI']));
-    error_log($msg);
-    header("Location: $url");
-    exit();
+    public static function fatalExceptionHandler(Throwable $e) {
+        $msg = "Unhandled exception in {$e->getFile()}@{$e->getLine()}:  {$e->getMessage()}\n";
+        $msg .= $e->getTraceAsString();
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/error.php?' .
+            http_build_query(array('code' => 500,
+                       'uri' => $_SERVER['HTTP_X_NING_REQUEST_URI']));
+        error_log($msg);
+        if (PHP_SAPI === 'cli') {
+            fwrite(STDERR, $msg . PHP_EOL);
+            exit(1);
+        }
+        if (!headers_sent()) {
+            header("Location: $url");
+        }
+        exit();
     }
 
     /**

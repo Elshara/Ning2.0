@@ -25,11 +25,11 @@ $testfile      = empty($options["t"]) ? $default["testfile"] : $options["t"];
 if (isset($options["h"])) {
 	print<<<EOH
 	\$ php AllCmdlineUnitTests [options]
-"-a" : app base (Optional - default: current-dir [${default["apphome"]}])
-"-d" : test-directory to run the tests (Optional - default: [${default["testdir"]}])
-"-t" : particular test to run (Optional - default: run all tests [${default["testfile"]}])
-"-c" : path to core (Optional - default: [${default["coredir"]}])
-"-e" : path to devtestengine (Optional - default: [${default["devtestengine"]}])
+"-a" : app base (Optional - default: current-dir [{$default["apphome"]}])
+"-d" : test-directory to run the tests (Optional - default: [{$default["testdir"]}])
+"-t" : particular test to run (Optional - default: run all tests [{$default["testfile"]}])
+"-c" : path to core (Optional - default: [{$default["coredir"]}])
+"-e" : path to devtestengine (Optional - default: [{$default["devtestengine"]}])
 "-h" : print this help message (no value)
 
 

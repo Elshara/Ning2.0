@@ -341,7 +341,7 @@ class XG_LangHelper {
                         $lvalue = strtolower($value);
 
                         // If the first character is not a / then this is an opening tag
-                        if ($lvalue{0} != "/") {
+                        if ($lvalue[0] != "/") {
 
                             // Collect the tag name
                             preg_match("/^(\w*?)(\s|$)/", $lvalue, $t);
@@ -385,7 +385,7 @@ class XG_LangHelper {
 
                                     if (strlen($match[2])) {
                                         // Determine the last "safe line-break" character within this match
-                                        for ($x = 0, $ledge = 0; $x < strlen($lbrks); $x++) $ledge = max($ledge, strrpos($match[2], $lbrks{$x}));
+                                        for ($x = 0, $ledge = 0; $x < strlen($lbrks); $x++) $ledge = max($ledge, strrpos($match[2], $lbrks[$x]));
                                         if (!$ledge) $ledge = strlen($match[2]) - 1;
 
                                         // Insert the modified string
