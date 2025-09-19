@@ -27,3 +27,7 @@ note any required follow-up in their respective `AGENTS.md` files.
 ## Outstanding Work Log
 - Record required follow-up cleanups, deprecated pathways to retire, and pending documentation tasks
   uncovered while updating these shims.
+
+## Audit Summary
+- Pending lint audit captured for `lib/ning/compat`. Run `php tools/php_lint_audit.php lib/ning/compat` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

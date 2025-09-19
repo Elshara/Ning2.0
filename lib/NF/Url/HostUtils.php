@@ -49,10 +49,43 @@ if (!function_exists('nf_extract_host_and_port')) {
     }
 }
 
+if (!function_exists('nf_normalize_idn_host')) {
+    /**
+     * Converts internationalised domain names into their ASCII representation
+     * when the intl extension is available. This mirrors the punycode
+     * normalisation helpers used by platforms such as PHPFox and Dolphin so
+     * multi-network aliases can safely store non-Latin characters.
+     */
+    function nf_normalize_idn_host(string $host): string
+    {
+        $host = strtolower(trim($host));
+
+        if ($host === '' || $host === 'localhost' || nf_is_ip_address($host)) {
+            return $host;
+        }
+
+        if (preg_match('/[^\x20-\x7e]/', $host) !== 1) {
+            return $host;
+        }
+
+        if (function_exists('idn_to_ascii')) {
+            $flags = defined('IDNA_NONTRANSITIONAL_TO_ASCII')
+                ? IDNA_NONTRANSITIONAL_TO_ASCII
+                : (defined('IDNA_DEFAULT') ? IDNA_DEFAULT : 0);
+            $ascii = idn_to_ascii($host, $flags);
+            if (is_string($ascii) && $ascii !== '') {
+                return strtolower($ascii);
+            }
+        }
+
+        return $host;
+    }
+}
+
 if (!function_exists('nf_sanitize_detected_host')) {
     function nf_sanitize_detected_host(string $host): string
     {
-        $host = strtolower(trim($host));
+        $host = nf_normalize_idn_host($host);
 
         if ($host === '' || $host === '.') {
             return 'localhost';
@@ -123,5 +156,124 @@ if (!function_exists('nf_format_host_for_url')) {
         }
 
         return $host;
+    }
+}
+
+if (!function_exists('nf_multi_level_tld_suffixes')) {
+    /**
+     * @return list<string>
+     */
+    function nf_multi_level_tld_suffixes(): array
+    {
+        static $suffixes = [
+            'com.au',
+            'net.au',
+            'org.au',
+            'edu.au',
+            'gov.au',
+            'asn.au',
+            'id.au',
+            'com.br',
+            'com.cn',
+            'co.jp',
+            'or.jp',
+            'ne.jp',
+            'ac.jp',
+            'go.jp',
+            'co.nz',
+            'org.nz',
+            'govt.nz',
+            'ac.nz',
+            'co.uk',
+            'org.uk',
+            'gov.uk',
+            'ac.uk',
+            'net.uk',
+            'sch.uk',
+        ];
+
+        return $suffixes;
+    }
+}
+
+if (!function_exists('nf_derive_base_domain')) {
+    /**
+     * Returns the registrable domain for a given host while accounting for
+     * multi-level public suffixes (for example `example.co.uk`).
+     */
+    function nf_derive_base_domain(string $host): string
+    {
+        $host = nf_normalize_idn_host($host);
+
+        if ($host === '' || $host === 'localhost' || nf_is_ip_address($host)) {
+            return $host === '' ? 'localhost' : $host;
+        }
+
+        $parts = explode('.', $host);
+        if (count($parts) < 2) {
+            return $host;
+        }
+
+        $tld = array_pop($parts);
+        $secondLevel = array_pop($parts);
+        if ($secondLevel === null) {
+            return $host;
+        }
+
+        $candidate = $secondLevel . '.' . $tld;
+
+        if (!empty($parts)) {
+            $suffix = strtolower($candidate);
+            if (in_array($suffix, nf_multi_level_tld_suffixes(), true)) {
+                $thirdLevel = array_pop($parts);
+                if ($thirdLevel !== null && $thirdLevel !== '') {
+                    return $thirdLevel . '.' . $candidate;
+                }
+            }
+        }
+
+        return $candidate;
+    }
+}
+
+if (!function_exists('nf_derive_slug_from_host')) {
+    /**
+     * Derives a network slug from a host by stripping the base domain and
+     * normalising the remaining label for safe URL usage.
+     */
+    function nf_derive_slug_from_host(string $host, string $baseDomain): string
+    {
+        $host = nf_normalize_idn_host($host);
+        $baseDomain = nf_normalize_idn_host($baseDomain);
+
+        if ($host === '' || $host === $baseDomain || nf_is_ip_address($host)) {
+            return 'network';
+        }
+
+        $prefix = $host;
+        if ($baseDomain !== '') {
+            $suffix = '.' . $baseDomain;
+            if (str_ends_with($host, $suffix)) {
+                $prefix = substr($host, 0, -strlen($suffix));
+            }
+        }
+
+        $segments = array_filter(explode('.', $prefix));
+        if (empty($segments)) {
+            return 'network';
+        }
+
+        $candidate = (string) end($segments);
+        if ($candidate === '') {
+            return 'network';
+        }
+
+        $candidate = preg_replace('/[^a-z0-9-]/i', '-', $candidate) ?? '';
+        $candidate = trim($candidate, '-');
+        if ($candidate === '') {
+            return 'network';
+        }
+
+        return strtolower($candidate);
     }
 }
