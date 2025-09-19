@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Prefer union merges for scoped agent guidance files so updated instructions
+# from multiple branches concatenate instead of introducing manual conflicts.
+AGENTS.md merge=union
+**/AGENTS.md merge=union
