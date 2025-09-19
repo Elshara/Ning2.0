@@ -8,6 +8,9 @@ require_once __DIR__ . '/NF/Database/ConnectionFactory.php';
 
 if (!defined('NF_BASE_URL')) {
     $config = $GLOBALS['nf_app_config'] ?? null;
+$config = $GLOBALS['nf_app_config'] ?? null;
+
+if (!defined('NF_BASE_URL')) {
     $server = $_SERVER ?? [];
 
     if (!is_array($server)) {
@@ -18,6 +21,8 @@ if (!defined('NF_BASE_URL')) {
 
     define('NF_BASE_URL', $baseUrl);
 }
+
+$config = $GLOBALS['nf_app_config'] ?? $config;
 
 $databaseBootstrap = nf_initialize_database_connection(is_array($config) ? $config : null);
 
