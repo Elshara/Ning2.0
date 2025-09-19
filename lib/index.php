@@ -20,6 +20,8 @@ if (!defined('NF_BASE_URL')) {
     define('NF_BASE_URL', $baseUrl);
 }
 
+$config = $GLOBALS['nf_app_config'] ?? $config;
+
 $databaseBootstrap = nf_initialize_database_connection(is_array($config) ? $config : null);
 
 if (!isset($GLOBALS['nf_runtime']) || !is_array($GLOBALS['nf_runtime'])) {
