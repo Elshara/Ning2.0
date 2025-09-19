@@ -28,6 +28,9 @@ function testSlugDerivation(): void
     assertSame('custom-value', nf_derive_slug_from_host('custom_value.example.com', 'example.com'), 'Invalid characters should be normalised to hyphens');
 }
 
+$tests = [
+    'Base domain derivation' => 'testBaseDomainDerivation',
+    'Slug derivation' => 'testSlugDerivation',
 function testIdnHostNormalisation(): void
 {
     $idnHost = 'münich.example';

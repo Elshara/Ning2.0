@@ -49,6 +49,10 @@ if (!function_exists('nf_extract_host_and_port')) {
     }
 }
 
+if (!function_exists('nf_sanitize_detected_host')) {
+    function nf_sanitize_detected_host(string $host): string
+    {
+        $host = strtolower(trim($host));
 if (!function_exists('nf_normalize_idn_host')) {
     /**
      * Converts internationalised domain names into their ASCII representation
@@ -203,6 +207,7 @@ if (!function_exists('nf_derive_base_domain')) {
      */
     function nf_derive_base_domain(string $host): string
     {
+        $host = strtolower(trim($host));
         $host = nf_normalize_idn_host($host);
 
         if ($host === '' || $host === 'localhost' || nf_is_ip_address($host)) {
@@ -243,6 +248,8 @@ if (!function_exists('nf_derive_slug_from_host')) {
      */
     function nf_derive_slug_from_host(string $host, string $baseDomain): string
     {
+        $host = strtolower(trim($host));
+        $baseDomain = strtolower(trim($baseDomain));
         $host = nf_normalize_idn_host($host);
         $baseDomain = nf_normalize_idn_host($baseDomain);
 
