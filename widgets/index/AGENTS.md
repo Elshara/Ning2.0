@@ -21,3 +21,7 @@ for feed previews.
 
 ## Outstanding Work Log
 - Track pending personalization features, theme variable migrations, and caching strategies.
+
+## Audit Summary
+- Pending lint audit captured for `widgets/index`. Run `php tools/php_lint_audit.php widgets/index` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

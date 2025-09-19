@@ -29,3 +29,7 @@ sharing detection logic with the installer and reference `widgets/` guidance for
   normalization and forwarded-header parsing routines into the dedicated subdirectory.
 - Track adoption of the database connection factory (`lib/NF/Database/ConnectionFactory.php`) and
   note remaining legacy MySQL entry points that still bypass PDO.
+
+## Audit Summary
+- Pending lint audit captured for `lib/NF`. Run `php tools/php_lint_audit.php lib/NF` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

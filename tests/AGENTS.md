@@ -18,6 +18,12 @@ modifying files under `tests/`. Coordinate with `test/AGENTS.md` for legacy harn
 ## Testing & Checks
 - Execute the relevant test groups or scripts touched by your change. Record results in summaries.
 - Update Composer or PHPUnit configuration when adding new suites.
+- Run `php tests/integration/duplicate_audit_test.php` after modifying setup configuration or
+  environment helpers; it serves as the file-audit gate for duplicate detection.
 
 ## Outstanding Work Log
 - Track pending migrations, missing fixtures, or duplicate cleanups uncovered during testing.
+
+## Audit Summary
+- Pending lint audit captured for `tests`. Run `php tools/php_lint_audit.php tests` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

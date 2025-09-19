@@ -21,3 +21,7 @@ Coordinate with `widgets/groups/AGENTS.md` for membership-linked visibility and 
 
 ## Outstanding Work Log
 - Track outstanding calendar integrations, reminder delivery methods, and accessibility improvements.
+
+## Audit Summary
+- Pending lint audit captured for `widgets/events`. Run `php tools/php_lint_audit.php widgets/events` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

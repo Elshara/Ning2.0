@@ -18,3 +18,7 @@ legacy SimpleTest assets under `test/`.
 
 ## Outstanding Work Log
 - Maintain a checklist of remaining migration tasks and duplicate cleanups in this section.
+
+## Audit Summary
+- Pending lint audit captured for `test`. Run `php tools/php_lint_audit.php test` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

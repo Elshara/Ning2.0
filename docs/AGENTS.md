@@ -18,3 +18,11 @@ Coordinate with other directory guides when documenting code they own.
 
 ## Outstanding Work Log
 - Record documentation debt, missing diagrams, or areas needing clarification.
+- Track cross-platform porting assessments and update them as specific modules move into Ning2.0.
+- Restructure `docs/xn_dependency_inventory.md` so repeated table headers do not trigger the duplicate-line scanner.
+- Record comparative notes when analysing PHPFox Legacy, Dolphin Remake, or Cheetah modules so
+  engineers know which Ning subsystems should host the imported functionality.
+
+## Audit Summary
+- Pending lint audit captured for `docs`. Run `php tools/php_lint_audit.php docs` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

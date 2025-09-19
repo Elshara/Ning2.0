@@ -27,3 +27,7 @@ needed) and note cross-directory impacts.
 ## Outstanding Work Log
 - Use this space to track missing endpoints, serialization formats to revisit, or coordination needed
   with `widgets/` and `WWF/` consumers.
+
+## Audit Summary
+- Pending lint audit captured for `lib/ning`. Run `php tools/php_lint_audit.php lib/ning` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

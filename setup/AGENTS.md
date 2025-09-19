@@ -20,7 +20,16 @@
 - After modifying the wizard, run targeted CLI and browser entry-point checks where possible, and
   document results in commit summaries.
 - Keep generated files like `config/app.php` ignored and note any installer automation gaps here.
+- Run `php tests/integration/duplicate_audit_test.php` whenever configuration or environment helpers
+  change to ensure the duplicate-audit gate remains stable.
 
 ## Outstanding Work Log
-- Track extraction of configuration assembly logic from `setup/index.php` into the new `setup/src/Config/` scope so the wizard
-  controller focuses purely on state orchestration and validation.
+- With configuration assembly delegated to `Setup\Config\ConfigBuilder`, continue decomposing `setup/index.php` by extracting
+  per-step controllers (environment, database, administrators, network) into dedicated files so the wizard class only
+  coordinates flow control.
+- Catalogue wizard capabilities from PHPFox Legacy, Dolphin Remake, and Cheetah that should be
+  replicated or superseded here before implementation.
+
+## Audit Summary
+- Pending lint audit captured for `setup`. Run `php tools/php_lint_audit.php setup` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

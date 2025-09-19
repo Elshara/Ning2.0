@@ -21,3 +21,7 @@ shared stream logic.
 
 ## Outstanding Work Log
 - Track planned integrations with centralized caching, rate limiting, and credential storage systems.
+
+## Audit Summary
+- Pending lint audit captured for `widgets/feed`. Run `php tools/php_lint_audit.php widgets/feed` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

@@ -12,8 +12,18 @@
 - Keep helper methods private unless shared usage is required. Promote shared abstractions into a dedicated interface or trait and document the contract in this scope.
 
 ## Testing & Checks
-- Add or update tests under `tests/` when changing serialization behaviour. At minimum, run `php tools/detect_duplicates.php setup/src/Config` after edits to ensure helpers remain distinct.
-- Validate installer flows manually (CLI and browser) when touching write paths to confirm permissions and error handling surface correctly.
+- Add or update tests under `tests/` when changing serialization behaviour. At minimum, run
+  `php tools/detect_duplicates.php setup/src/Config` after edits to ensure helpers remain distinct
+  and keep `php tests/integration/duplicate_audit_test.php` green.
+- Validate installer flows manually (CLI and browser) when touching write paths to confirm
+  permissions and error handling surface correctly.
 
 ## Outstanding Work Log
-- Extract a dedicated configuration builder that assembles the array consumed by the writer so the wizard controller only orchestrates state transitions.
+- Extend automated coverage for the configuration builder and writer, including
+  unwritable-directory and invalid-path scenarios, so future refactors remain safe.
+- Document any PHPFox Legacy, Dolphin Remake, or Cheetah configuration concepts that should be
+  ported, mapping their storage expectations before implementation.
+
+## Audit Summary
+- Pending lint audit captured for `setup/src/Config`. Run `php tools/php_lint_audit.php setup/src/Config` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.
