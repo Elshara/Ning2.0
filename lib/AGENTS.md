@@ -27,3 +27,5 @@ repository root `AGENTS.md` for shared expectations. Coordinate with `widgets/AG
 ## Outstanding Work Log
 - List discovered duplication, modernization gaps, or missing functionality here with actionable
   next steps.
+- Map PHPFox Legacy, Dolphin Remake, and Cheetah features onto Ning modules before importing code so
+  data access layers and permission models remain consistent across platforms.

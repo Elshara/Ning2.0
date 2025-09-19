@@ -20,8 +20,12 @@
 - After modifying the wizard, run targeted CLI and browser entry-point checks where possible, and
   document results in commit summaries.
 - Keep generated files like `config/app.php` ignored and note any installer automation gaps here.
+- Run `php tests/integration/duplicate_audit_test.php` whenever configuration or environment helpers
+  change to ensure the duplicate-audit gate remains stable.
 
 ## Outstanding Work Log
 - With configuration assembly delegated to `Setup\Config\ConfigBuilder`, continue decomposing `setup/index.php` by extracting
   per-step controllers (environment, database, administrators, network) into dedicated files so the wizard class only
   coordinates flow control.
+- Catalogue wizard capabilities from PHPFox Legacy, Dolphin Remake, and Cheetah that should be
+  replicated or superseded here before implementation.

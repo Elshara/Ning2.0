@@ -20,8 +20,12 @@ Coordinate with the relevant runtime directory `AGENTS.md` files for behavioural
 - Run the relevant PHPUnit/Pest commands (or legacy harness) locally before submitting changes and
   record results in summaries.
 - Execute `php tools/detect_duplicates.php tests/integration` periodically to keep helper code DRY.
+- Keep `php tests/integration/duplicate_audit_test.php` passing after edits to setup configuration or
+  environment helpers; it enforces duplicate-free scaffolding for wizard logic.
 
 ## Outstanding Work Log
 - Track remaining legacy harness migrations, missing fixtures, and integration gaps uncovered by
   modernization work.
 - Note additional public-suffix examples here if the helper coverage requires more fixtures.
+- Document upcoming duplicate-audit targets (e.g., runtime URL helpers) once the existing wizard
+  directories remain clean across releases.

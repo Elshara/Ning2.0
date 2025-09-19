@@ -23,8 +23,9 @@ instructions for environment detection helpers and request metadata utilities.
 - Extend unit tests that cover header permutations, IPv6 parsing, Cloudflare/Forwarded support, and
   subdirectory detection. Add fixtures representing real-world proxy configurations when issues are
   discovered.
-- Run `php tools/detect_duplicates.php setup/src/Environment` to ensure detection logic remains
-  centralised.
+- Run `php tools/detect_duplicates.php setup/src/Environment` and
+  `php tests/integration/duplicate_audit_test.php` to ensure detection logic remains centralised and
+  audit checks stay green.
 
 ## Outstanding Work Log
 - Track remaining edge cases (load balancers, unusual proxy headers) and planned sync work with
@@ -33,3 +34,5 @@ instructions for environment detection helpers and request metadata utilities.
   runtime rely on the same host and base-path utilities.
 - Verify new public-suffix requirements during deployments and update the shared helper list when
   additional regions are needed.
+- Catalogue candidate environment-detection improvements from PHPFox Legacy, Dolphin Remake, and
+  Cheetah so cross-platform proxy support is analysed before implementation.

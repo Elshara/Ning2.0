@@ -13,3 +13,5 @@
 
 ## Outstanding Work Log
 - Track planned enhancements or refactors to repository tooling here.
+- Document new integration hooks (e.g., duplicate audit tests) whenever tooling gains consumers so
+  contributors know which scripts are considered gates.

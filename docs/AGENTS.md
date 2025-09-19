@@ -20,3 +20,5 @@ Coordinate with other directory guides when documenting code they own.
 - Record documentation debt, missing diagrams, or areas needing clarification.
 - Track cross-platform porting assessments and update them as specific modules move into Ning2.0.
 - Restructure `docs/xn_dependency_inventory.md` so repeated table headers do not trigger the duplicate-line scanner.
+- Record comparative notes when analysing PHPFox Legacy, Dolphin Remake, or Cheetah modules so
+  engineers know which Ning subsystems should host the imported functionality.

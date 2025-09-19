@@ -11,6 +11,9 @@ these expectations to the local context. When creating a new directory, add the 
   constructs.
 - Prefer incremental modernization: split monolithic files into cohesive modules, keep one class
   or function per file when practical, and document follow-up refactors in the local `AGENTS.md`.
+- When porting behaviour from PHPFox Legacy, Dolphin Remake, or Cheetah, start with isolated
+  helpers or services that can be exercised by existing tests. Document mapping notes between the
+  source platform and the Ning module inside the relevant directory guidance before landing code.
 - Preserve backward compatibility with the existing bootstrap (`index.php` ➝ `bootstrap.php`
   ➝ `lib/index.php`) unless a local scope specifically authorises removal of legacy entry points.
 - Prefer pure helpers and dependency-injected services over new global state. Reuse the shared
@@ -18,6 +21,8 @@ these expectations to the local context. When creating a new directory, add the 
   functionality that still needs to be implemented.
 - Maintain clear separation between runtime logic and setup wizard behaviour. Shared detection
   or validation code belongs in `lib/NF/` (runtime) or `setup/src/` (wizard).
+- Keep accessibility and HTML5 semantics in mind when touching templates. Record gaps that block
+  WCAG compliance in the scoped `AGENTS.md` so future passes can address them alongside SEO needs.
 - When you discover redundant or superseded files, remove them only after confirming their
   behaviour is replaced elsewhere. Record removals and outstanding gaps in the relevant
   `AGENTS.md`.
@@ -38,6 +43,8 @@ Before submitting changes that touch PHP or configuration logic, run:
 1. `composer validate`
 2. `find . -name '*.php' -print0 | xargs -0 -n1 php -l`
 3. `php tools/detect_duplicates.php`
+4. `php tests/integration/duplicate_audit_test.php` when touching setup configuration or environment
+   helpers to ensure the new file-audit gate stays green.
 
 If a step is not applicable (e.g., `composer.json` removed), state why in your summary rather than
 skipping silently. The duplicate scanner flags repeated lines and blocks that need consolidation;
@@ -73,6 +80,9 @@ address or document each reported item before completing your work.
    outstanding migrations away from flat-file configuration.
 9. Verify templates reference relocated static assets under `assets/` and record any remaining
    legacy paths in the relevant directory guidance.
+10. Stage import candidates from PHPFox Legacy, Dolphin Remake, and Cheetah by cataloguing their
+    modules, database dependencies, and builder tooling in the matching Ning directories before
+    attempting a direct port.
 
 ## Documentation
 - Update `README.md` or relevant docs when behaviour, requirements, or workflows change.
