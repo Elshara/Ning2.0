@@ -9,6 +9,10 @@
   runtime code and the installer.
 - When moving additional routines out of `UrlHelpers.php`, document the migration here and update the
   outstanding work log so future contributors know what still needs to be decomposed.
+- Maintain shared base-domain and slug derivation helpers here so the installer and runtime stay in
+  sync; extend the suffix list as new regions are required.
+- Normalise internationalised domain names (IDN) through the shared helpers so proxy detection and
+  alias validation behave consistently across multilingual deployments.
 - Ensure new helpers include thorough PHPDoc describing accepted inputs (IPv6, forwarded headers,
   etc.) to avoid regressions when invoked by proxy-aware contexts.
 
@@ -22,3 +26,11 @@
 - Extract base-path normalization helpers into this directory and replace the legacy implementations
   inside `UrlHelpers.php`.
 - Backfill PHPUnit coverage for IPv6-with-port and punycode host detection edge cases.
+- Audit additional public-suffix entries that hosted networks may rely on and append them to the
+  shared helper when identified.
+- Follow up on environments without the intl extension by providing a transliteration fallback for
+  IDN host normalisation so wizard defaults remain predictable.
+
+## Audit Summary
+- Pending lint audit captured for `lib/NF/Url`. Run `php tools/php_lint_audit.php lib/NF/Url` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

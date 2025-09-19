@@ -13,3 +13,7 @@
 
 ## Outstanding Work Log
 - List example updates, missing files, or duplication cleanups that remain outstanding.
+
+## Audit Summary
+- Pending lint audit captured for `instances`. Run `php tools/php_lint_audit.php instances` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

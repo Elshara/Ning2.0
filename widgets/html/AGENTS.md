@@ -22,3 +22,7 @@
 
 ## Outstanding Work Log
 - Track planned editor upgrades, accessibility improvements, and localization support tasks.
+
+## Audit Summary
+- Pending lint audit captured for `widgets/html`. Run `php tools/php_lint_audit.php widgets/html` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

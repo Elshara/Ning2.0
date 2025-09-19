@@ -24,3 +24,7 @@
 
 ## Outstanding Work Log
 - Track unfinished refactors, missing validation rules, or UX improvements that need follow-up.
+
+## Audit Summary
+- Pending lint audit captured for `setup/src`. Run `php tools/php_lint_audit.php setup/src` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

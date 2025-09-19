@@ -21,3 +21,7 @@
 - Migrate legacy database initialization code in widgets and scripts to use the shared PDO factory.
 - Implement connection pooling or read/write splitting as part of the broader database modernization
   roadmap.
+
+## Audit Summary
+- Pending lint audit captured for `lib/NF/Database`. Run `php tools/php_lint_audit.php lib/NF/Database` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

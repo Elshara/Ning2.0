@@ -21,3 +21,7 @@ moderation services.
 
 ## Outstanding Work Log
 - Track migration to unified search, moderation queue implementations, and websocket updates.
+
+## Audit Summary
+- Pending lint audit captured for `widgets/forum`. Run `php tools/php_lint_audit.php widgets/forum` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

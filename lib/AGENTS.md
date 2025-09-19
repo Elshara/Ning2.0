@@ -27,3 +27,9 @@ repository root `AGENTS.md` for shared expectations. Coordinate with `widgets/AG
 ## Outstanding Work Log
 - List discovered duplication, modernization gaps, or missing functionality here with actionable
   next steps.
+- Map PHPFox Legacy, Dolphin Remake, and Cheetah features onto Ning modules before importing code so
+  data access layers and permission models remain consistent across platforms.
+
+## Audit Summary
+- Pending lint audit captured for `lib`. Run `php tools/php_lint_audit.php lib` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.
