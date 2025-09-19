@@ -29,7 +29,8 @@ current request:
 1. **Environment** – confirms the detected host, port, HTTPS status, and recommended base domain
    while allowing you to name the overall platform.
 2. **Database** – gathers the MySQL host, port, database name, and credentials, verifies access
-   using PDO, and creates the database when it is missing.
+   using PDO, creates the database when it is missing, and records whether the server reports
+   itself as MySQL or MariaDB (including version details) for the generated configuration.
 3. **Administrators** – provisions both a global super administrator and the initial network
    administrator with securely hashed passwords.
 4. **Network & Automation** – defines the primary network name, subdomain or base path, alias

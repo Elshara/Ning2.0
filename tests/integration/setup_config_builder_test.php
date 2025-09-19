@@ -27,6 +27,8 @@ function testBuildsNetworkConfiguration(): void
         'name' => 'ning',
         'user' => 'ning',
         'password' => 'secret',
+        'driver' => 'mariadb',
+        'server_version' => '10.11.5-MariaDB',
     ];
 
     $superAdmin = [
@@ -84,6 +86,8 @@ function testBuildsNetworkConfiguration(): void
     assertSame(['community.example.net'], $config['networks']['community']['aliases'], 'Aliases should be preserved');
     assertSame('2024-01-01T00:00:00+00:00', $config['app']['created_at'], 'Created timestamp should reflect the provided clock');
     assertSame('mysql:host=db.internal;port=3306;dbname=ning;charset=utf8mb4', $config['database']['dsn'], 'DSN should include host, port, and charset');
+    assertSame('mariadb', $config['database']['driver'], 'Database driver should reflect the provided metadata');
+    assertSame('10.11.5-MariaDB', $config['database']['server_version'], 'Database version should be preserved');
     assertSame($detected, $config['app']['detected'], 'Detected environment metadata should be embedded');
 }
 
@@ -115,6 +119,7 @@ function testFallsBackToDetectedPort(): void
     );
 
     assertSame('https://alpha.example.org:8443', $config['networks']['alpha']['primary_url'], 'Primary URL should include the detected non-standard port');
+    assertSame('mysql', $config['database']['driver'], 'Database driver should default to MySQL when unspecified');
 }
 
 $tests = [

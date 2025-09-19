@@ -74,6 +74,8 @@ final class ConfigBuilder
                 'name' => $database['name'] ?? '',
                 'user' => $database['user'] ?? '',
                 'password' => $database['password'] ?? '',
+                'driver' => strtolower((string) ($database['driver'] ?? 'mysql')),
+                'server_version' => (string) ($database['server_version'] ?? ''),
                 'dsn' => sprintf(
                     'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
                     $database['host'] ?? 'localhost',

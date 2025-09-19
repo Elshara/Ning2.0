@@ -72,6 +72,8 @@ class SetupWizard
                 'name' => '',
                 'user' => '',
                 'password' => '',
+                'driver' => 'mysql',
+                'server_version' => '',
             ],
             'super_admin' => [
                 'email' => '',
@@ -332,6 +334,11 @@ class SetupWizard
 
         $dsn = sprintf('mysql:host=%s;port=%d;charset=utf8mb4', $host, (int) $port);
 
+        $databaseDetails = [
+            'driver' => 'mysql',
+            'version' => '',
+        ];
+
         try {
             $pdo = new PDO($dsn, $user, $password, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -340,6 +347,7 @@ class SetupWizard
 
             $quotedName = '`' . str_replace('`', '``', $name) . '`';
             $pdo->exec("CREATE DATABASE IF NOT EXISTS {$quotedName} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            $databaseDetails = $this->describeDatabaseServer($pdo);
         } catch (PDOException $exception) {
             $errors['connection'] = 'Unable to connect to the database using the provided credentials: ' . $exception->getMessage();
             return $errors;
@@ -351,6 +359,8 @@ class SetupWizard
             'name' => $name,
             'user' => $user,
             'password' => $password,
+            'driver' => $databaseDetails['driver'] ?? 'mysql',
+            'server_version' => $databaseDetails['version'] ?? '',
         ];
 
         return [];
@@ -843,6 +853,8 @@ TEXT;
             'name' => '',
             'user' => '',
             'password' => '',
+            'driver' => 'mysql',
+            'server_version' => '',
         ];
 
         echo '<form method="post">';
@@ -1082,6 +1094,13 @@ TEXT;
         echo '<li>Port: ' . htmlspecialchars((string) ($config['database']['port'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
         echo '<li>Name: ' . htmlspecialchars((string) ($config['database']['name'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
         echo '<li>Username: ' . htmlspecialchars((string) ($config['database']['user'] ?? ''), ENT_QUOTES, 'UTF-8') . '</li>';
+        $driver = strtolower((string) ($config['database']['driver'] ?? 'mysql'));
+        $driverLabel = $driver === 'mariadb' ? 'MariaDB' : 'MySQL';
+        echo '<li>Engine: ' . htmlspecialchars($driverLabel, ENT_QUOTES, 'UTF-8') . '</li>';
+        $version = trim((string) ($config['database']['server_version'] ?? ''));
+        if ($version !== '') {
+            echo '<li>Server Version: ' . htmlspecialchars($version, ENT_QUOTES, 'UTF-8') . '</li>';
+        }
         echo '</ul>';
 
         echo '<h3>Super Administrator</h3>';
@@ -1502,6 +1521,67 @@ TEXT;
         return array_values(array_unique($aliases));
     }
 
+    /**
+     * Capture the database server metadata for configuration and summary output.
+     *
+     * @return array{driver:string, version:string}
+     */
+    private function describeDatabaseServer(\PDO $pdo): array
+    {
+        $version = '';
+
+        try {
+            $raw = $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);
+            if (is_string($raw)) {
+                $version = trim($raw);
+            }
+        } catch (\Throwable $exception) {
+            $this->logDatabaseMetadataWarning('ATTR_SERVER_VERSION', $exception);
+        }
+
+        if ($version === '') {
+            try {
+                $statement = $pdo->query('SELECT VERSION() AS version');
+                if ($statement !== false) {
+                    $row = $statement->fetch(\PDO::FETCH_ASSOC);
+                    if (is_array($row)) {
+                        $candidate = $row['version'] ?? null;
+                        if (is_string($candidate)) {
+                            $version = trim($candidate);
+                        }
+                    }
+                    $statement->closeCursor();
+                }
+            } catch (\Throwable $exception) {
+                $this->logDatabaseMetadataWarning('SELECT VERSION()', $exception);
+            }
+        }
+
+        $driver = 'mysql';
+        if ($version !== '' && stripos($version, 'mariadb') !== false) {
+            $driver = 'mariadb';
+        }
+
+        return [
+            'driver' => $driver,
+            'version' => $version,
+        ];
+    }
+
+    private function logDatabaseMetadataWarning(string $source, \Throwable $exception): void
+    {
+        if (PHP_SAPI !== 'cli') {
+            return;
+        }
+
+        $message = sprintf(
+            'Warning: unable to read database metadata via %s (%s).',
+            $source,
+            $exception->getMessage()
+        );
+
+        fwrite(STDERR, $message . "\n");
+    }
 }
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
