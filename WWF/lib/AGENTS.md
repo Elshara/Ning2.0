@@ -23,3 +23,7 @@ components. Coordinate with `lib/AGENTS.md` when code is shared between WWF and 
 ## Outstanding Work Log
 - Track remaining modernization tasks, shared helper migrations, and deprecations scheduled for
   removal.
+
+## Audit Summary
+- Pending lint audit captured for `WWF/lib`. Run `php tools/php_lint_audit.php WWF/lib` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

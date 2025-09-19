@@ -25,3 +25,7 @@ helpers.
 
 ## Outstanding Work Log
 - Track remaining modernization tasks, missing permission checks, and UI consolidations.
+
+## Audit Summary
+- Pending lint audit captured for `widgets/admin`. Run `php tools/php_lint_audit.php widgets/admin` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.

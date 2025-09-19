@@ -8,7 +8,6 @@ This codebase is in the process of being modernized to run on current versions o
    that the `pdo_mysql`, `mbstring`, and `openssl` extensions are available.
 2. Upload or extract the repository into the document root of your preferred PHP-compatible web
    server. All required libraries are included with the project.
-
 3. (Optional) Run `composer install` from the project root to prime the autoloader and benefit from
    classmap optimisations when additional packages are introduced.
 4. Confirm the `config/` directory (or whichever location you deploy as your application root)
@@ -19,16 +18,6 @@ This codebase is in the process of being modernized to run on current versions o
    administrator, appoint the first network administrator, and choose the addressing and automation
    strategy for the initial network.
 7. After completion the installer writes `config/app.php` (ignored by version control) and redirects
-
-3. Confirm the `config/` directory (or whichever location you deploy as your application root)
-   is writable by the PHP process so the installer can persist `config/app.php`.
-4. Visit the root URL in your browser. The guided setup wizard launches automatically when no
-   configuration exists.
-5. Complete the wizard to describe your environment, connect to MySQL, define the global super
-   administrator, appoint the first network administrator, and choose the addressing and automation
-   strategy for the initial network.
-6. After completion the installer writes `config/app.php` (ignored by version control) and redirects
-
    back to the application bootstrap so you can sign in as either the super administrator or the
    network owner.
 
@@ -40,7 +29,8 @@ current request:
 1. **Environment** – confirms the detected host, port, HTTPS status, and recommended base domain
    while allowing you to name the overall platform.
 2. **Database** – gathers the MySQL host, port, database name, and credentials, verifies access
-   using PDO, and creates the database when it is missing.
+   using PDO, creates the database when it is missing, and records whether the server reports
+   itself as MySQL or MariaDB (including version details) for the generated configuration.
 3. **Administrators** – provisions both a global super administrator and the initial network
    administrator with securely hashed passwords.
 4. **Network & Automation** – defines the primary network name, subdomain or base path, alias
@@ -50,7 +40,6 @@ current request:
 Once installation is complete the platform supports multiple networks with unique domains or
 subdomains, per-network administrators, optional alias domains, GitHub-driven automatic deployments
 with opt-out controls, and either cron- or page-triggered scheduled tasks.
-
 
 ## Static assets
 
@@ -63,4 +52,14 @@ The legacy runtime now bootstraps a shared PDO connection using the generated co
 stores the connection metadata in `$GLOBALS['nf_runtime']['database']`. Individual modules should
 prefer this factory over bespoke MySQL adapters as database modernization continues.
 
+## Repository management and upstream coordination
 
+Operational tasks that sit outside day-to-day development now live in
+[`docs/repository_management.md`](docs/repository_management.md). Review that playbook when:
+
+- auditing which pull requests the `master` branch can see from the command line,
+- wiring in additional Git repositories that supply import candidates or shared tooling, and
+- planning how to split long-running modernization efforts into standalone repositories.
+
+The document also tracks the integration status of upstream pull requests #12 and #14 so the team
+knows when to close them on GitHub after publishing the merged commits.

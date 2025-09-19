@@ -14,3 +14,7 @@
 
 ## Outstanding Work Log
 - Note assets slated for replacement, removal, or addition here.
+
+## Audit Summary
+- Pending lint audit captured for `xn_resources`. Run `php tools/php_lint_audit.php xn_resources` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.
+- Continue cataloguing PHPFox Legacy, Dolphin, and Cheetah feature gaps relevant to this scope during modernization.
