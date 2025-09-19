@@ -532,8 +532,8 @@ class Video_VideoController extends W_Controller {
             //  Users not logged in can see a cached page
             //  Detail page - cache only if we're caching order n items (BAZ-2969)
             if (XG_Cache::cacheOrderN()) {
-                $this->setCaching(array(crc32($_SERVER['QUERY_STRING'])), 300);
-                // TODO: Better to use md5(XG_HttpHelper::currentUrl())  [Jon Aquino 2007-10-25]
+                $cacheKey = md5(XG_HttpHelper::currentUrl());
+                $this->setCaching(array($cacheKey), 300);
             }
         }
         if ($this->error = Video_SecurityHelper::checkVisibleToCurrentUser($this->_user, $this->video)) {

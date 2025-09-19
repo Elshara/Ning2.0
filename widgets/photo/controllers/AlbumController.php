@@ -248,12 +248,10 @@ class Photo_AlbumController extends W_Controller {
     }
 
     private function handleSortingAndPagination($filters, $sort) {
+        XG_App::includeFileOnce('/lib/XG_PaginationHelper.php');
         $this->pageSize = 20;
-        // TODO: Use XG_PaginationHelper::computeStart(). [Jon Aquino 2008-02-16]
-        $this->begin = 0;
-        if (intval($_GET['page']) > 0) {
-            $this->begin = ($_GET['page'] - 1) * $this->pageSize;
-        }
+        $page = $_GET['page'] ?? null;
+        $this->begin = XG_PaginationHelper::computeStart($page, $this->pageSize);
         $albumData = Photo_AlbumHelper::getSortedAlbums($filters, $sort, $this->begin, $this->begin + $this->pageSize);
         $this->albums = $albumData['albums'];
         $this->numAlbums = $albumData['numAlbums'];
@@ -307,8 +305,7 @@ class Photo_AlbumController extends W_Controller {
         $this->showFacebookMeta = array_key_exists('from', $_GET) && ($_GET['from'] === 'fb');
         if($_GET['rss']=='yes'){
             $appname = XN_Application::load()->name;
-            // TODO: Use xg_xmlentities instead of htmlspecialchars [Jon Aquino 2008-02-20]
-            $this->title = htmlspecialchars($this->album->title, ENT_COMPAT, 'UTF-8');
+            $this->title = xg_xmlentities($this->album->title);
             $this->description = xg_xmlentities(xg_text('ALBUM_BY_X_ON_X', $this->album->contributorName, $appname));
             $this->link = $this->_buildUrl('album','show', '?id=' . $this->album->id);
             if ($this->my->coverPhotoId) {

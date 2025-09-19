@@ -6,8 +6,6 @@
 require_once __DIR__ . '/NF/UrlHelpers.php';
 require_once __DIR__ . '/NF/Database/ConnectionFactory.php';
 
-if (!defined('NF_BASE_URL')) {
-    $config = $GLOBALS['nf_app_config'] ?? null;
 $config = $GLOBALS['nf_app_config'] ?? null;
 
 if (!defined('NF_BASE_URL')) {

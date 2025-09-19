@@ -5,6 +5,7 @@ XG_App::includeFileOnce('/lib/XG_ModuleHelper.php');
 XG_App::includeFileOnce('/lib/XG_Message.php');
 XG_App::includeFileOnce('/lib/XG_MetatagHelper.php');
 XG_App::includeFileOnce('/lib/XG_FullNameHelper.php');
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 
 class Index_IndexController extends XG_BrowserAwareController {
 
@@ -25,8 +26,8 @@ class Index_IndexController extends XG_BrowserAwareController {
     public function action_index() {
         /** Cache approach index-signedout */
         if (! ($this->_user->isLoggedIn() || XG_App::getLogoutCookie())) {
-            $this->setCaching(array(crc32($_SERVER['QUERY_STRING'])), 300);
-            // TODO: Better to use md5(XG_HttpHelper::currentUrl())  [Jon Aquino 2007-10-25]
+            $cacheKey = md5(XG_HttpHelper::currentUrl());
+            $this->setCaching(array($cacheKey), 300);
         }
 
         $this->app = XN_Application::load();
@@ -53,8 +54,8 @@ class Index_IndexController extends XG_BrowserAwareController {
     public function action_index_iphone() {
         /** Cache approach index-signedout */
         if (! ($this->_user->isLoggedIn() || XG_App::getLogoutCookie())) {
-            $this->setCaching(array(crc32($_SERVER['QUERY_STRING'])), 300);
-            // TODO: Better to use md5(XG_HttpHelper::currentUrl())  [Jon Aquino 2007-10-25]
+            $cacheKey = md5(XG_HttpHelper::currentUrl());
+            $this->setCaching(array($cacheKey), 300);
         }
         $this->enabledModules = XG_ModuleHelper::getEnabledModules();
         $this->navEntries = XG_IPhoneHelper::getNavEntries();

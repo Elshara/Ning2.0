@@ -178,8 +178,9 @@ class XG_Form {
      *  @return     string
      */
     public function hidden($name) {
-        // TODO: Use xnhtmlentities instead of xg_xmlentities, which is intended for xml contexts [Jon Aquino 2008-04-02]
-        return '<input type="hidden" name="'.$name.'" value="'.xg_xmlentities($this->_values[$name]).'" />';
+        $value = $this->_values[$name] ?? '';
+
+        return '<input type="hidden" name="'.$name.'" value="'.xnhtmlentities((string) $value).'" />';
     }
 
     /**
