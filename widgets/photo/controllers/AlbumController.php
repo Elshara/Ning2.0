@@ -12,6 +12,8 @@ class Photo_AlbumController extends W_Controller {
 
 
     public function action_overridePrivacy($action) {
+        $rssParam = $_GET['rss'] ?? '';
+        $rss = is_scalar($rssParam) ? trim((string) $rssParam) : '';
         $rss = $_GET['rss'] ?? '';
 
         return (! XG_App::appIsPrivate() && $action == 'show' && $rss === 'yes');
@@ -68,6 +70,12 @@ class Photo_AlbumController extends W_Controller {
                 Photo_JsonHelper::outputAndExit(array());
             }
 
+            $photoIdRaw = $_GET['photoId'] ?? null;
+            $photoId = is_scalar($photoIdRaw) ? trim((string) $photoIdRaw) : '';
+            $albums = Photo_AlbumHelper::getAllAvailableAlbums(
+                $this->_user->screenName,
+                $photoId !== '' ? $photoId : null
+            );
             $photoId = $_GET['photoId'] ?? null;
             $albums = Photo_AlbumHelper::getAllAvailableAlbums($this->_user->screenName, $photoId);
 
@@ -92,6 +100,9 @@ class Photo_AlbumController extends W_Controller {
             return;
         }
 
+        $photoIdRaw = $_POST['photoId'] ?? null;
+        $photoId = is_scalar($photoIdRaw) ? trim((string) $photoIdRaw) : '';
+        if ($photoId === '') {
         $photoId = $_POST['photoId'] ?? null;
         if (!$photoId) {
             header("HTTP/1.0 403 Forbidden");
@@ -100,11 +111,16 @@ class Photo_AlbumController extends W_Controller {
 
         $photo = Photo_PhotoHelper::load($photoId);
         $album = null;
+        $newAlbumNameRaw = $_POST['newAlbumName'] ?? '';
+        $newAlbumName = is_scalar($newAlbumNameRaw) ? trim((string) $newAlbumNameRaw) : '';
         $newAlbumName = trim((string) ($_POST['newAlbumName'] ?? ''));
         if ($newAlbumName !== '') {
             $album = Photo_AlbumHelper::create();
             $album->title = $newAlbumName;
         } else {
+            $albumIdRaw = $_POST['albumId'] ?? null;
+            $albumId = is_scalar($albumIdRaw) ? trim((string) $albumIdRaw) : '';
+            if ($albumId !== '') {
             $albumId = $_POST['albumId'] ?? '';
             if (mb_strlen($albumId) > 0) {
                 $album = Photo_AlbumHelper::load($albumId);
@@ -118,6 +134,8 @@ class Photo_AlbumController extends W_Controller {
         Photo_AlbumHelper::addPhoto($this->_user, $album, $photo);
         header("HTTP/1.0 200 OK");
 
+        $renderRaw = $_POST['render'] ?? '';
+        $render = is_scalar($renderRaw) ? trim((string) $renderRaw) : '';
         $render = $_POST['render'] ?? '';
         if ($render === 'bar') {
             $albumData = Photo_AlbumHelper::getAlbums(array('photoId' => $photo->id),
@@ -139,6 +157,9 @@ class Photo_AlbumController extends W_Controller {
             return;
         }
 
+        $photoIdRaw = $_POST['photoId'] ?? null;
+        $photoId = is_scalar($photoIdRaw) ? trim((string) $photoIdRaw) : '';
+        if ($photoId === '') {
         $photoId = $_POST['photoId'] ?? null;
         if (!$photoId) {
             header("HTTP/1.0 403 Forbidden");
@@ -147,6 +168,13 @@ class Photo_AlbumController extends W_Controller {
 
         $photo = Photo_PhotoHelper::load($photoId);
         $album = null;
+        $albumIdRaw = $_POST['albumId'] ?? null;
+        $albumId = is_scalar($albumIdRaw) ? trim((string) $albumIdRaw) : '';
+        if ($albumId !== '') {
+            $album = Photo_AlbumHelper::load($albumId);
+        } else {
+            $newAlbumNameRaw = $_POST['newAlbumName'] ?? '';
+            $newAlbumName = is_scalar($newAlbumNameRaw) ? trim((string) $newAlbumNameRaw) : '';
         $albumId = $_POST['albumId'] ?? '';
         if (mb_strlen($albumId) > 0) {
             $album = Photo_AlbumHelper::load($albumId);
@@ -170,9 +198,11 @@ class Photo_AlbumController extends W_Controller {
      * Shows the albums of a particular owner.
      */
     public function action_listForOwner() {
-        if (isset($_GET['screenName']) && User::isMember($_GET['screenName'])) {
+        $requestedScreenNameRaw = $_GET['screenName'] ?? null;
+        $requestedScreenName = is_scalar($requestedScreenNameRaw) ? trim((string) $requestedScreenNameRaw) : '';
+        if ($requestedScreenName !== '' && User::isMember($requestedScreenName)) {
             // make sure the requested screenName is a member of the app otherwise we'll create xn_anonymous User objects (BAZ-8401) [ywh 2008-07-22]
-            $this->user = Photo_UserHelper::load($_GET['screenName']);
+            $this->user = Photo_UserHelper::load($requestedScreenName);
         } else {
             XG_SecurityHelper::redirectIfNotMember();
             $this->user = Photo_UserHelper::load($this->_user);
@@ -236,6 +266,10 @@ class Photo_AlbumController extends W_Controller {
                 // while searchability is being added to an app without search. [Jon Aquino 2008-02-13]
                 $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
                 $this->handleSortingAndPagination($filters, $this->getSortDescriptor());
+            }
+        } else {
+            $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+            $this->handleSortingAndPagination($filters, $this->getSortDescriptor());
             }
         } else {
             $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;

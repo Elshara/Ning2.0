@@ -242,34 +242,43 @@ class Photo_AlbumHelper {
      */
     public static function getAllAvailableAlbums($screenName, $excludedPhotoId = null) {
         if (! $screenName) { return array(); }
+
+        $screenName = (string) $screenName;
+        $excludedPhotoId = is_scalar($excludedPhotoId) ? trim((string) $excludedPhotoId) : '';
+        $hasExcludedPhoto = $excludedPhotoId !== '';
         $allAlbumsFilter = array('owner' => $screenName, 'includeHidden' => true);
 
-        if (isset($excludedPhotoId)) {
-            $photoAlbumsFilter = array('owner'   => $screenName, 'includeHidden' => true,
-                                       'photoId' => $excludedPhotoId);
+        $excludedAlbumIds = array();
+        if ($hasExcludedPhoto) {
+            $photoAlbumsFilter = array(
+                'owner' => $screenName,
+                'includeHidden' => true,
+                'photoId' => $excludedPhotoId,
+            );
 
-            // For now, we have to use two (rolling) queries to get the albums that don't contain the photo
-            $photoAlbums = array();
-            $begin       = 0;
+            $begin = 0;
             do {
                 $photoAlbumsData = Photo_AlbumHelper::getAlbums($photoAlbumsFilter, $begin, $begin + 100);
-                $photoAlbums     = array_merge($photoAlbums, $photoAlbumsData['albums']);
-                $begin           = $begin + 100;
+                foreach ($photoAlbumsData['albums'] as $album) {
+                    $excludedAlbumIds[$album->id] = true;
+                }
+                $begin += 100;
             } while ($photoAlbumsData['numAlbums'] > $begin);
         }
 
-        $albums = array();
-        $begin  = 0;
+        $result = array();
+        $begin = 0;
         do {
             $allAlbumsData = Photo_AlbumHelper::getAlbums($allAlbumsFilter, $begin, $begin + 100);
-            $albums        = array_merge($albums, $photoAlbums ? array_diff($allAlbumsData['albums'], $photoAlbums) : $allAlbumsData['albums']);
-            $begin         = $begin + 100;
+            foreach ($allAlbumsData['albums'] as $album) {
+                if ($hasExcludedPhoto && isset($excludedAlbumIds[$album->id])) {
+                    continue;
+                }
+                $result[$album->id] = $album->title;
+            }
+            $begin += 100;
         } while ($allAlbumsData['numAlbums'] > $begin);
 
-        $result = array();
-        foreach ($albums as $album) {
-            $result[$album->id] = $album->title;
-        }
         return $result;
     }
 

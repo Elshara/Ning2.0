@@ -201,6 +201,10 @@ class Video_VideoController extends W_Controller {
         } else {
             $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
             $this->handleSortingAndPagination($filters, 20);
+            }
+        } else {
+            $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+            $this->handleSortingAndPagination($filters, 20);
                 self::handleSortingAndPagination($filters, 20);
             }
         } else {
