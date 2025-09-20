@@ -294,6 +294,8 @@ class Photo_AlbumController extends W_Controller {
         $pageValue = $_GET['page'] ?? null;
         $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
         $this->begin = XG_PaginationHelper::computeStart($pageNumber, $this->pageSize);
+        $page = $_GET['page'] ?? null;
+        $this->begin = XG_PaginationHelper::computeStart($page, $this->pageSize);
         $albumData = Photo_AlbumHelper::getSortedAlbums($filters, $sort, $this->begin, $this->begin + $this->pageSize);
         $this->albums = $albumData['albums'];
         $this->numAlbums = $albumData['numAlbums'];
