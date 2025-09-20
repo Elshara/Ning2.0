@@ -118,6 +118,16 @@ class XG_Form {
         $attributes = ' id="' . $fieldName . '" name="' . $fieldName . '"';
         if ($css !== '') {
             $attributes .= ' class="' . $css . '"';
+        $isList = ( $first == 0 && $last == count($values)-1 );
+        $value = $this->_values[$name] ?? null;
+        foreach ($values as $k=>$v) {
+            if ($isList) {
+                $k = $v;
+            }
+            $optionValue = xg_xmlentities((string) $k);
+            $optionLabel = xg_xmlentities((string) $v);
+            $isSelected = ((string) $k === (string) $value) ? ' selected="selected"' : '';
+            $options .= '<option value="' . $optionValue . '"' . $isSelected . '>' . $optionLabel . '</option>';
         }
 
         $htmlAttributes = trim((string) $html);
@@ -225,6 +235,10 @@ class XG_Form {
         $htmlSuffix = ($htmlAttributes !== '') ? ' ' . $htmlAttributes : '';
 
         return '<input type="text" id="' . $fieldName . '" name="' . $fieldName . '" class="' . $css . '" value="' . $valueAttribute . '"' . $htmlSuffix . ' />';
+        $css = 'textfield' . ($required ? ' required' : '');
+        $value = $this->_values[$name] ?? '';
+
+        return '<input type="text" id="'.$name.'" name="'.$name.'" class="'.$css.'" value="'.xg_xmlentities((string) $value).'"'.($html?' '.$html:'').' />';
     }
 
     /**
@@ -358,6 +372,11 @@ class XG_Form {
         $meridiemRaw = $_REQUEST[$idx."R"] ?? null;
         $hourRaw = $_REQUEST[$idx."H"] ?? null;
         $minuteRaw = $_REQUEST[$idx."I"] ?? null;
+
+        $meridiem = is_scalar($meridiemRaw) ? mb_strtolower(trim((string) $meridiemRaw)) : '';
+        $hourValue = (is_scalar($hourRaw) && $hourRaw !== '') ? (int) $hourRaw : 0;
+        $minuteValue = (is_scalar($minuteRaw) && $minuteRaw !== '') ? (int) $minuteRaw : 0;
+
 
         $meridiem = is_scalar($meridiemRaw) ? mb_strtolower(trim((string) $meridiemRaw)) : '';
         $hourValue = (is_scalar($hourRaw) && $hourRaw !== '') ? (int) $hourRaw : 0;
