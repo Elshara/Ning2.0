@@ -90,9 +90,17 @@ class Index_FeatureController extends W_Controller {
            $this->backLink = XG_App::getPreviousStepUrl();
            $this->nextLink = XG_App::getNextStepUrl();
        }
-       // TODO: Instead of (count(array_keys(XN_Application::load()->premiumServices)) < 1), we can probably just check !XN_Application::load()->premiumServices [Jon Aquino 2008-09-15]
-       $this->showPremiumServicesPromo = (count(array_keys(XN_Application::load()->premiumServices)) < 1) && XG_SecurityHelper::userIsOwner() && XG_App::appIsLaunched();
-       $this->premiumServicesUrl = 'http://' . XN_AtomHelper::HOST_APP('www') . '/home/apps/premium?appUrl=' . XN_Application::load()->relativeUrl;
+       $application = XN_Application::load();
+       $premiumServices = $application->premiumServices;
+       $hasPremiumServices = false;
+       if (is_array($premiumServices) || $premiumServices instanceof Countable) {
+           $hasPremiumServices = count($premiumServices) > 0;
+       } else {
+           $hasPremiumServices = (bool) $premiumServices;
+       }
+
+       $this->showPremiumServicesPromo = (!$hasPremiumServices) && XG_SecurityHelper::userIsOwner() && XG_App::appIsLaunched();
+       $this->premiumServicesUrl = 'http://' . XN_AtomHelper::HOST_APP('www') . '/home/apps/premium?appUrl=' . $application->relativeUrl;
        $this->initialVisibleSourceFeatureCount = XG_App::appIsLaunched() ? 9999 : 6;
    }
 
