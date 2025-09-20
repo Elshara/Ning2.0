@@ -12,7 +12,10 @@ class Photo_AlbumController extends W_Controller {
 
 
     public function action_overridePrivacy($action) {
-        return (! XG_App::appIsPrivate() && $action == 'show' && $_GET['rss'] == 'yes');
+        $rssParam = $_GET['rss'] ?? '';
+        $rss = is_scalar($rssParam) ? trim((string) $rssParam) : '';
+
+        return (! XG_App::appIsPrivate() && $action == 'show' && $rss === 'yes');
     }
 
     protected function _before() {
@@ -34,7 +37,8 @@ class Photo_AlbumController extends W_Controller {
 
     public function action_gfx() {
         Photo_LogHelper::log('debug: ' . Photo_HttpHelper::currentUrl());
-        Photo_LogHelper::log('referrer: ' . $_SERVER['HTTP_REFERER']);
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        Photo_LogHelper::log('referrer: ' . $referer);
     }
 
     /**
@@ -46,9 +50,13 @@ class Photo_AlbumController extends W_Controller {
      */
     private function getSortDescriptor() {
         $sorts = Photo_AlbumHelper::getKnownSortingOrders();
-        $result = $sorts[$_GET['sort']];
-        if (! $result) { $result = $sorts[Photo_AlbumHelper::SORT_ORDER_MOSTRECENT]; }
-        return $result;
+        $requested = $_GET['sort'] ?? null;
+
+        if ($requested !== null && isset($sorts[$requested])) {
+            return $sorts[$requested];
+        }
+
+        return $sorts[Photo_AlbumHelper::SORT_ORDER_MOSTRECENT];
     }
 
     /**
@@ -61,7 +69,12 @@ class Photo_AlbumController extends W_Controller {
                 Photo_JsonHelper::outputAndExit(array());
             }
 
-            $albums = Photo_AlbumHelper::getAllAvailableAlbums($this->_user->screenName, $_GET['photoId']);
+            $photoIdRaw = $_GET['photoId'] ?? null;
+            $photoId = is_scalar($photoIdRaw) ? trim((string) $photoIdRaw) : '';
+            $albums = Photo_AlbumHelper::getAllAvailableAlbums(
+                $this->_user->screenName,
+                $photoId !== '' ? $photoId : null
+            );
 
             Photo_JsonHelper::outputAndExit(array('albums' => $albums));
         } catch (Exception $e) {
@@ -84,12 +97,26 @@ class Photo_AlbumController extends W_Controller {
             return;
         }
 
-        $photo = Photo_PhotoHelper::load($_POST['photoId']);
-        if ($_POST['newAlbumName'] && (mb_strlen($_POST['newAlbumName']) > 0)) {
-            $album        = Photo_AlbumHelper::create();
-            $album->title = $_POST['newAlbumName'];
-        } else if ($_POST['albumId']) {
-            $album = Photo_AlbumHelper::load($_POST['albumId']);
+        $photoIdRaw = $_POST['photoId'] ?? null;
+        $photoId = is_scalar($photoIdRaw) ? trim((string) $photoIdRaw) : '';
+        if ($photoId === '') {
+            header("HTTP/1.0 403 Forbidden");
+            return;
+        }
+
+        $photo = Photo_PhotoHelper::load($photoId);
+        $album = null;
+        $newAlbumNameRaw = $_POST['newAlbumName'] ?? '';
+        $newAlbumName = is_scalar($newAlbumNameRaw) ? trim((string) $newAlbumNameRaw) : '';
+        if ($newAlbumName !== '') {
+            $album = Photo_AlbumHelper::create();
+            $album->title = $newAlbumName;
+        } else {
+            $albumIdRaw = $_POST['albumId'] ?? null;
+            $albumId = is_scalar($albumIdRaw) ? trim((string) $albumIdRaw) : '';
+            if ($albumId !== '') {
+                $album = Photo_AlbumHelper::load($albumId);
+            }
         }
 
         if (!$photo || !$album || (($album->contributorName != null) && ($album->contributorName != $this->_user->screenName))) {
@@ -99,7 +126,9 @@ class Photo_AlbumController extends W_Controller {
         Photo_AlbumHelper::addPhoto($this->_user, $album, $photo);
         header("HTTP/1.0 200 OK");
 
-        if (isset($_POST['render']) && ($_POST['render'] == 'bar')) {
+        $renderRaw = $_POST['render'] ?? '';
+        $render = is_scalar($renderRaw) ? trim((string) $renderRaw) : '';
+        if ($render === 'bar') {
             $albumData = Photo_AlbumHelper::getAlbums(array('photoId' => $photo->id),
                                                       0,
                                                       7);
@@ -119,12 +148,26 @@ class Photo_AlbumController extends W_Controller {
             return;
         }
 
-        $photo = Photo_PhotoHelper::load($_POST['photoId']);
-        if ($_POST['albumId']) {
-            $album = Photo_AlbumHelper::load($_POST['albumId']);
-        } else if ($_POST['newAlbumName']) {
-            $album        = Photo_AlbumHelper::create();
-            $album->title = $_POST['newAlbumName'];
+        $photoIdRaw = $_POST['photoId'] ?? null;
+        $photoId = is_scalar($photoIdRaw) ? trim((string) $photoIdRaw) : '';
+        if ($photoId === '') {
+            header("HTTP/1.0 403 Forbidden");
+            return;
+        }
+
+        $photo = Photo_PhotoHelper::load($photoId);
+        $album = null;
+        $albumIdRaw = $_POST['albumId'] ?? null;
+        $albumId = is_scalar($albumIdRaw) ? trim((string) $albumIdRaw) : '';
+        if ($albumId !== '') {
+            $album = Photo_AlbumHelper::load($albumId);
+        } else {
+            $newAlbumNameRaw = $_POST['newAlbumName'] ?? '';
+            $newAlbumName = is_scalar($newAlbumNameRaw) ? trim((string) $newAlbumNameRaw) : '';
+            if ($newAlbumName !== '') {
+                $album = Photo_AlbumHelper::create();
+                $album->title = $newAlbumName;
+            }
         }
 
         if (!$photo || !$album || ($album->contributorName != $this->_user->screenName)) {
@@ -139,9 +182,11 @@ class Photo_AlbumController extends W_Controller {
      * Shows the albums of a particular owner.
      */
     public function action_listForOwner() {
-        if (isset($_GET['screenName']) && User::isMember($_GET['screenName'])) {
+        $requestedScreenNameRaw = $_GET['screenName'] ?? null;
+        $requestedScreenName = is_scalar($requestedScreenNameRaw) ? trim((string) $requestedScreenNameRaw) : '';
+        if ($requestedScreenName !== '' && User::isMember($requestedScreenName)) {
             // make sure the requested screenName is a member of the app otherwise we'll create xn_anonymous User objects (BAZ-8401) [ywh 2008-07-22]
-            $this->user = Photo_UserHelper::load($_GET['screenName']);
+            $this->user = Photo_UserHelper::load($requestedScreenName);
         } else {
             XG_SecurityHelper::redirectIfNotMember();
             $this->user = Photo_UserHelper::load($this->_user);
@@ -155,15 +200,14 @@ class Photo_AlbumController extends W_Controller {
         $this->pageTitle = $this->myOwnAlbums ?
                                 xg_text('MY_ALBUMS') :
                                 xg_text('USER_ALBUMS', Photo_FullNameHelper::fullName($this->user->title));
-        self::handleSortingAndPagination(array('owner' => $this->user->title, 'includeHidden' => $this->myOwnAlbums), self::getSortDescriptor());
+        $this->handleSortingAndPagination(array('owner' => $this->user->title, 'includeHidden' => $this->myOwnAlbums), $this->getSortDescriptor());
     }
 
     /**
      * Shows all albums.
      */
     public function action_list() {
-        self::handleSortingAndPagination(null, self::getSortDescriptor());
-        $sort = self::getSortDescriptor();
+        $this->handleSortingAndPagination(null, $this->getSortDescriptor());
        	$this->title = xg_text('ALL_ALBUMS');
         $this->pageTitle = xg_text('ALBUMS_NO_COLON');
         if ($this->begin == 0) {
@@ -181,16 +225,19 @@ class Photo_AlbumController extends W_Controller {
     public function action_search() {
         XG_App::includeFileOnce('/lib/XG_PaginationHelper.php');
         XG_App::includeFileOnce('/lib/XG_QueryHelper.php');
+        $searchTerms = $_GET['q'] ?? '';
         if (XG_QueryHelper::getSearchMethod() == 'search') {
             try {
                 $this->pageSize = 20;
-                $begin = XG_PaginationHelper::computeStart($_GET['page'], $this->pageSize);
+                $pageValue = $_GET['page'] ?? null;
+                $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
+                $begin = XG_PaginationHelper::computeStart($pageNumber, $this->pageSize);
                 $query = XN_Query::create('Search');
                 $query->filter('type', 'like', 'Album');
                 $query->begin($begin);
                 $query->end($begin + $this->pageSize);
                 $query->alwaysReturnTotalCount(true);
-                XG_QueryHelper::addSearchFilter($query, $_GET['q'], true);
+                XG_QueryHelper::addSearchFilter($query, $searchTerms, true);
                 XG_QueryHelper::addExcludeFromPublicSearchFilter($query, true);
                 $this->albums = XG_QueryHelper::contentFromSearchResults($query->execute(), false);
                 $this->numAlbums = $query->getTotalCount();
@@ -201,10 +248,12 @@ class Photo_AlbumController extends W_Controller {
             } catch (Exception $e) {
                 // DS said that the search core may throw an exception
                 // while searchability is being added to an app without search. [Jon Aquino 2008-02-13]
-                self::handleSortingAndPagination(array('searchTerms' => $_GET['q']), self::getSortDescriptor());
+                $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+                $this->handleSortingAndPagination($filters, $this->getSortDescriptor());
             }
         } else {
-            self::handleSortingAndPagination(array('searchTerms' => $_GET['q']), self::getSortDescriptor());
+            $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+            $this->handleSortingAndPagination($filters, $this->getSortDescriptor());
         }
     }
 
@@ -212,7 +261,7 @@ class Photo_AlbumController extends W_Controller {
      * Shows a list of albums that have been promoted.
      */
     public function action_listFeatured() {
-        self::handleSortingAndPagination(array('promoted' => true), null);
+        $this->handleSortingAndPagination(array('promoted' => true), null);
     }
 
     /**
@@ -220,8 +269,13 @@ class Photo_AlbumController extends W_Controller {
      */
     public function action_registershown() {
         try {
-            $album = Photo_ContentHelper::findByID('Album', $_POST['id'], true, false);
-            if ($album && (!$this->_user->isLoggedIn() || ($this->_user->screenName != $this->album->contributorName))) {
+            $albumId = $_POST['id'] ?? null;
+            if (!$albumId) {
+                Photo_JsonHelper::outputAndExit(array());
+            }
+
+            $album = Photo_ContentHelper::findByID('Album', $albumId, true, false);
+            if ($album && (!$this->_user->isLoggedIn() || ($this->_user->screenName != $album->contributorName))) {
                 $album->my->viewCount = $album->my->viewCount + 1;
                 // BAZ-1507: Don't invalidate cache here, or the cache gets blown away on each detail view
                 XG_App::setInvalidateFromHooks(false);
@@ -244,22 +298,24 @@ class Photo_AlbumController extends W_Controller {
             $this->error = array('title' => xg_text('SLOW_DOWN_THERE_CHIEF'), 'subtitle' => '', 'description' => xg_text('I_DO_NOT_HAVE_PHOTO'));
             return $this->render('error', 'index');
         }
-        self::handleSortingAndPagination(array('photoId' => $this->photo->id), self::getSortDescriptor());
+        $this->handleSortingAndPagination(array('photoId' => $this->photo->id), $this->getSortDescriptor());
     }
 
     private function handleSortingAndPagination($filters, $sort) {
+        XG_App::includeFileOnce('/lib/XG_PaginationHelper.php');
         $this->pageSize = 20;
-        // TODO: Use XG_PaginationHelper::computeStart(). [Jon Aquino 2008-02-16]
-        $this->begin = 0;
-        if (intval($_GET['page']) > 0) {
-            $this->begin = ($_GET['page'] - 1) * $this->pageSize;
-        }
+        $pageValue = $_GET['page'] ?? null;
+        $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
+        $this->begin = XG_PaginationHelper::computeStart($pageNumber, $this->pageSize);
         $albumData = Photo_AlbumHelper::getSortedAlbums($filters, $sort, $this->begin, $this->begin + $this->pageSize);
         $this->albums = $albumData['albums'];
         $this->numAlbums = $albumData['numAlbums'];
         $this->coverPhotos = Photo_AlbumHelper::getCoverPhotos($this->albums);
-        $this->sortOptions = Photo_HtmlHelper::toSortOptions(Photo_AlbumHelper::getKnownSortingOrders(), $sort['alias']);
-        $this->isSortRandom = $sort['alias'] == Photo_AlbumHelper::SORT_ORDER_RANDOM;
+        $sorts = Photo_AlbumHelper::getKnownSortingOrders();
+        $sortDescriptor = $sort ?? $sorts[Photo_AlbumHelper::SORT_ORDER_MOSTRECENT];
+        $sortAlias = $sortDescriptor['alias'] ?? Photo_AlbumHelper::SORT_ORDER_MOSTRECENT;
+        $this->sortOptions = Photo_HtmlHelper::toSortOptions($sorts, $sortAlias);
+        $this->isSortRandom = $sortAlias == Photo_AlbumHelper::SORT_ORDER_RANDOM;
         Photo_FullNameHelper::initialize($this->albums);
     }
 
@@ -281,16 +337,16 @@ class Photo_AlbumController extends W_Controller {
         XG_CommentHelper::stopFollowingIfRequested($this->album);
         $this->isOwner = XG_SecurityHelper::userIsContributor($this->_user, $this->album);
         if ($this->isOwner) { $this->updateAlbum($this->album); }
-        if($_GET['rss']=='yes'){
+        $rss = (($_GET['rss'] ?? '') === 'yes');
+        if ($rss) {
             header("Content-Type: text/xml");
             $this->setCaching(array('photos-album-show-' . md5(XG_HttpHelper::currentUrl())), 1800);
-            if ($_GET['test_caching']) { var_dump('Not cached'); }
+            if (!empty($_GET['test_caching'])) { var_dump('Not cached'); }
         }
         $this->pageSize = 16;
-        $begin = 0;
-        if (preg_match('@^[.0-9]+$@u', $_GET['page']) && ($_GET['page'] > 0)) {
-            $begin = ($_GET['page'] - 1) * $this->pageSize;
-        }
+        $pageValue = $_GET['page'] ?? null;
+        $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
+        $begin = XG_PaginationHelper::computeStart($pageNumber, $this->pageSize);
         $this->coverPhoto = Photo_AlbumHelper::getCoverPhotos(array($this->album));
         $photoIds = Photo_ContentHelper::ids($this->album, 'photos');
         $photosData = Photo_PhotoHelper::getSpecificPhotos($this->isOwner ? null : $this->_user, $photoIds, null, $begin, $begin + $this->pageSize);
@@ -305,13 +361,12 @@ class Photo_AlbumController extends W_Controller {
             $this->album->save();
         }
         $this->showFacebookMeta = array_key_exists('from', $_GET) && ($_GET['from'] === 'fb');
-        if($_GET['rss']=='yes'){
+        if ($rss) {
             $appname = XN_Application::load()->name;
-            // TODO: Use xg_xmlentities instead of htmlspecialchars [Jon Aquino 2008-02-20]
-            $this->title = htmlspecialchars($this->album->title, ENT_COMPAT, 'UTF-8');
+            $this->title = xg_xmlentities($this->album->title);
             $this->description = xg_xmlentities(xg_text('ALBUM_BY_X_ON_X', $this->album->contributorName, $appname));
             $this->link = $this->_buildUrl('album','show', '?id=' . $this->album->id);
-            if ($this->my->coverPhotoId) {
+            if ($this->album->my->coverPhotoId) {
                 Photo_HtmlHelper::fitImageIntoThumb($this->coverPhoto[0], 50, 50, $imgUrl, $imgWidth, $imgHeight);
                 $this->feedImageUrl = $imgUrl;
                 $this->feedImageHeight = 50;
@@ -349,11 +404,15 @@ class Photo_AlbumController extends W_Controller {
         XG_SecurityHelper::redirectIfNotMember();
         XG_JoinPromptHelper::joinGroupOnDelete();
         if ($_SERVER['REQUEST_METHOD'] != 'POST') { throw new Exception('Not a POST'); }
-        $album = Photo_AlbumHelper::load($_GET['id']);
+        $albumId = $_GET['id'] ?? '';
+        if ($albumId === '') { throw new Exception('Album id missing'); }
+        $album = Photo_AlbumHelper::load($albumId);
         if (Photo_SecurityHelper::failed(Photo_SecurityHelper::checkCurrentUserCanDeleteAlbum($this->_user, $album))) { throw new Exception('Not allowed'); }
         Photo_AlbumHelper::delete($album);
         Photo_AlbumHelper::updateAlbumCount(User::load(XN_Profile::current()));
-        header('Location: ' . $_GET['target']);
+        $targetParam = isset($_GET['target']) ? trim((string) $_GET['target']) : '';
+        $target = ($targetParam !== '') ? $targetParam : $this->_buildUrl('album', 'list');
+        header('Location: ' . $target);
     }
 
     public function action_new() {
@@ -393,17 +452,16 @@ class Photo_AlbumController extends W_Controller {
 
             $filters = array();
 
-            if ($_GET['origin'] == 'my') {
+            if (($_GET['origin'] ?? '') === 'my') {
                 $filters['contributor'] = $this->_user->screenName;
             }
             if (isset($_GET['tags'])) {
                 $filters['tags'] = XN_Tag::parseTagString($_GET['tags']);
             }
 
-            $begin = 0;
-            if (preg_match('@^[.0-9]+$@u', $_GET['page']) && ($_GET['page'] > 0)) {
-                $begin = ($_GET['page'] - 1) * self::NUM_THUMBS_ALBUMEDITVIEW;
-            }
+            $pageValue = $_GET['page'] ?? null;
+            $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
+            $begin = ($pageNumber - 1) * self::NUM_THUMBS_ALBUMEDITVIEW;
 
             $photosData = Photo_PhotoHelper::getSortedPhotos($this->_user,
                                                              $filters,
@@ -453,6 +511,7 @@ class Photo_AlbumController extends W_Controller {
                 header("HTTP/1.0 403 Forbidden");
                 return;
             }
+            $newAlbum = false;
             if (isset($_POST['albumId']) && (mb_strlen($_POST['albumId']) > 0)) {
                 try {
                     $album = Photo_AlbumHelper::load($_POST['albumId']);
@@ -575,11 +634,14 @@ class Photo_AlbumController extends W_Controller {
         $old = $album->export();
         Photo_AlbumHelper::updateAlbum($this->_user, $album);
         if (array_diff_assoc($old, $album->export())) {
-        	$album->save();
-		}
+            $album->save();
+        }
         // TODO: Maybe eliminate removedPhotoCount [Jon Aquino 2008-02-20]
-        if ($album->my->photoCount < $old['photoCount']) {
-            $this->removedPhotoCount = $oldNumPhotos - $album->my->photoCount;
+        if (isset($old['photoCount']) && $album->my->photoCount < $old['photoCount']) {
+            $removed = $old['photoCount'] - $album->my->photoCount;
+            if ($removed > 0) {
+                $this->removedPhotoCount = $removed;
+            }
         }
     }
 }
