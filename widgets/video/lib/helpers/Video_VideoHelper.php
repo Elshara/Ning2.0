@@ -268,7 +268,9 @@ class Video_VideoHelper {
         /* Perhaps cache if the user is not logged in */
         $shouldCache = (! XN_Profile::current()->isLoggedIn()); // Should this not be $profile? [Jon Aquino 2008-09-19]
 
-        if (!$filters || !$filters['includeUnconvertedVideos']) {
+        $filters = $filters ? $filters : array();
+        $includeUnconverted = !empty($filters['includeUnconvertedVideos']);
+        if (!$includeUnconverted) {
             Video_SecurityHelper::addConversionCompleteFilter($query);
         }
         if ($filters) {
@@ -279,39 +281,41 @@ class Video_VideoHelper {
              * filters are in use: contributor, tag
              */
              // TODO: Allow caching for friends queries, but use XG_QueryHelper::setMaxAgeForFriendsQuery [Jon Aquino 2008-09-17]
-             if (isset($filters['friends'])) {
+             if (!empty($filters['friends'])) {
                  $shouldCache = false;
              }
-             if ((isset($filters['contributor']) || isset($filters['tag'])) &&
+             if (((isset($filters['contributor']) && $filters['contributor'] !== '') || (isset($filters['tag']) && $filters['tag'] !== '')) &&
                  (! XG_Cache::cacheOrderN())) {
                 $shouldCache = false;
              }
 
 
-            if ($filters['contributor']) {
+            if (!empty($filters['contributor'])) {
                 $query->filter('contributorName', 'eic', $filters['contributor']);
                 // we don't want the approved filter for the "My Videos"
                 if ($profile->screenName == $filters['contributor']) {
                     $needApprovedFilter = false;
                 }
-            } else if ($filters['friends'] && XN_Profile::current()->isLoggedIn()) {  // Should this not be $profile? [Jon Aquino 2008-09-19]
+            } else if (!empty($filters['friends']) && XN_Profile::current()->isLoggedIn()) {  // Should this not be $profile? [Jon Aquino 2008-09-19]
                 $query->filter('contributorName', 'in', XN_Query::FRIENDS());
             }
-            if (mb_strlen($filters['location'])) {
-                $query->filter('my->location', 'eic', $filters['location']);
+            $location = $filters['location'] ?? '';
+            if (mb_strlen($location)) {
+                $query->filter('my->location', 'eic', $location);
             }
-            if ($filters['locationRequired']) {
+            if (!empty($filters['locationRequired'])) {
                 $query->filter('my->lat', '<>', null);
                 $query->filter('my->lat', '<>', '');
                 $query->filter('my->lng', '<>', null);
                 $query->filter('my->lng', '<>', '');
             }
-            if ($filters['tag']) {
+            if (!empty($filters['tag'])) {
                 $query->filter('tag->value', 'eic', $filters['tag']);
             }
-            if (mb_strlen($filters['searchTerms'])) {
+            $searchTerms = $filters['searchTerms'] ?? '';
+            if (mb_strlen($searchTerms)) {
                 XG_App::includeFileOnce('/lib/XG_QueryHelper.php');
-                XG_QueryHelper::addSearchFilter($query, $filters['searchTerms']);
+                XG_QueryHelper::addSearchFilter($query, $searchTerms);
             }
         }
         if ($needApprovedFilter) {
