@@ -154,6 +154,7 @@ class Video_VideoController extends W_Controller {
             $this->setCaching(array(md5(XG_HttpHelper::currentUrl())), 300);
         }
         $this->handleSortingAndPagination(null, self::NUM_THUMBS_TWOCOLUMNVIEW);
+        self::handleSortingAndPagination(null, self::NUM_THUMBS_TWOCOLUMNVIEW);
         Video_FullNameHelper::initialize($this->videos);
         if ($this->page == 1) {
             $this->featuredVideos = Video_VideoHelper::getPromotedVideos(6);
@@ -200,6 +201,11 @@ class Video_VideoController extends W_Controller {
         } else {
             $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
             $this->handleSortingAndPagination($filters, 20);
+                self::handleSortingAndPagination($filters, 20);
+            }
+        } else {
+            $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+            self::handleSortingAndPagination($filters, 20);
         }
         Video_FullNameHelper::initialize($this->videos);
     }
@@ -222,6 +228,7 @@ class Video_VideoController extends W_Controller {
         $this->pageSize = self::NUM_THUMBS_TWOCOLUMNVIEW;
         $filters = $this->location !== '' ? array('location' => $this->location) : null;
         $this->handleSortingAndPagination($filters, $this->pageSize);
+        self::handleSortingAndPagination($filters, $this->pageSize);
         Video_FullNameHelper::initialize($this->videos);
         $rssParam = $_GET['rss'] ?? '';
         if ($rssParam === 'yes') {
@@ -304,6 +311,7 @@ class Video_VideoController extends W_Controller {
         }
         if ($isRss) { $this->sort = Video_VideoHelper::getMostRecentSortingOrder(); }
         $this->handleSortingAndPagination(array('tag' => $this->tag), $isRss ? self::NUM_THUMBS_RSS : self::NUM_THUMBS_TWOCOLUMNVIEW);
+        self::handleSortingAndPagination(array('tag' => $this->tag), $isRss ? self::NUM_THUMBS_RSS : self::NUM_THUMBS_TWOCOLUMNVIEW);
         $this->rssTitle = xg_text('ALL_VIDEOS_TAGGED_X_X', $this->tag, XN_Application::load()->name);
         if ($isRss) {
             $this->title = $this->rssTitle;
