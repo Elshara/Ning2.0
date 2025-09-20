@@ -18,6 +18,9 @@ class Video_VideoController extends W_Controller {
     const PLAYER_LOGO_CHANGED = 'PLAYER_LOGO_CHANGED';
 
     public function action_overridePrivacy($action) {
+        $rssParam = $_GET['rss'] ?? '';
+        $isRss = $rssParam === 'yes';
+
         return
             // Player feeds implement their own privacy mechanism [Jon Aquino 2006-12-09]
             $action == 'showPlayerConfig' ||
@@ -26,9 +29,9 @@ class Video_VideoController extends W_Controller {
             $action == 'conversionUpdated' ||
 
             (! XG_App::appIsPrivate() && $action == 'rss') ||
-            (! XG_App::appIsPrivate() && $action == 'listFavorites' && $_GET['rss'] == 'yes') ||
-            (! XG_App::appIsPrivate() && $action == 'listForContributor' && $_GET['rss'] == 'yes') ||
-            (! XG_App::appIsPrivate() && $action == 'listTagged' && $_GET['rss'] == 'yes');
+            (! XG_App::appIsPrivate() && $action == 'listFavorites' && $isRss) ||
+            (! XG_App::appIsPrivate() && $action == 'listForContributor' && $isRss) ||
+            (! XG_App::appIsPrivate() && $action == 'listTagged' && $isRss);
     }
 
     protected function _before() {
@@ -63,7 +66,7 @@ class Video_VideoController extends W_Controller {
 
         $this->pageSize = self::NUM_THUMBS_TWOCOLUMNVIEW;
         $this->sorts    = Video_VideoHelper::getKnownSortingOrders();
-        $this->sort     = self::getSortDescriptor();
+        $this->sort     = $this->getSortDescriptor();
     }
 
     /**
@@ -74,11 +77,13 @@ class Video_VideoController extends W_Controller {
      * @return The sort descriptor, one of the $this->sorts items
      */
     private function getSortDescriptor() {
-        $result = $this->sorts[$_GET['sort']];
-        if (!$result) {
-            $result = $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT];
+        $requested = $_GET['sort'] ?? null;
+
+        if ($requested !== null && isset($this->sorts[$requested])) {
+            return $this->sorts[$requested];
         }
-        return $result;
+
+        return $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT];
     }
 
     // @todo Move these queries out of the controller and into, for example, Video or VideoHelper.
@@ -143,11 +148,12 @@ class Video_VideoController extends W_Controller {
     }
 
     public function action_list() {
-        if ($_GET['q']) { return $this->forwardTo('search'); }
+        $searchTerms = trim((string) ($_GET['q'] ?? ''));
+        if ($searchTerms !== '') { return $this->forwardTo('search'); }
         if (! $this->_user->isLoggedIn()) {
             $this->setCaching(array(md5(XG_HttpHelper::currentUrl())), 300);
         }
-        self::handleSortingAndPagination(array('searchTerms' => $_GET['q']), self::NUM_THUMBS_TWOCOLUMNVIEW);
+        $this->handleSortingAndPagination(null, self::NUM_THUMBS_TWOCOLUMNVIEW);
         Video_FullNameHelper::initialize($this->videos);
         if ($this->page == 1) {
             $this->featuredVideos = Video_VideoHelper::getPromotedVideos(6);
@@ -160,7 +166,7 @@ class Video_VideoController extends W_Controller {
         $this->pageTitle = xg_text('VIDEOS');
         $this->title = xg_text('ALL_VIDEOS');
         $this->showFacebookMeta = array_key_exists('from', $_GET) && ($_GET['from'] === 'fb');
-        if ($_GET['q']) { $this->title = xg_text('SEARCH_RESULTS'); }
+        if ($searchTerms !== '') { $this->title = xg_text('SEARCH_RESULTS'); }
     }
 
     /**
@@ -169,26 +175,31 @@ class Video_VideoController extends W_Controller {
     public function action_search() {
         XG_App::includeFileOnce('/lib/XG_PaginationHelper.php');
         XG_App::includeFileOnce('/lib/XG_QueryHelper.php');
+        $searchTerms = trim((string) ($_GET['q'] ?? ''));
         if (XG_QueryHelper::getSearchMethod() == 'search') {
             try {
                 $this->pageSize = self::NUM_THUMBS_TWOCOLUMNVIEW;
-                $begin = XG_PaginationHelper::computeStart($_GET['page'], $this->pageSize);
+                $pageValue = $_GET['page'] ?? null;
+                $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
+                $begin = XG_PaginationHelper::computeStart($pageNumber, $this->pageSize);
                 $query = XN_Query::create('Search');
                 $query->filter('type', 'like', 'Video');
                 $query->begin($begin);
                 $query->end($begin + $this->pageSize);
                 $query->alwaysReturnTotalCount(true);
-                XG_QueryHelper::addSearchFilter($query, $_GET['q'], true);
+                XG_QueryHelper::addSearchFilter($query, $searchTerms, true);
                 XG_QueryHelper::addExcludeFromPublicSearchFilter($query, true);
                 $this->videos = XG_QueryHelper::contentFromSearchResults($query->execute(), false);
                 $this->numVideos = $query->getTotalCount();
             } catch (Exception $e) {
                 // According to David Sklar, the search core may throw an exception
                 // while searchability is being added to an app without search. [Jon Aquino 2008-02-13]
-                self::handleSortingAndPagination(array('searchTerms' => $_GET['q']), 20);
+                $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+                $this->handleSortingAndPagination($filters, 20);
             }
         } else {
-            self::handleSortingAndPagination(array('searchTerms' => $_GET['q']), 20);
+            $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+            $this->handleSortingAndPagination($filters, 20);
         }
         Video_FullNameHelper::initialize($this->videos);
     }
@@ -198,7 +209,7 @@ class Video_VideoController extends W_Controller {
             $this->setCaching(array(md5(XG_HttpHelper::currentUrl())), 300);
         }
         $this->sort = Video_VideoHelper::getPromotedSortingOrder();
-        self::handleSortingAndPagination();
+        $this->handleSortingAndPagination();
         $this->pageTitle = xg_text('VIDEOS');
         $this->title = xg_text('FEATURED_VIDEOS');
     }
@@ -207,14 +218,16 @@ class Video_VideoController extends W_Controller {
      * Displays all videos for a given location.
      */
     public function action_listForLocation() {
-        $this->location = $_GET['location'];
+        $this->location = trim((string) ($_GET['location'] ?? ''));
         $this->pageSize = self::NUM_THUMBS_TWOCOLUMNVIEW;
-        self::handleSortingAndPagination(array('location' => $this->location), $this->pageSize);
+        $filters = $this->location !== '' ? array('location' => $this->location) : null;
+        $this->handleSortingAndPagination($filters, $this->pageSize);
         Video_FullNameHelper::initialize($this->videos);
-        if ($_GET['rss']) {
+        $rssParam = $_GET['rss'] ?? '';
+        if ($rssParam === 'yes') {
             header("Content-Type: text/xml");
             $this->setCaching(array('video-video-rss-' . md5(XG_HttpHelper::currentUrl())), 1800);
-            if ($_GET['test_caching']) { var_dump('Not cached'); }
+            if (!empty($_GET['test_caching'])) { var_dump('Not cached'); }
             $this->title = xg_text('VIDEOS_FOR_LOCATION', $this->location);
             $this->link = 'http://' . $_SERVER['HTTP_HOST'];
             $this->render('rss');
@@ -237,7 +250,9 @@ class Video_VideoController extends W_Controller {
         }
         $this->bodyId = 'videos-to-approve';
         if (Video_SecurityHelper::isApprovalRequired()) {
-            $this->query = Video_VideoHelper::query($this->_user, $_GET['page'], $this->pageSize, $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT], false);
+            $pageValue = $_GET['page'] ?? null;
+            $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
+            $this->query = Video_VideoHelper::query($this->_user, $pageNumber, $this->pageSize, $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT], false);
             $this->query->filter('my->approved', '=', 'N');
             $this->videos = $this->query->execute();
             if (count($this->videos) == 0 && $this->query->getTotalCount() > 0) {
@@ -254,11 +269,12 @@ class Video_VideoController extends W_Controller {
 
     public function action_rss() {
         $this->setCaching(array('video-video-rss-' . md5(XG_HttpHelper::currentUrl())), 1800);
-        if ($_GET['test_caching']) { var_dump('Not cached'); }
+        if (!empty($_GET['test_caching'])) { var_dump('Not cached'); }
         $query = Video_VideoHelper::query($this->_user, 1, self::NUM_THUMBS_RSS, $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT]);
         $this->videos = $query->execute();
         $this->title = xg_text('LATEST_VIDEOS');
         foreach ($this->videos as $video) {
+            $thumbnail = '';
             if ($video->my->previewFrame) {
                 ob_start(); ?>
                 <a href="<?php echo $this->_buildUrl('video', 'show') . '?id=' . $video->id ?>">
@@ -275,25 +291,27 @@ class Video_VideoController extends W_Controller {
 
 
     public function action_listTagged() {
-        $this->tag = $_GET['tag'];
-        if (!$this->tag) {
+        $this->tag = trim((string) ($_GET['tag'] ?? ''));
+        if ($this->tag === '') {
             $this->error = xg_text('NO_TAG_WAS_SPECIFIED');
             $this->render('error', 'index');
             return;
         }
-        if ($_GET['rss']) {
+        $rssParam = $_GET['rss'] ?? '';
+        $isRss = $rssParam === 'yes';
+        if ($isRss) {
             header("Content-Type: text/xml");
         }
-        if ($_GET['rss']) { $this->sort = Video_VideoHelper::getMostRecentSortingOrder(); }
-        self::handleSortingAndPagination(array('tag' => $this->tag), $_GET['rss'] ? self::NUM_THUMBS_RSS : self::NUM_THUMBS_TWOCOLUMNVIEW);
-        $this->rssTitle = xg_text('ALL_VIDEOS_TAGGED_X_X', $_GET['tag'], XN_Application::load()->name);
-        if ($_GET['rss']) {
+        if ($isRss) { $this->sort = Video_VideoHelper::getMostRecentSortingOrder(); }
+        $this->handleSortingAndPagination(array('tag' => $this->tag), $isRss ? self::NUM_THUMBS_RSS : self::NUM_THUMBS_TWOCOLUMNVIEW);
+        $this->rssTitle = xg_text('ALL_VIDEOS_TAGGED_X_X', $this->tag, XN_Application::load()->name);
+        if ($isRss) {
             $this->title = $this->rssTitle;
-            $this->link = $this->_buildUrl('video', 'listTagged', array('tag' => $_GET['tag']));
+            $this->link = $this->_buildUrl('video', 'listTagged', array('tag' => $this->tag));
             $this->render('rss');
             return;
         }
-        $this->pageUrl = $this->_buildUrl('video', 'listTagged', array('tag' => $_GET['tag']));
+        $this->pageUrl = $this->_buildUrl('video', 'listTagged', array('tag' => $this->tag));
         Video_FullNameHelper::initialize($this->videos);
     }
 
@@ -302,22 +320,25 @@ class Video_VideoController extends W_Controller {
      *     uploaded - whether to notify the user that her videos were successfully uploaded
      */
     public function action_listForContributor() {
-        if (isset($_GET['screenName']) && User::isMember($_GET['screenName'])) {
-            $this->user = Video_UserHelper::load($_GET['screenName']);
+        $requestedScreenName = trim((string) ($_GET['screenName'] ?? ''));
+        if ($requestedScreenName !== '' && User::isMember($requestedScreenName)) {
+            $this->user = Video_UserHelper::load($requestedScreenName);
         } else {
             XG_SecurityHelper::redirectIfNotMember();
             $this->user = Video_UserHelper::load($this->_user);
         }
         if (! $this->user) { throw new Exception(); }
-        if (! $_GET['screenName']) {
+        if ($requestedScreenName === '') {
             // Redirect; otherwise Bloglines bookmarklet will hit sign-in page when looking for RSS autodiscovery elements  [Jon Aquino 2006-09-29]
             $this->redirectTo('listForContributor', 'video', array('screenName' => $this->user->title));
             return;
         }
-        if ($_GET['rss']) {
+        $rssParam = $_GET['rss'] ?? '';
+        $isRss = $rssParam === 'yes';
+        if ($isRss) {
             header("Content-Type: text/xml");
             $this->setCaching(array('video-video-listForContributor-' . md5(XG_HttpHelper::currentUrl())), 1800);
-            if ($_GET['test_caching']) { var_dump('Not cached'); }
+            if (!empty($_GET['test_caching'])) { var_dump('Not cached'); }
         }
         $this->myOwnVideos = ($this->user->title == $this->_user->screenName);
         $this->title = $this->myOwnVideos ? xg_text('MY_VIDEOS') :
@@ -327,15 +348,16 @@ class Video_VideoController extends W_Controller {
         $this->pageUrl = $this->_buildUrl('video', 'listForContributor');
         $this->pageUrl = XG_HttpHelper::addParameter($this->pageUrl,'screenName',xnhtmlentities($this->user->title));
 
-        if ($this->myOwnVideos || $_GET['rss']) {
-            $this->sort = $_GET['sort'] ? $this->sort : $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT];
+        if ($this->myOwnVideos || $isRss) {
+            $requestedSort = $_GET['sort'] ?? null;
+            $this->sort = ($requestedSort !== null && $requestedSort !== '') ? $this->sort : $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT];
         }//force merge conflict
 
-        self::handleSortingAndPagination(array('contributor'              => $this->user->title,
+        $this->handleSortingAndPagination(array('contributor'              => $this->user->title,
                                                'includeUnconvertedVideos' => $this->myOwnVideos),
-                                         $_GET['rss'] ? self::NUM_THUMBS_RSS : self::NUM_THUMBS_TWOCOLUMNVIEW);
+                                         $isRss ? self::NUM_THUMBS_RSS : self::NUM_THUMBS_TWOCOLUMNVIEW);
 
-        if ($_GET['rss']) {
+        if ($isRss) {
             Video_FullNameHelper::initialize(array_merge($this->videos, array($this->user)));
             $this->title = xg_text('XS_VIDEOS_X',  Video_FullNameHelper::fullName($this->user->title), XN_Application::load()->name);
             $this->link = $this->_buildUrl('video', 'listForContributor', array('screenName' => $this->user->title));
@@ -345,7 +367,7 @@ class Video_VideoController extends W_Controller {
 
         $this->friends = Video_UserHelper::getFriends($this->user->title, 7, $numFriends);
         Video_FullNameHelper::initialize(array_merge($this->videos, array($this->user), $this->friends));
-        if ($_GET['uploaded']) {
+        if (!empty($_GET['uploaded'])) {
             if (XG_SecurityHelper::userIsAdmin(XN_Profile::current()) || !Video_SecurityHelper::isApprovalRequired()) {
                 $this->uploadMessage = xg_text('VIDEOS_SUCCESSFULLY_UPLOADED');
             } else {
@@ -357,7 +379,7 @@ class Video_VideoController extends W_Controller {
     public function action_listFriends() {
         XG_SecurityHelper::redirectIfNotMember();
         $this->pageUrl = $this->_buildUrl('video', 'listFriends');
-        self::handleSortingAndPagination(array('friends' => true));
+        $this->handleSortingAndPagination(array('friends' => true));
         $this->friends = Video_UserHelper::getFriends($this->_user->screenName, 7, $numFriends);
         $this->numFriends = $numFriends;
         Video_FullNameHelper::initialize(array_merge($this->friends, $this->videos));
@@ -371,10 +393,10 @@ class Video_VideoController extends W_Controller {
      * @param numPerPage The number of thumbs per page
      */
     private function handleSortingAndPagination($filters = null, $numPerPage = self::NUM_THUMBS_TWOCOLUMNVIEW, $beginOffset = 0) {
-        $begin = 0;
-        if (intval($_GET['page']) > 0) {
-            $begin = ($_GET['page'] - 1) * $numPerPage;
-        }
+        XG_App::includeFileOnce('/lib/XG_PaginationHelper.php');
+        $pageValue = $_GET['page'] ?? null;
+        $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
+        $begin = XG_PaginationHelper::computeStart($pageNumber, $numPerPage);
         $begin = max(0, $begin + $beginOffset);
         if ($this->sort['alias'] == Video_VideoHelper::SORT_ORDER_PROMOTED) {
             $videosData = Video_VideoHelper::getPromotedVideos($numPerPage,true,$begin);
@@ -432,32 +454,37 @@ class Video_VideoController extends W_Controller {
     }
 
     public function action_listFavorites() {
-        if ($_GET['screenName'] && User::isMember($_GET['screenName'])) {
-            $this->user = Video_UserHelper::load($_GET['screenName']);
+        $screenNameParam = trim((string) ($_GET['screenName'] ?? ''));
+        if ($screenNameParam !== '' && User::isMember($screenNameParam)) {
+            $this->user = Video_UserHelper::load($screenNameParam);
         } else {
             XG_SecurityHelper::redirectIfNotMember();
             $this->user = Video_UserHelper::load($this->_user);
         }
-        if (! $this->user) { throw new Exception(); }
-        if (! $_GET['screenName']) {
+        if (!$this->user) { throw new Exception(); }
+        if ($screenNameParam === '') {
             // Redirect; otherwise Bloglines bookmarklet will hit sign-in page when looking for RSS autodiscovery elements  [Jon Aquino 2006-09-29]
             $this->redirectTo('listFavorites', 'video', array('screenName' => $this->user->title));
             return;
         }
-        if ($_GET['rss']) {
+        $rssParam = $_GET['rss'] ?? '';
+        $isRss = ($rssParam !== '' && $rssParam !== '0');
+        if ($isRss) {
             header("Content-Type: text/xml");
             $this->setCaching(array('video-video-listFavorites-' . md5(XG_HttpHelper::currentUrl())), 1800);
-            if ($_GET['test_caching']) { var_dump('Not cached'); }
+            if (!empty($_GET['test_caching'])) { var_dump('Not cached'); }
         }
         $this->myOwnFavorites = ($this->user->title == $this->_user->screenName);
         $this->pageUrl = $this->_buildUrl('video', 'listFavorites', array('screenName' => $this->user->title));
-        $numPerPage = $_GET['rss'] ? self::NUM_THUMBS_RSS : self::NUM_THUMBS_TWOCOLUMNVIEW;
+        $numPerPage = $isRss ? self::NUM_THUMBS_RSS : self::NUM_THUMBS_TWOCOLUMNVIEW;
         $begin = 0;
-        if (preg_match('@^[.0-9]+$@u', $_GET['page']) && ($_GET['page'] > 0)) {
-            $begin = ($_GET['page'] - 1) * $numPerPage;
+        $pageValue = $_GET['page'] ?? null;
+        if (is_numeric($pageValue) && (int) $pageValue > 0) {
+            $begin = ((int) $pageValue - 1) * $numPerPage;
         }
-        if ($_GET['rss']) {
-            $this->sort = $_GET['sort'] ? $this->sort : $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT];
+        if ($isRss) {
+            $requestedSort = $_GET['sort'] ?? null;
+            $this->sort = ($requestedSort !== null && $requestedSort !== '') ? $this->sort : $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT];
         }
         $favoritesData = Video_VideoHelper::getSpecificVideos($this->_user,
                                                               Video_ContentHelper::ids($this->user, Video_UserHelper::attributeName('favorites')),
@@ -465,7 +492,7 @@ class Video_VideoController extends W_Controller {
                                                               $begin,
                                                               $begin + $numPerPage);
         $this->videos = $favoritesData['videos'];
-        if ($_GET['rss']) {
+        if ($isRss) {
             Video_FullNameHelper::initialize(array_merge($this->videos, array($this->user)));
             $this->title = xg_text('XS_FAVORITES_X', Video_FullNameHelper::fullName($this->user->title), XN_Application::load()->name);
             $this->link = $this->_buildUrl('video', 'listFavorites', array('screenName' => $this->user->title));
@@ -486,8 +513,12 @@ class Video_VideoController extends W_Controller {
 
 
     public function action_conversionStatus() {
+        $videoId = $_GET['id'] ?? '';
+        if ($videoId === '') {
+            Video_JsonHelper::outputAndExit(array('conversionStatus' => 'failed'));
+        }
         try {
-            $video = Video_ContentHelper::findByID('Video', $_GET['id']);
+            $video = Video_ContentHelper::findByID('Video', $videoId);
         } catch (Exception $e) {
             // Video likely deleted in conversionUpdated because of an error during conversion [Jon Aquino 2006-12-19]
             Video_JsonHelper::outputAndExit(array('conversionStatus' => 'failed'));
@@ -532,8 +563,8 @@ class Video_VideoController extends W_Controller {
             //  Users not logged in can see a cached page
             //  Detail page - cache only if we're caching order n items (BAZ-2969)
             if (XG_Cache::cacheOrderN()) {
-                $this->setCaching(array(crc32($_SERVER['QUERY_STRING'])), 300);
-                // TODO: Better to use md5(XG_HttpHelper::currentUrl())  [Jon Aquino 2007-10-25]
+                $cacheKey = md5(XG_HttpHelper::currentUrl());
+                $this->setCaching(array($cacheKey), 300);
             }
         }
         if ($this->error = Video_SecurityHelper::checkVisibleToCurrentUser($this->_user, $this->video)) {
@@ -609,11 +640,11 @@ class Video_VideoController extends W_Controller {
             XG_App::includeFileOnce('/lib/XG_FacebookHelper.php');
             $dispType = XG_FacebookHelper::getFacebookDisplayType('video');
             if ($dispType === 'promoted') {
-                $video = self::action_getMostRecentPromotedLocalVideo();
+                $video = $this->action_getMostRecentPromotedLocalVideo();
             } else if ($dispType === 'rated') {
-                $video = self::action_getHighestRatedLocalVideo();
+                $video = $this->action_getHighestRatedLocalVideo();
             } else {
-                $video = self::action_getMostRecentLocalVideo();
+                $video = $this->action_getMostRecentLocalVideo();
             }
             if (! is_object($video)) { throw new Exception("Returned video was not an object"); }
         } catch (Exception $e) {
@@ -1013,7 +1044,7 @@ class Video_VideoController extends W_Controller {
         }
         Video_UserHelper::set($user, 'lastUploadOn', date('c'), XN_Attribute::DATE);
         $user->save();
-        self::logVideoCreation($video);
+        $this->logVideoCreation($video);
         return $video;
     }
 
@@ -1155,7 +1186,7 @@ class Video_VideoController extends W_Controller {
         }
         if (XG_PromotionHelper::isPromoted($video) && $video->my->visibility != 'all') { XG_PromotionHelper::remove($video); }
         XG_TagHelper::updateTagsAndSave($video, $args['tags']);
-        self::logVideoUpdate($video);
+        $this->logVideoUpdate($video);
     }
 
     /**
@@ -1195,7 +1226,16 @@ class Video_VideoController extends W_Controller {
     public function action_delete() {
         XG_SecurityHelper::redirectIfNotMember();
         XG_JoinPromptHelper::joinGroupOnDelete();
-        $video = Video_ContentHelper::findByID('Video', $_POST['id']);
+        $videoId = $_POST['id'] ?? '';
+        if ($videoId === '') {
+            header("HTTP/1.0 400 Bad Request");
+            return;
+        }
+        $video = Video_ContentHelper::findByID('Video', $videoId);
+        if (! $video) {
+            header("HTTP/1.0 404 Not Found");
+            return;
+        }
         if (Video_SecurityHelper::checkCurrentUserContributedOrIsAdmin($this->_user, $video) == null) {
             Video_VideoHelper::delete($video);
             // Output something; otherwise dojo.io.bind does not seem to get a response
@@ -1307,7 +1347,7 @@ class Video_VideoController extends W_Controller {
         $this->_widget->privateConfig['playerHeaderBackground'] = $_POST['player_header_background'];
 
         $this->_widget->saveConfig();
-        header('Location: ' . self::getUrlForPostPlayerLogoCustomization());
+        header('Location: ' . $this->getUrlForPostPlayerLogoCustomization());
     }
 
     /**
@@ -1331,34 +1371,46 @@ class Video_VideoController extends W_Controller {
         $this->_widget->privateConfig['playerLogoUrl'] = "";
         $this->_widget->privateConfig['playerLogoType'] = 'header_text';
         $this->_widget->saveConfig();
-        header('Location: ' . self::getUrlForPostPlayerLogoCustomization());
+        header('Location: ' . $this->getUrlForPostPlayerLogoCustomization());
     }
 
     public function action_approve() {
-        $video = Video_ContentHelper::findByID('Video', $_GET['id']);
+        $videoId = $_GET['id'] ?? '';
+        if ($videoId === '') { throw new Exception('Video id missing'); }
+        $video = Video_ContentHelper::findByID('Video', $videoId);
+        if (! $video) { throw new Exception('Video not found'); }
         if ($this->error = Video_SecurityHelper::checkCurrentUserIsAdmin($this->_user)) {
             $this->render('error', 'index');
             return;
         }
-        $this->approveOrReject($video, $_GET['approved'] == 'Y');
-        if ($_GET['json'] != 'yes') {
-            header('Location: ' . $_GET['target']);
+        $isApproved = (($_GET['approved'] ?? '') === 'Y');
+        $this->approveOrReject($video, $isApproved);
+        $isJsonRequest = (($_GET['json'] ?? '') === 'yes');
+        $targetParam = isset($_GET['target']) ? trim((string) $_GET['target']) : '';
+        $targetUrl = ($targetParam !== '') ? $targetParam : $this->_buildUrl('video', 'index');
+        if (! $isJsonRequest) {
+            header('Location: ' . $targetUrl);
             exit;
         }
-        $parsedUrl = parse_url($_GET['target']);
-        parse_str($parsedUrl['query'], $urlParameters);
-        $query = Video_VideoHelper::query($this->_user, $urlParameters['page'], self::APPROVAL_PAGE_SIZE, $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT], false);
+        $parsedUrl = parse_url($targetUrl);
+        $urlParameters = array();
+        if (is_array($parsedUrl) && isset($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $urlParameters);
+        }
+        $pageValue = $urlParameters['page'] ?? 1;
+        $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
+        $query = Video_VideoHelper::query($this->_user, $pageNumber, self::APPROVAL_PAGE_SIZE, $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT], false);
         $query->filter('my->approved', '=', 'N');
         $videos = $query->execute();
         ob_start();
-        $paginationValues = Video_HtmlHelper::pagination($query->getTotalCount(), self::APPROVAL_PAGE_SIZE, $_GET['target']);
+        $paginationValues = Video_HtmlHelper::pagination($query->getTotalCount(), self::APPROVAL_PAGE_SIZE, $targetUrl);
         $this->renderPartial('fragment_pagination', 'video', $paginationValues);
         $this->pagination = trim(ob_get_contents());
         ob_end_clean();
         $this->html = '';
         if (count($videos) == self::APPROVAL_PAGE_SIZE) {
             ob_start();
-            $this->renderPartial('fragment_approvalListPlayer', array('video' => $videos[count($videos)-1], 'currentUrl' => $_GET['target']));
+            $this->renderPartial('fragment_approvalListPlayer', array('video' => $videos[count($videos)-1], 'currentUrl' => $targetUrl));
             $this->html = trim(ob_get_contents());
             ob_end_clean();
         }
@@ -1533,19 +1585,19 @@ class Video_VideoController extends W_Controller {
         }
         switch($this->args['videoID']) {
             case 'most_recent':
-                $this->args['video'] = self::action_getMostRecentLocalVideo();
+                $this->args['video'] = $this->action_getMostRecentLocalVideo();
                 break;
             case 'highest_rated':
-                $this->args['video'] = self::action_getHighestRatedLocalVideo();
+                $this->args['video'] = $this->action_getHighestRatedLocalVideo();
                 break;
             case 'promoted':
-                $this->args['video'] = self::action_getMostRecentPromotedLocalVideo();
+                $this->args['video'] = $this->action_getMostRecentPromotedLocalVideo();
                 break;
             case 'user_most_recent':
-                $this->args['video'] = self::action_getMostRecentLocalVideo($this->args['contributorName']);
+                $this->args['video'] = $this->action_getMostRecentLocalVideo($this->args['contributorName']);
                 break;
             case 'user_highest_rated':
-                $this->args['video'] = self::action_getHighestRatedLocalVideo($this->args['contributorName']);
+                $this->args['video'] = $this->action_getHighestRatedLocalVideo($this->args['contributorName']);
                 break;
             default:
                 $this->args['video'] = XN_Content::load($this->args['videoID']);

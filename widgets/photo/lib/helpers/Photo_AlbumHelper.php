@@ -165,10 +165,14 @@ class Photo_AlbumHelper {
 
         $query = XN_Query::create('Content')->filter('type', '=', 'Album')->filter('owner');
         if (! $filters) { $filters = array(); }
-        if ($filters['owner']) { $query->filter('contributorName', 'eic', $filters['owner']); }
-        if (! $filters['includeHidden']) { $query->filter('my->hidden', '<>', 'Y'); }
-        if ($filters['photoId']) { $query->filter('my->photos', 'like', (string)$filters['photoId'] . " "); }
-        if ($filters['title']) { $query->filter('title', '=', (string)$filters['title']); }
+        $owner = isset($filters['owner']) ? (string) $filters['owner'] : '';
+        if ($owner !== '') { $query->filter('contributorName', 'eic', $owner); }
+        $includeHidden = !empty($filters['includeHidden']);
+        if (! $includeHidden) { $query->filter('my->hidden', '<>', 'Y'); }
+        $photoId = isset($filters['photoId']) ? (string) $filters['photoId'] : '';
+        if ($photoId !== '') { $query->filter('my->photos', 'like', $photoId . " "); }
+        $title = isset($filters['title']) ? (string) $filters['title'] : '';
+        if ($title !== '') { $query->filter('title', '=', $title); }
         $query->order('updatedDate', 'desc', XN_Attribute::DATE);
         $query->begin($begin);
         $query->end($end);
@@ -194,22 +198,24 @@ class Photo_AlbumHelper {
     public static function getSortedAlbums($filters, $sort, $begin = 0, $end = 100) {
         XG_App::includeFileOnce('/lib/XG_PromotionHelper.php');
         XG_App::includeFileOnce('/lib/XG_QueryHelper.php');
-        if ($filters['promoted'] && ! XG_PromotionHelper::areQueriesEnabled()) { return array('albums' => array(), 'numAlbums' => 0); }
+        $filters = $filters ? $filters : array();
+        $isPromoted = !empty($filters['promoted']);
+        if ($isPromoted && ! XG_PromotionHelper::areQueriesEnabled()) { return array('albums' => array(), 'numAlbums' => 0); }
         $query = XN_Query::create('Content')->filter('type', '=', 'Album')->filter('owner');
-        if (! $filters) { $filters = array(); }
-        if ($filters['owner']) { $query->filter('contributorName', 'eic', $filters['owner']); }
-        if ($filters['photoId']) { $query->filter('my->photos', 'like', (string)$filters['photoId'] . " "); }
-        if ($filters['title']) { $query->filter('title', '=', (string)$filters['title']); }
-        if ($filters['promoted']) { XG_PromotionHelper::addPromotedFilterToQuery($query); }
-        if (! $filters['includeHidden']) { $query->filter('my->hidden', '<>', 'Y'); }
-        if (mb_strlen($filters['searchTerms'])) { XG_QueryHelper::addSearchFilter($query, $filters['searchTerms']); }
+        if (!empty($filters['owner'])) { $query->filter('contributorName', 'eic', $filters['owner']); }
+        if (!empty($filters['photoId'])) { $query->filter('my->photos', 'like', (string)$filters['photoId'] . " "); }
+        if (!empty($filters['title'])) { $query->filter('title', '=', (string)$filters['title']); }
+        if ($isPromoted) { XG_PromotionHelper::addPromotedFilterToQuery($query); }
+        if (empty($filters['includeHidden'])) { $query->filter('my->hidden', '<>', 'Y'); }
+        $searchTerms = $filters['searchTerms'] ?? '';
+        if (mb_strlen($searchTerms)) { XG_QueryHelper::addSearchFilter($query, $searchTerms); }
         if ($sort) {
-            if ($sort['alias'] == self::SORT_ORDER_RANDOM) {
+            if (($sort['alias'] ?? null) == self::SORT_ORDER_RANDOM) {
                 $query->order('random()');
             } else {
                 $query->order($sort['attribute'], $sort['direction'], $sort['type']);
             }
-        } elseif ($filters['promoted']) {
+        } elseif ($isPromoted) {
             $query->order('my->' . XG_PromotionHelper::attributeName(), 'desc', XN_Attribute::DATE);
         }
         $query->begin($begin);
@@ -218,7 +224,7 @@ class Photo_AlbumHelper {
 
         // BAZ-6710: If we're just asking for promoted albums, cache and only expire
         // when album promotion changes
-        if (($filters['promoted']) && (count($filters) == 1)) {
+        if ($isPromoted && (count($filters) == 1)) {
             $query = XG_Query::create($query);
             $query->setCaching(XG_CacheExpiryHelper::promotedObjectsChangedCondition('Album'));
         }

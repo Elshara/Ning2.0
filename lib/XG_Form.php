@@ -27,8 +27,8 @@ class XG_Form {
     public function set($name,$value) { # void
         $this->_values[$name] = $value;
     }
-    public function get($name) { # scalar
-        return $this->_values[$name];
+    public function get($name) { # scalar|null
+        return $this->_values[$name] ?? null;
     }
 
     /**
@@ -86,12 +86,15 @@ class XG_Form {
         end($values); $last = key($values);
 
         $isList = ( $first == 0 && $last == count($values)-1 );
-        $value = $this->_values[$name];
+        $value = $this->_values[$name] ?? null;
         foreach ($values as $k=>$v) {
             if ($isList) {
                 $k = $v;
             }
-            $options .= '<option value="'.$k.'"'.($k==$value ? ' selected="selected"':'').'>'.$v.'</option>';
+            $optionValue = xg_xmlentities((string) $k);
+            $optionLabel = xg_xmlentities((string) $v);
+            $isSelected = ((string) $k === (string) $value) ? ' selected="selected"' : '';
+            $options .= '<option value="' . $optionValue . '"' . $isSelected . '>' . $optionLabel . '</option>';
         }
         return '<select id="'.$name.'" name="'.$name.'"' .
             ($css ? ' class="'.$css.'"' : '') .
@@ -168,7 +171,9 @@ class XG_Form {
      */
     public function text($name, $required = 0, $html = '') {
         $css = 'textfield' . ($required ? ' required' : '');
-        return '<input type="text" id="'.$name.'" name="'.$name.'" class="'.$css.'" value="'.xg_xmlentities($this->_values[$name]).'"'.($html?' '.$html:'').' />';
+        $value = $this->_values[$name] ?? '';
+
+        return '<input type="text" id="'.$name.'" name="'.$name.'" class="'.$css.'" value="'.xg_xmlentities((string) $value).'"'.($html?' '.$html:'').' />';
     }
 
     /**
@@ -178,8 +183,9 @@ class XG_Form {
      *  @return     string
      */
     public function hidden($name) {
-        // TODO: Use xnhtmlentities instead of xg_xmlentities, which is intended for xml contexts [Jon Aquino 2008-04-02]
-        return '<input type="hidden" name="'.$name.'" value="'.xg_xmlentities($this->_values[$name]).'" />';
+        $value = $this->_values[$name] ?? '';
+
+        return '<input type="hidden" name="'.$name.'" value="'.xnhtmlentities((string) $value).'" />';
     }
 
     /**
@@ -187,7 +193,9 @@ class XG_Form {
      *  @return     string
      */
     public function radio($name,$value) {
-        return '<input class="radio" type="radio" name="'.$name.'" value="'.xg_xmlentities($value).'"'.($value == $this->_values[$name]?' checked="checked"':'').'>';
+        $current = $this->_values[$name] ?? null;
+
+        return '<input class="radio" type="radio" name="'.$name.'" value="'.xg_xmlentities((string) $value).'"'.(((string) $value === (string) $current)?' checked="checked"':'').'>';
     }
 
     /**
@@ -196,7 +204,9 @@ class XG_Form {
      *  @return     string
      */
     public function checkbox($name, $html = '') {
-        return '<input class="checkbox" type="checkbox" name="'.$name.'" value="1"'.($this->_values[$name]?' checked="checked"':'') . ($html?' '.$html:'') . '>';
+        $isChecked = !empty($this->_values[$name]);
+
+        return '<input class="checkbox" type="checkbox" name="'.$name.'" value="1"'.($isChecked?' checked="checked"':'') . ($html?' '.$html:'') . '>';
     }
 
     /**
@@ -210,10 +220,12 @@ class XG_Form {
     public function editor($name, $required = 0, $html = '') {
         $css = $required ? 'required' : '';
         XG_App::ningLoaderRequire('xg.shared.SimpleToolbar');
+        $value = $this->_values[$name] ?? '';
+
         return
             '<div class="texteditor">'.
                 '<textarea id="'.$name.'" name="'.$name.'" dojoType="SimpleToolbar"'.($css ? ' class="'.$css.'"' : '') . ($html?' '.$html:'') . '>'.
-                    xg_xmlentities($this->_values[$name]).
+                    xg_xmlentities((string) $value).
                 '</textarea>'.
             '</div>';
     }
@@ -227,11 +239,16 @@ class XG_Form {
      */
     public function image($name, $required = 0) {
         XG_App::ningLoaderRequire('xg.shared.BazelImagePicker');
-        return '<div class="swatch_group nofloat'.($required?' required':'').'" dojoType="BazelImagePicker" fieldname="'.$name.'"
-            showUseNoImage="0" trimUploadsOnSubmit="0" allowTile="0"
-            swatchWidth="23px" swatchHeight="21px"
-            cssClass="swatch_group nofloat'.($required?' required':'').'"
-            currentImagePath="'.xg_xmlentities($this->_values[$name]).'"></div>'.($required?'':'<br class="clear" />');
+        $value = $this->_values[$name] ?? '';
+        $classes = 'swatch_group nofloat' . ($required ? ' required' : '');
+        $fieldName = xg_xmlentities((string) $name);
+
+        return '<div class="' . $classes . '" dojoType="BazelImagePicker" fieldname="' . $fieldName . '"'
+            . ' showUseNoImage="0" trimUploadsOnSubmit="0" allowTile="0"'
+            . ' swatchWidth="23px" swatchHeight="21px"'
+            . ' cssClass="' . $classes . '"'
+            . ' currentImagePath="' . xg_xmlentities((string) $value) . '"></div>'
+            . ($required ? '' : '<br class="clear" />');
     }
 
     /**
@@ -244,6 +261,7 @@ class XG_Form {
      */
     public function field($description /*..args..*/) {
         $args = func_get_args();
+        $output = '';
         $name = '';
         for($i = 1, $max = count($args); $i<$max; $i++) {
             if (is_string($args[$i])) {
@@ -268,15 +286,14 @@ class XG_Form {
      *  @return     string(YYYY-MM-DD)
      */
     public static function parseDate($idx) {
-        if (!$y = $_REQUEST[$idx."Y"]) {
-            $y = date('Y');
-        }
-        if (!$m = $_REQUEST[$idx."M"]) {
-            $m = date('m');
-        }
-        if (!$d = $_REQUEST[$idx."D"]) {
-            $d = 1;
-        }
+        $requestedYear = $_REQUEST[$idx."Y"] ?? null;
+        $requestedMonth = $_REQUEST[$idx."M"] ?? null;
+        $requestedDay = $_REQUEST[$idx."D"] ?? null;
+
+        $y = (is_scalar($requestedYear) && $requestedYear !== '') ? (int) $requestedYear : (int) date('Y');
+        $m = (is_scalar($requestedMonth) && $requestedMonth !== '') ? (int) $requestedMonth : (int) date('m');
+        $d = (is_scalar($requestedDay) && $requestedDay !== '') ? (int) $requestedDay : 1;
+
         return checkdate($m,$d,$y) ? sprintf('%04d-%02d-%02d',$y,$m,$d) : '';
     }
 
@@ -287,17 +304,23 @@ class XG_Form {
      *  @return     string(HH:MM) H=[0,23]
      */
     public static function parseTime($idx) {
-        if ($r = $_REQUEST[$idx."R"]) {	// 12-hour
-            $h = $_REQUEST[$idx."H"];
-            $h = $h == 12 ? ($r == 'am' ? 0 : 12) : $h+($r=='am'?0:12);
-        } else {							// 24-hour
-            $h = $_REQUEST[$idx."H"];
+        $meridiemRaw = $_REQUEST[$idx."R"] ?? null;
+        $hourRaw = $_REQUEST[$idx."H"] ?? null;
+        $minuteRaw = $_REQUEST[$idx."I"] ?? null;
+
+        $meridiem = is_scalar($meridiemRaw) ? mb_strtolower(trim((string) $meridiemRaw)) : '';
+        $hourValue = (is_scalar($hourRaw) && $hourRaw !== '') ? (int) $hourRaw : 0;
+        $minuteValue = (is_scalar($minuteRaw) && $minuteRaw !== '') ? (int) $minuteRaw : 0;
+
+        if ($meridiem === 'am' || $meridiem === 'pm') {
+            if ($hourValue === 12) {
+                $hourValue = ($meridiem === 'am') ? 0 : 12;
+            } else {
+                $hourValue += ($meridiem === 'am') ? 0 : 12;
+            }
         }
 
-        if (!$m = $_REQUEST[$idx."I"]) {
-            $m = 0;
-        }
-        return sprintf('%02d:%02d',$h,$m);
+        return sprintf('%02d:%02d',$hourValue,$minuteValue);
     }
 }
 ?>
