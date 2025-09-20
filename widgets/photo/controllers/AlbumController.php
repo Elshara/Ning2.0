@@ -186,15 +186,14 @@ class Photo_AlbumController extends W_Controller {
         $this->pageTitle = $this->myOwnAlbums ?
                                 xg_text('MY_ALBUMS') :
                                 xg_text('USER_ALBUMS', Photo_FullNameHelper::fullName($this->user->title));
-        self::handleSortingAndPagination(array('owner' => $this->user->title, 'includeHidden' => $this->myOwnAlbums), self::getSortDescriptor());
+        $this->handleSortingAndPagination(array('owner' => $this->user->title, 'includeHidden' => $this->myOwnAlbums), $this->getSortDescriptor());
     }
 
     /**
      * Shows all albums.
      */
     public function action_list() {
-        self::handleSortingAndPagination(null, self::getSortDescriptor());
-        $sort = self::getSortDescriptor();
+        $this->handleSortingAndPagination(null, $this->getSortDescriptor());
        	$this->title = xg_text('ALL_ALBUMS');
         $this->pageTitle = xg_text('ALBUMS_NO_COLON');
         if ($this->begin == 0) {
@@ -236,6 +235,11 @@ class Photo_AlbumController extends W_Controller {
                 // DS said that the search core may throw an exception
                 // while searchability is being added to an app without search. [Jon Aquino 2008-02-13]
                 $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+                $this->handleSortingAndPagination($filters, $this->getSortDescriptor());
+            }
+        } else {
+            $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+            $this->handleSortingAndPagination($filters, $this->getSortDescriptor());
                 self::handleSortingAndPagination($filters, self::getSortDescriptor());
             }
         } else {
@@ -248,7 +252,7 @@ class Photo_AlbumController extends W_Controller {
      * Shows a list of albums that have been promoted.
      */
     public function action_listFeatured() {
-        self::handleSortingAndPagination(array('promoted' => true), null);
+        $this->handleSortingAndPagination(array('promoted' => true), null);
     }
 
     /**
@@ -285,7 +289,7 @@ class Photo_AlbumController extends W_Controller {
             $this->error = array('title' => xg_text('SLOW_DOWN_THERE_CHIEF'), 'subtitle' => '', 'description' => xg_text('I_DO_NOT_HAVE_PHOTO'));
             return $this->render('error', 'index');
         }
-        self::handleSortingAndPagination(array('photoId' => $this->photo->id), self::getSortDescriptor());
+        $this->handleSortingAndPagination(array('photoId' => $this->photo->id), $this->getSortDescriptor());
     }
 
     private function handleSortingAndPagination($filters, $sort) {
