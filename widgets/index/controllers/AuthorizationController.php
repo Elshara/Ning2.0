@@ -17,6 +17,7 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
     protected function _before() {
         $this->_widget->includeFileOnce('/lib/helpers/Index_AuthorizationHelper.php');
         XG_App::includeFileOnce('/lib/XG_LogHelper.php');
+        XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
         XG_HttpHelper::trimGetAndPostValues();
     }
 
@@ -52,12 +53,16 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
     public function action_signIn($errors = array()) {
         setcookie('xg_cookie_check','1');
         self::log($errors);
-        $this->target = $_GET['target'] ? $_GET['target'] : xg_absolute_url('/');
-        $this->groupToJoin = $_GET['groupToJoin'];
-        $this->form = new XNC_Form(array('emailAddress' => $_GET['emailAddress']));
+        $this->target = $this->getTargetParameter(xg_absolute_url('/'));
+        $this->groupToJoin = $this->getGroupToJoinParameter();
+        $emailAddress = null;
+        if (isset($_GET['emailAddress']) && ! is_array($_GET['emailAddress'])) {
+            $emailAddress = trim((string) $_GET['emailAddress']);
+        }
+        $this->form = new XNC_Form(array('emailAddress' => $emailAddress));
         $this->errors = $errors;
         $this->showSignUpLink = $this->currentUserCanSeeSignUpPage();
-        $this->showInvitationExpiredMessage = $_GET['invitationExpired'];
+        $this->showInvitationExpiredMessage = $this->getQueryFlag('invitationExpired');
     }
     //
     public function action_signIn_iphone($errors = array()) { # void
@@ -85,10 +90,14 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      *     password - Ning password
      */
     public function action_doSignIn() {
-        $this->doSignInProper('signIn', $_POST['emailAddress'], $_POST['password'], $_POST['tosAgree'], $_GET['target'], $_GET['groupToJoin']);
+        $target = $this->getTargetParameter();
+        $groupToJoin = $this->getGroupToJoinParameter();
+        $this->doSignInProper('signIn', $_POST['emailAddress'], $_POST['password'], $_POST['tosAgree'], $target, $groupToJoin);
     }
     public function action_doSignIn_iphone() {
-        $this->doSignInProper('signIn_iphone', $_POST['emailAddress'], $_POST['password'], $_POST['tosAgree'], $_GET['target'], $_GET['groupToJoin']);
+        $target = $this->getTargetParameter();
+        $groupToJoin = $this->getGroupToJoinParameter();
+        $this->doSignInProper('signIn_iphone', $_POST['emailAddress'], $_POST['password'], $_POST['tosAgree'], $target, $groupToJoin);
     }
 
     /**
@@ -141,7 +150,7 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
             XG_App::setLogoutCookie(true); // TODO: is the just-logged-out cookie used anymore? [Jon Aquino 2008-04-21]
             XN_Profile::signOut();
         }
-        $target = $_GET['target'] ? $_GET['target'] : xg_absolute_url('/');
+        $target = $this->getTargetParameter(xg_absolute_url('/'));
         header('Location: ' . $target);
     }
     public function action_signOut_iphone() {
@@ -185,10 +194,14 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
     public function action_signUpNingUser($errors = array()) {
         setcookie('xg_cookie_check','1');
         self::log($errors);
-        $this->target = $_GET['target'] ? $_GET['target'] : xg_absolute_url('/');
+        $this->target = $this->getTargetParameter(xg_absolute_url('/'));
         $this->invitation = $this->associatedInvitation();
-        $this->groupToJoin = $_GET['groupToJoin'];
-        $this->form = new XNC_Form(array('emailAddress' => $_GET['emailAddress'] ? $_GET['emailAddress'] : XN_Profile::current()->email));
+        $this->groupToJoin = $this->getGroupToJoinParameter();
+        $emailAddress = XN_Profile::current()->email;
+        if (isset($_GET['emailAddress']) && ! is_array($_GET['emailAddress']) && $_GET['emailAddress'] !== '') {
+            $emailAddress = trim((string) $_GET['emailAddress']);
+        }
+        $this->form = new XNC_Form(array('emailAddress' => $emailAddress));
         $this->errors = $errors;
     }
 
@@ -219,7 +232,9 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      *     password - Ning password
      */
     public function action_doSignUpNingUser() {
-        $this->doSignInProper('signUpNingUser', $_POST['emailAddress'], $_POST['password'], $_POST['tosAgree'], $_GET['target'], $_GET['groupToJoin']);
+        $target = $this->getTargetParameter();
+        $groupToJoin = $this->getGroupToJoinParameter();
+        $this->doSignInProper('signUpNingUser', $_POST['emailAddress'], $_POST['password'], $_POST['tosAgree'], $target, $groupToJoin);
     }
 
     /**
@@ -235,10 +250,14 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
     public function action_signUp($errors = array()) {
         setcookie('xg_cookie_check','1');
         self::log($errors);
-        $this->target = $_GET['target'] ? $_GET['target'] : xg_absolute_url('/');
+        $this->target = $this->getTargetParameter(xg_absolute_url('/'));
         $this->invitation = $this->associatedInvitation();
-        $this->groupToJoin = $_GET['groupToJoin'];
-        $this->form = new XNC_Form(array('emailAddress' => $_GET['emailAddress'], 'birthdateMonth' => '1', 'birthdateDay' => '1', 'birthdateYear' => '1975'));
+        $this->groupToJoin = $this->getGroupToJoinParameter();
+        $emailAddress = null;
+        if (isset($_GET['emailAddress']) && ! is_array($_GET['emailAddress'])) {
+            $emailAddress = trim((string) $_GET['emailAddress']);
+        }
+        $this->form = new XNC_Form(array('emailAddress' => $emailAddress, 'birthdateMonth' => '1', 'birthdateDay' => '1', 'birthdateYear' => '1975'));
         $this->errors = $errors;
         $this->captcha = XN_Auth_Captcha::create();
         list($this->yearOptions, $this->monthOptions, $this->dayOptions) = $this->birthdateOptions();
@@ -278,18 +297,23 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      *     password - Ning password
      */
     public function action_doSignUp() {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') { $this->redirectTo('signUp', 'authorization', array('target' => $_GET['target'], 'groupToJoin' => $_GET['groupToJoin'])); return; }
+        $target = $this->getTargetParameter();
+        $groupToJoin = $this->getGroupToJoinParameter();
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            $this->redirectTo('signUp', 'authorization', array('target' => $target, 'groupToJoin' => $groupToJoin));
+            return;
+        }
         $errors = array();
         if (! $_POST['tosAgree']) {
             $errors['tosAgree'] = xg_html('PLEASE_AGREE_TOS');
         }
         if ($errors) {
-			// Suppress the profile check, because otherwise there is a way to sign in w/o ToS checkbox. [Andrey 2008-10-07]
-            return $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $_GET['target'], $_GET['groupToJoin'], $errors, false);
+                        // Suppress the profile check, because otherwise there is a way to sign in w/o ToS checkbox. [Andrey 2008-10-07]
+            return $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $target, $groupToJoin, $errors, false);
         }
         if (true === XN_Profile::signIn($_POST['emailAddress'], $_POST['password'], array('max-age' => 2 * 365 * 24 * 60 * 60))) {
             XG_App::sendNoCacheHeaders(true);
-            return $this->forwardOrRedirect('signIn', $_POST['emailAddress'], $_GET['target'], $_GET['groupToJoin']);
+            return $this->forwardOrRedirect('signIn', $_POST['emailAddress'], $target, $groupToJoin);
         }
         XG_App::includeFileOnce('/lib/XG_ValidationHelper.php');
         if (! $_POST['emailAddress']) {
@@ -315,29 +339,29 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
         if (! $birthdate) {
             $errors['birthdateMonth'] = xg_html('PLEASE_ENTER_BIRTHDAY');
         } elseif (strtotime($birthdate) > strtotime('13 years ago')) {
-            return $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $_GET['target'], $_GET['groupToJoin'],
+            return $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $target, $groupToJoin,
                     array('' => xg_html('INELIGIBLE_TO_REGISTER'))); // BAZ-7407 [Jon Aquino 2008-05-01]
         } elseif (! Index_ProfileInfoFormHelper::isBirthdateValid($_POST)) {
             $errors['birthdateMonth'] = xg_html('CHOOSE_VALID_BIRTHDAY');
         }
         if (! $_POST['captchaValue']) { $errors['captchaValue'] = xg_html('PLEASE_ENTER_CODE'); }
         if ($errors) {
-            return $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $_GET['target'], $_GET['groupToJoin'], $errors);
+            return $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $target, $groupToJoin, $errors);
         }
         $captcha = XN_Auth_Captcha::create($_POST['captchaToken']);
         $captcha->value = $_POST['captchaValue'];
         $profile = XN_Profile::create($_POST['emailAddress'], $_POST['password']);
         $profile->birthdate = $birthdate;
         if (is_array($result = $profile->save($captcha))) {
-            return $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $_GET['target'], $_GET['groupToJoin'],
-                    Index_AuthorizationHelper::errorMessage(key($result), 'signUp', $this->associatedInvitation(), $_GET['target'], $_GET['groupToJoin']));
+            return $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $target, $groupToJoin,
+                    Index_AuthorizationHelper::errorMessage(key($result), 'signUp', $this->associatedInvitation(), $target, $groupToJoin));
         }
         if (is_array($result = XN_Profile::signIn($_POST['emailAddress'], $_POST['password'], array('max-age' => 2 * 365 * 24 * 60 * 60)))) {
-            return $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $_GET['target'], $_GET['groupToJoin'],
-                    Index_AuthorizationHelper::errorMessage(key($result), 'signUp', $this->associatedInvitation(), $_GET['target'], $_GET['groupToJoin']));
+            return $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $target, $groupToJoin,
+                    Index_AuthorizationHelper::errorMessage(key($result), 'signUp', $this->associatedInvitation(), $target, $groupToJoin));
         }
         XG_App::sendNoCacheHeaders(true);
-        $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $_GET['target'], $_GET['groupToJoin']);
+        $this->forwardOrRedirect('signUp', $_POST['emailAddress'], $target, $groupToJoin);
     }
     public function action_doSignUp_iphone() {
         $this->action_doSignUp();
@@ -351,8 +375,9 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      *     previousUrl - (optional) target for the Back link
      */
     public function action_ningId() {
-        if ( !($this->noBack = $_GET['noBack']) ) {
-            $this->previousUrl = $_GET['previousUrl'] ? $_GET['previousUrl'] : xg_absolute_url('/');
+        $this->noBack = $this->getQueryFlag('noBack');
+        if (! $this->noBack) {
+            $this->previousUrl = $this->getRedirectParameterFromGet('previousUrl', xg_absolute_url('/'));
         }
     }
 
@@ -381,8 +406,9 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      *     noBack - (optional) whether to show a Close link (instead of a Back link)
      */
     public function action_termsOfService() {
-        if ( !($this->noBack = $_GET['noBack']) ) {
-            $this->previousUrl = $_GET['previousUrl'] ? $_GET['previousUrl'] : xg_absolute_url('/');
+        $this->noBack = $this->getQueryFlag('noBack');
+        if (! $this->noBack) {
+            $this->previousUrl = $this->getRedirectParameterFromGet('previousUrl', xg_absolute_url('/'));
         }
         $this->privacyPolicyUrl = $this->_buildUrl('authorization', 'privacyPolicy', array('previousUrl' => $this->previousUrl));
         $this->networkNameHtml = xnhtmlentities(XN_Application::load()->name);
@@ -400,8 +426,9 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      *     noBack - (optional) whether to show a Close link (instead of a Back link)
      */
     public function action_privacyPolicy() {
-        if ( !($this->noBack = $_GET['noBack']) ) {
-            $this->previousUrl = $_GET['previousUrl'] ? $_GET['previousUrl'] : xg_absolute_url('/');
+        $this->noBack = $this->getQueryFlag('noBack');
+        if (! $this->noBack) {
+            $this->previousUrl = $this->getRedirectParameterFromGet('previousUrl', xg_absolute_url('/'));
         }
         $this->termsOfServiceUrl = $this->_buildUrl('authorization', 'termsOfService', array('previousUrl' => $this->previousUrl));
         $this->networkNameHtml = xnhtmlentities(XN_Application::load()->name);
@@ -415,8 +442,9 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      * Displays the full text of the Ning Application Terms of Service
      */
     public function action_applicationTos() {
-        if ( !($this->noBack = $_GET['noBack']) ) {
-            $this->previousUrl = $_GET['previousUrl'] ? $_GET['previousUrl'] : xg_absolute_url('/');
+        $this->noBack = $this->getQueryFlag('noBack');
+        if (! $this->noBack) {
+            $this->previousUrl = $this->getRedirectParameterFromGet('previousUrl', xg_absolute_url('/'));
         }
     }
     
@@ -424,8 +452,9 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      * Displays the full text of the Ning Application Developer Terms of Service
      */
     public function action_developerTos() {
-        if ( !($this->noBack = $_GET['noBack']) ) {
-            $this->previousUrl = $_GET['previousUrl'] ? $_GET['previousUrl'] : xg_absolute_url('/');
+        $this->noBack = $this->getQueryFlag('noBack');
+        if (! $this->noBack) {
+            $this->previousUrl = $this->getRedirectParameterFromGet('previousUrl', xg_absolute_url('/'));
         }
     }
     
@@ -438,8 +467,9 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      */
     public function action_problemsSigningIn() {
         XG_LogHelper::logBasicFlows('problemsSigningIn.');
-        if ( !($this->noBack = $_GET['noBack']) ) {
-            $this->previousUrl = $_GET['previousUrl'] ? $_GET['previousUrl'] : xg_absolute_url('/');
+        $this->noBack = $this->getQueryFlag('noBack');
+        if (! $this->noBack) {
+            $this->previousUrl = $this->getRedirectParameterFromGet('previousUrl', xg_absolute_url('/'));
         }
     }
 
@@ -454,7 +484,7 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
     public function action_requestPasswordReset($errors = array()) {
         self::log($errors);
         if ($_SERVER['REQUEST_METHOD'] != 'POST') { XG_LogHelper::logBasicFlows('requestPasswordReset.'); }
-        $this->previousUrl = $_GET['previousUrl'] ? $_GET['previousUrl'] : xg_absolute_url('/');
+        $this->previousUrl = $this->getRedirectParameterFromGet('previousUrl', xg_absolute_url('/'));
         $this->form = new XNC_Form(array('previousUrl' => $this->previousUrl));
         $this->errors = $errors;
     }
@@ -504,7 +534,7 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      */
     public function action_passwordResetSent($errors = array()) {
         // Is $errors used? [Jon Aquino 2008-06-18]
-        $this->previousUrl = $_GET['previousUrl'] ? $_GET['previousUrl'] : xg_absolute_url('/');
+        $this->previousUrl = $this->getRedirectParameterFromGet('previousUrl', xg_absolute_url('/'));
     }
 
     /**
@@ -552,10 +582,10 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
         self::log($errors);
         XG_SecurityHelper::redirectToSignUpPageIfSignedOut();
         $this->errors = $errors;
-        $this->target = $_GET['target'] ? $_GET['target'] : xg_absolute_url('/');
-        $this->unfinishedProfile = $_GET['unfinishedProfile'];
-        $this->newNingUser = $_GET['newNingUser'];
-        $this->groupToJoin = $_GET['groupToJoin'];
+        $this->target = $this->getTargetParameter(xg_absolute_url('/'));
+        $this->unfinishedProfile = $this->getQueryFlag('unfinishedProfile');
+        $this->newNingUser = $this->getQueryFlag('newNingUser');
+        $this->groupToJoin = $this->getGroupToJoinParameter();
         $this->_widget->includeFileOnce('/lib/helpers/Index_ProfileInfoFormHelper.php');
         $this->showGenderField = Index_ProfileInfoFormHelper::isShowingGenderFieldOnCreateProfilePage();
         $this->showLocationField = Index_ProfileInfoFormHelper::isShowingLocationFieldOnCreateProfilePage();
@@ -593,7 +623,14 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
      */
     public function action_createProfile() {
         XG_SecurityHelper::redirectToSignUpPageIfSignedOut();
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') { return $this->redirectTo('newProfile', 'authorization', array('target' => $_GET['target'], 'newNingUser' => $_GET['newNingUser'], 'groupToJoin' => $_GET['groupToJoin'])); }
+        $target = $this->getTargetParameter();
+        $newNingUser = $this->getQueryFlag('newNingUser');
+        $groupToJoin = $this->getGroupToJoinParameter();
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            $parameters = array('target' => $target, 'groupToJoin' => $groupToJoin);
+            if ($newNingUser) { $parameters['newNingUser'] = '1'; }
+            return $this->redirectTo('newProfile', 'authorization', $parameters);
+        }
         $this->_widget->includeFileOnce('/lib/helpers/Index_ProfileInfoFormHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Index_MembershipHelper.php');
         W_Cache::getWidget('profiles')->includeFileOnce('/lib/helpers/Profiles_ProfileQuestionFormHelper.php');
@@ -602,18 +639,18 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
             return;
         }
         $user = User::loadOrCreate($this->_user);
-        Index_ProfileInfoFormHelper::write($this->_user, $user, $_GET['newNingUser'], true);
+        Index_ProfileInfoFormHelper::write($this->_user, $user, $newNingUser, true);
         Profiles_ProfileQuestionFormHelper::write($user);
         if (is_array($result = $this->_user->save())) {
             return $this->forwardTo('newProfile', 'authorization', array(
-                    Index_AuthorizationHelper::errorMessage(key($result), 'newProfile', $this->associatedInvitation(), $_GET['target'], $_GET['groupToJoin'])));
+                    Index_AuthorizationHelper::errorMessage(key($result), 'newProfile', $this->associatedInvitation(), $target, $groupToJoin)));
         }
         // no changes to user object allowed here until XN_Content reload issue is solved (NING-5370). [Andrey 2008-07-23]
         Index_MembershipHelper::onJoin($this->_user, $user, $this->associatedInvitation()); // Saves the User object [Jon Aquino 2007-09-24]
-        if (! $_GET['target']) {
+        if ($target === null) {
             header('Location: ' . xg_absolute_url('/'));
         } else {
-            header('Location: ' . $_GET['target']);
+            header('Location: ' . $target);
         }
     }
     public function action_createProfile_iphone() {
@@ -734,7 +771,10 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
             return $this->forwardTo($args[1], 'authorization', array($args[2]));
         } elseif ($args[0] == 'redirect') {
             $parameters = $args[2] ? $args[2] : array();
-            if ($args[1] == 'newProfile') { $parameters['eoc144'] = $_GET['eoc144']; }
+            if ($args[1] == 'newProfile' && isset($_GET['eoc144']) && ! is_array($_GET['eoc144'])) {
+                $eocValue = preg_replace('/[^0-9]/', '', (string) $_GET['eoc144']);
+                if ($eocValue !== '') { $parameters['eoc144'] = $eocValue; }
+            }
             return $this->redirectTo($args[1], 'authorization', $parameters);
         } else {
             throw new Exception('Assertion failed (1230500910) - ' . var_export($args, true));
@@ -753,7 +793,7 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
         if (! $checked) {
             $checked = true;
             W_Cache::getWidget('main')->includeFileOnce('/lib/helpers/Index_InvitationHelper.php');
-            $invitation = Index_InvitationHelper::getUnusedInvitation($_GET['target']);
+            $invitation = Index_InvitationHelper::getUnusedInvitation($this->getTargetParameter());
         }
         return $invitation;
     }
@@ -765,6 +805,74 @@ class Index_AuthorizationController extends XG_BrowserAwareController {
         if (! $errors) { return; }
         $route = XG_App::getRequestedRoute();
         XG_LogHelper::logBasicFlows($route['actionName'] . '.', $errors);
+    }
+
+    private function getTargetParameter($default = null)
+    {
+        static $cachedTarget = null;
+        static $targetComputed = false;
+        if (! $targetComputed) {
+            $targetComputed = true;
+            $raw = null;
+            if (isset($_GET['target']) && ! is_array($_GET['target'])) {
+                $raw = $_GET['target'];
+            }
+            $normalized = XG_HttpHelper::normalizeRedirectTarget($raw);
+            if ($normalized !== null) {
+                $cachedTarget = xg_absolute_url($normalized);
+            }
+        }
+
+        if ($cachedTarget !== null) {
+            return $cachedTarget;
+        }
+
+        return $default;
+    }
+
+    private function getGroupToJoinParameter()
+    {
+        static $cachedGroupToJoin = null;
+        static $groupComputed = false;
+        if (! $groupComputed) {
+            $groupComputed = true;
+            if (isset($_GET['groupToJoin']) && ! is_array($_GET['groupToJoin'])) {
+                $value = trim((string) $_GET['groupToJoin']);
+                if ($value !== '') {
+                    $cachedGroupToJoin = mb_substr($value, 0, 512);
+                }
+            }
+        }
+
+        return $cachedGroupToJoin;
+    }
+
+    private function getRedirectParameterFromGet($key, $default = null)
+    {
+        if (! isset($_GET[$key]) || is_array($_GET[$key])) {
+            return $default;
+        }
+
+        $normalized = XG_HttpHelper::normalizeRedirectTarget($_GET[$key]);
+        if ($normalized === null) {
+            return $default;
+        }
+
+        return xg_absolute_url($normalized);
+    }
+
+    private function getQueryFlag($key)
+    {
+        if (! isset($_GET[$key]) || is_array($_GET[$key])) {
+            return false;
+        }
+
+        $value = trim((string) $_GET[$key]);
+        if ($value === '' || $value === '0' || strcasecmp($value, 'false') === 0) {
+            return false;
+        }
+
+        return true;
     }
 
 }

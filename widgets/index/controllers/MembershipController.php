@@ -88,9 +88,9 @@ class Index_MembershipController extends W_Controller {
         }
         Profiles_ProfileQuestionHelper::putQuestions($profilesWidget, $submittedQuestions);
 
-        $this->_widget->config['showGenderFieldOnCreateProfilePage'] = $_POST['showGenderFieldOnCreateProfilePage'] ? '1' : '0';
-        $this->_widget->config['showLocationFieldOnCreateProfilePage'] = $_POST['showLocationFieldOnCreateProfilePage'] ? '1' : '0';
-        $this->_widget->config['showCountryFieldOnCreateProfilePage'] = $_POST['showCountryFieldOnCreateProfilePage'] ? '1' : '0';
+        $this->_widget->config['showGenderFieldOnCreateProfilePage'] = $this->getCheckboxValue('showGenderFieldOnCreateProfilePage');
+        $this->_widget->config['showLocationFieldOnCreateProfilePage'] = $this->getCheckboxValue('showLocationFieldOnCreateProfilePage');
+        $this->_widget->config['showCountryFieldOnCreateProfilePage'] = $this->getCheckboxValue('showCountryFieldOnCreateProfilePage');
         $this->_widget->saveConfig();
         $profilesWidget->saveConfig();
 
@@ -111,21 +111,20 @@ class Index_MembershipController extends W_Controller {
             error_log("Couldn't update User searchability after profile question change: " . $e->getMessage());
         }
         if (! XG_App::appIsLaunched()) { return $this->redirectTo($this->_buildUrl('admin', 'launch')); } // BAZ-7608 [Jon Aquino 2008-05-13]
-        //  Check for an explicit success target (e.g. launch)
-        if (isset($_POST['successTarget']) && mb_strlen(trim($_POST['successTarget'])) > 0) {
-            header('Location: ' . $_POST['successTarget']);
+        $successTarget = $this->getSanitizedSuccessTargetFromPost();
+        if ($successTarget !== null) {
+            header('Location: ' . $successTarget);
             exit;
         }
-        else {
-            $this->redirectTo('questions', 'membership', '?saved=1');
-        }
+
+        $this->redirectTo('questions', 'membership', array('saved' => 1));
     }
 
     public function action_getQuestion() {
         if (!XG_SecurityHelper::userIsAdmin()) {
             throw new XN_Exception("Not allowed");
         }
-        $this->counter = isset($_GET['counter']) ? (integer) $_GET['counter'] : 1;
+        $this->counter = $this->getQueryInt('counter', 1, 1);
     }
 
     public function action_list() {
@@ -139,10 +138,8 @@ class Index_MembershipController extends W_Controller {
         $this->statusSortable = (Index_MembershipHelper::addMemberStatus() === 0);
         $this->setupPagination();
         $filters = $this->searchFilters();
-        if (!$_GET['sort']) {
-            $_GET['sort'] = 'date_d';
-        }
-        list($sortBy, $sortOrder, $sortType) =  XG_QueryHelper::sortOrder($_GET['sort']);
+        $sortKey = $this->getSortParameter();
+        list($sortBy, $sortOrder, $sortType) = XG_QueryHelper::sortOrder($sortKey);
         $this->memberInfo = User::find($filters, $this->start, $this->end,
                 array($sortBy, $sortType), $sortOrder, TRUE);
         // TODO: Eliminate $screenNames and for loop by passing User objects directly into XG_Cache::profiles()  [Jon Aquino 2007-10-29]
@@ -161,7 +158,8 @@ class Index_MembershipController extends W_Controller {
         $this->statusSortable = (Index_MembershipHelper::addMemberStatus() === 0); //TODO repeated code, share somehow
         $this->setupPagination();
         $filters = array_merge($this->searchFilters(), array('admin' => true));
-        list($sortBy, $sortOrder, $sortType) = XG_QueryHelper::sortOrder($_GET['sort']);
+        $sortKey = $this->getSortParameter();
+        list($sortBy, $sortOrder, $sortType) = XG_QueryHelper::sortOrder($sortKey);
         $this->administratorInfo = User::find($filters, $this->start, $this->end, array($sortBy, $sortType), $sortOrder, TRUE);
         $this->administratorProfiles = XG_Cache::profiles($this->administratorInfo['users']);
         $this->tabs = $this->tabs();
@@ -174,12 +172,13 @@ class Index_MembershipController extends W_Controller {
         $this->statusSortable = (Index_MembershipHelper::addMemberStatus() === 0);
         $this->setupPagination();
         $filters = array_merge($this->searchFilters(), array('blocked' => TRUE));
-        list($sortBy, $sortOrder, $sortType) = XG_QueryHelper::sortOrder($_GET['sort']);
+        $sortKey = $this->getSortParameter();
+        list($sortBy, $sortOrder, $sortType) = XG_QueryHelper::sortOrder($sortKey);
         $this->bannedInfo = User::find($filters, $this->start, $this->end,
                 array($sortBy, $sortType), $sortOrder, TRUE /* cache */);
-        if ($this->bannedInfo['numUsers'] == 0 && $_GET['q'] == '') {
+        if ($this->bannedInfo['numUsers'] == 0 && $this->q === null) {
             $opts = array();
-            if ($_GET['saved']) {
+            if ($this->getQueryFlag('saved')) {
                 $opts['saved'] = 1;
             }
             $this->redirectTo('listMembers', 'membership', $opts);
@@ -207,7 +206,7 @@ class Index_MembershipController extends W_Controller {
         W_Cache::getWidget('main')->includeFileOnce('/lib/helpers/Index_InvitationHelper.php');
         $invitations = Index_InvitationHelper::getUnusedInvitations($filters, $this->start, $this->end, $totalNumInvites, $profiles);
         $this->totalNumInvites = $totalNumInvites;
-        if ($this->totalNumInvites == 0 && $_GET['q'] == '') { return $this->redirectTo('listMembers', 'membership'); }
+        if ($this->totalNumInvites == 0 && $this->q === null) { return $this->redirectTo('listMembers', 'membership'); }
         $this->users = array();
         XG_App::includeFileOnce('/lib/XG_MembershipHelper.php');
         foreach ($invitations as $invitation) {
@@ -221,8 +220,8 @@ class Index_MembershipController extends W_Controller {
                     'status' => XG_MembershipHelper::INVITED);
         }
         $this->tabs = $this->tabs();
-        $this->resendCount = intval($_GET['resendCount']);
-        $this->cancelCount = intval($_GET['cancelCount']);
+        $this->resendCount = $this->getQueryInt('resendCount', 0, 0);
+        $this->cancelCount = $this->getQueryInt('cancelCount', 0, 0);
     }
 
     public function action_listRequested() {
@@ -239,9 +238,9 @@ class Index_MembershipController extends W_Controller {
                 $this->end, 'createdDate', 'desc', FALSE /* cache */);
         $this->requests = $requestInfo['requests'];
         $this->totalNumRequests = $requestInfo['numRequests'];
-        if ($this->totalNumRequests == 0 && $_GET['q'] == '') {
+        if ($this->totalNumRequests == 0 && $this->q === null) {
             $opts = array();
-            if ($_GET['saved']) {
+            if ($this->getQueryFlag('saved')) {
                 $opts['saved'] = 1;
             }
             $this->redirectTo('listMembers', 'membership', $opts);
@@ -266,12 +265,13 @@ class Index_MembershipController extends W_Controller {
         $this->setupPagination();
         $this->statusSortable = (Index_MembershipHelper::addMemberStatus() === 0);
         $filters = array_merge($this->searchFilters(), array('pending' => TRUE));
-        list($sortBy, $sortOrder, $sortType) = XG_QueryHelper::sortOrder($_GET['sort']);
+        $sortKey = $this->getSortParameter();
+        list($sortBy, $sortOrder, $sortType) = XG_QueryHelper::sortOrder($sortKey);
         $this->pendingInfo = User::find($filters, $this->start, $this->end,
                 array($sortBy, $sortType), $sortOrder, TRUE /* cache */);
-        if ($this->pendingInfo['numUsers'] == 0 && $_GET['q'] == '') {
+        if ($this->pendingInfo['numUsers'] == 0 && $this->q === null) {
             $opts = array();
-            if ($_GET['saved']) {
+            if ($this->getQueryFlag('saved')) {
                 $opts['saved'] = 1;
             }
             $this->redirectTo('listMembers', 'membership', $opts);
@@ -295,22 +295,24 @@ class Index_MembershipController extends W_Controller {
         //  So only the owner should be allowed to use it, not admins
         XG_SecurityHelper::redirectIfNotOwner();
 
-        $operation = $_POST['operation'];
-        $idsToProcess = array();
-        foreach ($_POST as $name => $value) {
-            if (mb_substr($name, 0, 5) == 'user_') {
-                $idsToProcess[] = mb_substr($name, 5);
-            }
+        $operation = $this->getPostOperation(array('promote', 'demote'));
+        $idsToProcess = $this->extractIdsFromPost('user_');
+
+        if (! $operation || ! $idsToProcess) {
+            $this->redirectTo('listMembers', 'membership', $this->buildMembersRedirectParams());
+            return;
         }
+
         $filters = array('contributorName' => array('in', $idsToProcess));
         $userInfo = User::find($filters, 0, 100);
         foreach ($userInfo['users'] as $user) {
-            error_log('Setting admin status for ' . $user->contributorName . ' to ' . ($operation == 'promote' ? 'TRUE' : 'FALSE'));
-            User::setAdminStatus($user, ($operation == 'promote'));
+            error_log('Setting admin status for ' . $user->contributorName . ' to ' . ($operation === 'promote' ? 'TRUE' : 'FALSE'));
+            User::setAdminStatus($user, ($operation === 'promote'));
             $user->save();
         }
 
-        $this->redirectTo('listMembers', 'membership', array('page' => $_POST['page'], 'q' => $_POST['q'], 'saved' => 1));
+        $params = $this->buildMembersRedirectParams(array('saved' => 1));
+        $this->redirectTo('listMembers', 'membership', $params);
     }
 
     /**
@@ -320,32 +322,33 @@ class Index_MembershipController extends W_Controller {
         // Currently, this method only removes administrators.
         // So only the owner should be allowed to use it, not admins
         XG_SecurityHelper::redirectIfNotOwner();
-        $operation = $_POST['operation'];
-        $idsToProcess = array();
-        foreach ($_POST as $name => $value) {
-            if (mb_substr($name, 0, 5) == 'user_') {
-                $idsToProcess[] = mb_substr($name, 5);
-            }
+        $operation = $this->getPostOperation(array('demote'));
+        $idsToProcess = $this->extractIdsFromPost('user_');
+
+        if ($operation !== 'demote' || ! $idsToProcess) {
+            $this->redirectTo('listAdministrators', 'membership', array('page' => $this->getPostPage()));
+            return;
         }
+
         $userInfo = User::find(array('contributorName' => array('in', $idsToProcess)), 0, 100);
         foreach ($userInfo['users'] as $user) {
-            if ($operation == 'demote' && $user->title != XN_Application::load()->ownerName) {
+            if ($user->title != XN_Application::load()->ownerName) {
                 User::setAdminStatus($user, false);
                 $user->save();
             }
         }
-        $this->redirectTo('listAdministrators', 'membership', array('page' => $_POST['page'], 'saved' => 1));
+
+        $this->redirectTo('listAdministrators', 'membership', array('page' => $this->getPostPage(), 'saved' => 1));
     }
 
     public function action_saveBanned() {
         XG_SecurityHelper::redirectIfNotAdmin();
         W_Cache::getWidget('main')->includeFileOnce('/lib/helpers/Index_NotificationHelper.php');
 
-        $idsToUnblock = array();
-        foreach ($_POST as $name => $value) {
-            if (mb_substr($name, 0, 5) == 'user_') {
-                $idsToUnblock[] = mb_substr($name, 5);
-            }
+        $idsToUnblock = $this->extractIdsFromPost('user_');
+        if (! $idsToUnblock) {
+            $this->redirectTo('listBanned', 'membership', array('page' => $this->getPostPage()));
+            return;
         }
         foreach (XN_Content::load($idsToUnblock) as $user) {
             User::setStatus($user, '');
@@ -362,51 +365,51 @@ class Index_MembershipController extends W_Controller {
         }
         XG_App::includeFileOnce('/lib/XG_EmbeddableHelper.php');
         XG_EmbeddableHelper::generateResources();
-        $this->redirectTo('listBanned', 'membership', array('page' => $_POST['page'], 'saved' => 1));
+        $this->redirectTo('listBanned', 'membership', array('page' => $this->getPostPage(), 'saved' => 1));
     }
 
     public function action_saveInvited() {
         W_Cache::getWidget('main')->includeFileOnce('/lib/helpers/Index_InvitationHelper.php');
         XG_SecurityHelper::redirectIfNotAdmin();
-        $idsToProcess = array();
-        foreach ($_POST as $name => $value) {
-            if (mb_substr($name, 0, 4) == 'inv_') {
-                $idsToProcess[$name] = mb_substr($name, 4);
+        $operation = $this->getPostOperation(array('cancel', 'resend'));
+        $idsToProcess = $this->extractIdsFromPost('inv_');
+        $cancelCount = 0;
+        $resendCount = 0;
+
+        if ($idsToProcess) {
+            if ($operation === 'cancel') {
+                Index_InvitationHelper::deleteUnusedInvitations($idsToProcess);
+                $cancelCount = count($idsToProcess);
+            } elseif ($operation === 'resend') {
+                Index_InvitationHelper::resendUnusedInvitations($idsToProcess);
+                $resendCount = count($idsToProcess);
             }
         }
-        if ($_POST['operation'] == 'cancel') { 
-            Index_InvitationHelper::deleteUnusedInvitations($idsToProcess); 
-            $cancelCount = count($idsToProcess);
-        }
-        if ($_POST['operation'] == 'resend') {
-            Index_InvitationHelper::resendUnusedInvitations($idsToProcess);
-            $resendCount = count($idsToProcess);
-        }
+
         $this->redirectTo('listInvited', 'membership', array(
-	    'page' => $_POST['page'],
-	    'resendCount' => $resendCount,
-	    'cancelCount' => $cancelCount,
-	    'saved' => 1,
-	));
+            'page' => $this->getPostPage(),
+            'resendCount' => $resendCount,
+            'cancelCount' => $cancelCount,
+            'saved' => 1,
+        ));
     }
 
     public function action_saveRequested() {
         XG_SecurityHelper::redirectIfNotAdmin();
 
-        $idsToProcess = array();
-        foreach ($_POST as $name => $value) {
-            if (mb_substr($name, 0, 4) == 'req_') {
-                $idsToProcess[] = mb_substr($name, 4);
+        $operation = $this->getPostOperation(array('invite', 'delete'));
+        $idsToProcess = $this->extractIdsFromPost('req_');
+
+        if ($idsToProcess) {
+            foreach (XN_Content::load($idsToProcess) as $req) {
+                if ($operation === 'invite') {
+                    throw new Exception('Unsupported operation (779423558)');
+                }
+                XN_Content::delete($req);
             }
-        }
-        foreach (XN_Content::load($idsToProcess) as $req) {
-            if ($_POST['operation'] == 'invite') {
-                throw new Exception('Unsupported operation (779423558)');
-            }
-            XN_Content::delete($req);
         }
 
-        $this->redirectTo('listRequested', 'membership', array('page' => $_POST['page'], 'saved' => 1));
+        $this->redirectTo('listRequested', 'membership', array('page' => $this->getPostPage(), 'saved' => 1));
     }
 
     public function action_savePending() {
@@ -414,20 +417,19 @@ class Index_MembershipController extends W_Controller {
 
         $this->_widget->includeFileOnce('/lib/helpers/Index_MembershipHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Index_InvitationHelper.php');
-        $idsToProcess = array();
-        foreach ($_POST as $name => $value) {
-            if (mb_substr($name, 0, 5) == 'user_') {
-                $id = mb_substr($name, 5);
-                $idsToProcess[$id] = $id;
-            }
+        $operation = $this->getPostOperation(array('accept', 'decline'));
+        $idsToProcess = $this->extractIdsFromPost('user_', true);
+        if (! $operation || ! $idsToProcess) {
+            $this->redirectTo('listPending', 'membership', array('page' => $this->getPostPage()));
+            return;
         }
+
         $profiles = XG_Cache::profiles($idsToProcess);
         foreach ($profiles as $screenName => $profile) {
             $user = User::load($screenName);
-            if ($_POST['operation'] == 'accept') {
+            if ($operation === 'accept') {
                 Index_MembershipHelper::onAccept($profile, $user);
-            }
-            else if ($_POST['operation'] == 'decline') {
+            } elseif ($operation === 'decline') {
                 // TODO: Move this code into Index_MembershipHelper::onDecline(), to be consistent [Jon Aquino 2007-12-03]
                 /* If a user is declined, it's as if they never applied */
                 XN_Content::delete(W_Content::unwrap($user));
@@ -440,7 +442,7 @@ class Index_MembershipController extends W_Controller {
             }
         }
 
-        $this->redirectTo('listPending', 'membership', array('page' => $_POST['page'], 'saved' => 1));
+        $this->redirectTo('listPending', 'membership', array('page' => $this->getPostPage(), 'saved' => 1));
     }
 
     protected function getMemberCounts() {
@@ -469,10 +471,9 @@ class Index_MembershipController extends W_Controller {
         XG_App::includeFileOnce('/lib/XG_PaginationHelper.php');
         $this->pageSize = 50;
         // Pages start at 1, not 0
-        $this->page = isset($_GET['page']) ? (integer) $_GET['page'] : 1;
-        $this->q = (isset($_GET['q']) ? $_GET['q'] : null);
-        if ($this->page < 1) { $this->page = 1; }
-        $this->start = ($this->page - 1) * $this->pageSize;
+        $this->page = $this->getQueryInt('page', 1, 1);
+        $this->q = $this->getOptionalQueryString('q');
+        $this->start = XG_PaginationHelper::computeStart($this->page, $this->pageSize);
         $this->end = $this->start + $this->pageSize;
     }
 
@@ -559,7 +560,7 @@ class Index_MembershipController extends W_Controller {
                 array('text' => xg_text('ADMINISTRATORS'), 'count' => $counts['administrators'], 'url' => $this->_widget->buildUrl('membership', 'listAdministrators')),
                 array('text' => xg_text('PENDING'), 'count' => $counts['pending'], 'url' => $this->_widget->buildUrl('membership', 'listPending')),
                 array('text' => xg_text('INVITED'), 'count' => $counts['invited'], 'url' => $this->_widget->buildUrl('membership', 'listInvited')),
-                array('text' => xg_text('REQUESTED_INVITE'), $counts['requested'], 'url' => $this->_widget->buildUrl('membership', 'listRequested')),
+                array('text' => xg_text('REQUESTED_INVITE'), 'count' => $counts['requested'], 'url' => $this->_widget->buildUrl('membership', 'listRequested')),
                 array('text' => xg_text('BANNED'), 'count' => $counts['banned'], 'url' => $this->_widget->buildUrl('membership', 'listBanned')));
     }
 
@@ -569,10 +570,167 @@ class Index_MembershipController extends W_Controller {
      * Optional $_GET variable: 'q'.  Used as text in search.
      */
     private function searchFilters() {
-        if (isset($_GET['q'])) {
-            return array('my->searchText' => array('likeic', $_GET['q']));
-        } else {
-            return array();
+        if ($this->q !== null) {
+            return array('my->searchText' => array('likeic', $this->q));
         }
+
+        return array();
+    }
+
+    private function getOptionalQueryString(string $key, int $maxLength = 255): ?string
+    {
+        return $this->extractString($_GET, $key, $maxLength);
+    }
+
+    private function getPostString(string $key, int $maxLength = 255): ?string
+    {
+        return $this->extractString($_POST, $key, $maxLength);
+    }
+
+    private function extractString(array $source, string $key, int $maxLength): ?string
+    {
+        if (! array_key_exists($key, $source)) { return null; }
+        $value = $source[$key];
+        if (! is_scalar($value)) { return null; }
+        $value = trim((string) $value);
+        if ($value === '') { return null; }
+        $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
+        if ($value === null || $value === '') { return null; }
+        if ($maxLength > 0) { $value = mb_substr($value, 0, $maxLength); }
+        return $value;
+    }
+
+    private function getQueryInt(string $key, int $default, int $min = PHP_INT_MIN, ?int $max = null): int
+    {
+        if (! array_key_exists($key, $_GET)) { return $default; }
+        return $this->filterInt($_GET[$key], $default, $min, $max);
+    }
+
+    private function getPostInt(string $key, int $default, int $min = PHP_INT_MIN, ?int $max = null): int
+    {
+        if (! array_key_exists($key, $_POST)) { return $default; }
+        return $this->filterInt($_POST[$key], $default, $min, $max);
+    }
+
+    private function filterInt($value, int $default, int $min, ?int $max): int
+    {
+        if (! is_scalar($value)) { return $default; }
+        $options = array('options' => array('min_range' => $min));
+        if ($max !== null) {
+            $options['options']['max_range'] = $max;
+        }
+        $filtered = filter_var($value, FILTER_VALIDATE_INT, $options);
+        if ($filtered === false) { return $default; }
+        return (int) $filtered;
+    }
+
+    private function getQueryFlag(string $key): bool
+    {
+        if (! array_key_exists($key, $_GET)) { return false; }
+        $value = $_GET[$key];
+        if (! is_scalar($value)) { return false; }
+        $normalized = strtolower(trim((string) $value));
+        return $normalized === '1' || $normalized === 'true' || $normalized === 'yes';
+    }
+
+    private function getSortParameter(): string
+    {
+        $sort = $this->getOptionalQueryString('sort', 64);
+        if ($sort === null) { return 'date_d'; }
+        if (! preg_match('/^[a-z0-9_]+$/i', $sort)) { return 'date_d'; }
+        return $sort;
+    }
+
+    private function getPostOperation(array $allowedOperations): ?string
+    {
+        $operation = $this->getPostString('operation', 32);
+        if ($operation === null) { return null; }
+        $operation = strtolower($operation);
+        if (! $allowedOperations) { return $operation; }
+        foreach ($allowedOperations as $allowed) {
+            if ($operation === strtolower($allowed)) {
+                return $operation;
+            }
+        }
+        return null;
+    }
+
+    private function extractIdsFromPost(string $prefix, bool $preserveKeys = false): array
+    {
+        $ids = array();
+        $prefixLength = mb_strlen($prefix);
+        foreach ($_POST as $name => $value) {
+            if (! is_string($name) || strncmp($name, $prefix, $prefixLength) !== 0) {
+                continue;
+            }
+            $id = mb_substr($name, $prefixLength);
+            $id = $this->sanitizeIdentifier($id);
+            if ($id === '') {
+                continue;
+            }
+            if ($preserveKeys) {
+                $ids[$id] = $id;
+            } else {
+                $ids[] = $id;
+            }
+        }
+        return $ids;
+    }
+
+    private function sanitizeIdentifier(string $value, int $maxLength = 128): string
+    {
+        $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
+        if ($value === null) { return ''; }
+        $value = trim($value);
+        if ($value === '') { return ''; }
+        $value = mb_substr($value, 0, $maxLength);
+        if (! preg_match('/^[A-Za-z0-9._@:+\-]+$/u', $value)) { return ''; }
+        return $value;
+    }
+
+    private function getPostPage(): int
+    {
+        return $this->getPostInt('page', 1, 1);
+    }
+
+    private function getPostSearchQuery(): ?string
+    {
+        return $this->getPostString('q');
+    }
+
+    private function buildMembersRedirectParams(array $extra = array()): array
+    {
+        $params = $extra;
+        $params['page'] = $this->getPostPage();
+        $search = $this->getPostSearchQuery();
+        if ($search !== null) {
+            $params['q'] = $search;
+        }
+        return $params;
+    }
+
+    private function getCheckboxValue(string $key): string
+    {
+        return $this->getPostString($key, 16) !== null ? '1' : '0';
+    }
+
+    private function getSanitizedSuccessTargetFromPost(): ?string
+    {
+        $rawTarget = $this->getPostString('successTarget', 2048);
+        if ($rawTarget === null) {
+            return null;
+        }
+
+        return $this->sanitizeRedirectTarget($rawTarget);
+    }
+
+    private function sanitizeRedirectTarget(?string $target): ?string
+    {
+        if ($target === null) {
+            return null;
+        }
+
+        XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
+        return XG_HttpHelper::normalizeRedirectTarget($target);
     }
 }

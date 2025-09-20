@@ -1,4 +1,5 @@
 <?php
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 
 /**
  * Dispatches requests pertaining to users.
@@ -262,6 +263,7 @@ class Groups_UserController extends XG_GroupEnabledController {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') { throw new Exception('Not a POST (640863359)'); }
         $group = Group::load($_GET['groupId']);
         if (! Groups_SecurityHelper::currentUserCanEditMemberships($group)) { $this->redirectTo('show', 'group', array('id' => $group->id)); return; }
+        $invitationCount = 0;
         if ($_POST['operation'] == 'resendInvitation') {
             Index_InvitationHelper::resendUnusedInvitations($_POST['selectedIds']);
             $invitationCount = count($_POST['selectedIds']);
@@ -286,7 +288,13 @@ class Groups_UserController extends XG_GroupEnabledController {
                 }
             }
         }
-        header('Location: ' . XG_HttpHelper::addParameter($_GET['target'], 'invitationCount', $invitationCount));
+        $redirectTarget = $this->getSanitizedRedirectTarget();
+        if ($redirectTarget === null) {
+            $redirectTarget = $this->_widget->buildUrl('user', 'edit', array('groupId' => $group->id));
+        }
+
+        header('Location: ' . XG_HttpHelper::addParameter($redirectTarget, 'invitationCount', $invitationCount));
+        exit;
     }
 
     /**
@@ -339,5 +347,14 @@ class Groups_UserController extends XG_GroupEnabledController {
         $groupFields['status'] = array('my->status', XN_Attribute::STRING);
         list($by, $direction, $type) = XG_QueryHelper::sortOrder($_GET['sort'], $groupFields);
         return $query->order($by, $direction, $type);
+    }
+
+    private function getSanitizedRedirectTarget(): ?string
+    {
+        if (! isset($_GET['target']) || is_array($_GET['target'])) {
+            return null;
+        }
+
+        return XG_HttpHelper::normalizeRedirectTarget($_GET['target']);
     }
 }

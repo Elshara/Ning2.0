@@ -1,4 +1,5 @@
 <?php
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 
 /**
  * Dispatches requests pertaining to groups.
@@ -188,8 +189,9 @@ class Groups_GroupController extends XG_GroupEnabledController {
         Index_NotificationHelper::startFollowing($group);
         Group::updateActivityScore($group,GROUP::ACTIVITY_SCORE_MEMBER_JOIN);
         Group::setStatus($group, $this->_user->screenName, 'member');
-        if ($_GET['joinGroupTarget']) {
-            header('Location: ' . $_GET['joinGroupTarget']);
+        $redirectTarget = $this->getSanitizedJoinTarget();
+        if ($redirectTarget !== null) {
+            header('Location: ' . $redirectTarget);
             exit;
         }
         $this->redirectTo('show', 'group', array('id' => $group->id));
@@ -814,6 +816,15 @@ class Groups_GroupController extends XG_GroupEnabledController {
                 $this->renderPartial('fragment_comment', 'group', array('object' => $object, 'group' => $this->groupIds[$object->my->groupId]));
                 break;
         }
+    }
+
+    private function getSanitizedJoinTarget(): ?string
+    {
+        if (! isset($_GET['joinGroupTarget']) || is_array($_GET['joinGroupTarget'])) {
+            return null;
+        }
+
+        return XG_HttpHelper::normalizeRedirectTarget($_GET['joinGroupTarget']);
     }
 
 }

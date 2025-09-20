@@ -62,7 +62,7 @@ class Index_InvitationHelper {
             exit;
         }
         if ($result == 'processed') {
-            header('Location:' . XG_HttpHelper::removeParameters(XG_HttpHelper::currentUrl(), array(self::SIGN_IN_CHECK_DONE, self::KEY)));
+            header('Location: ' . XG_HttpHelper::removeParameters(XG_HttpHelper::currentUrl(), array(self::SIGN_IN_CHECK_DONE, self::KEY)));
             exit;
         }
         return ! is_null($result);

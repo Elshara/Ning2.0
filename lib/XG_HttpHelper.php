@@ -241,6 +241,112 @@ class XG_HttpHelper {
     }
 
     /**
+     * Normalizes a user-supplied redirect target to a safe relative URL within the current host.
+     *
+     * Accepts absolute URLs when they reference the active host and strips the scheme/host so that
+     * callers can emit relative Location headers. Returns null if the value is empty, malformed, or
+     * targets a different host or protocol.
+     *
+     * @param mixed $target Potential redirect target.
+     * @return string|null Normalized relative URL or null when invalid.
+     */
+    public static function normalizeRedirectTarget($target)
+    {
+        if (! is_scalar($target)) { return null; }
+        $value = trim((string) $target);
+        if ($value === '') { return null; }
+
+        $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
+        if ($value === null || $value === '') { return null; }
+
+        if (preg_match('#^(?:javascript|data|vbscript|file):#i', $value)) { return null; }
+
+        $parts = @parse_url($value);
+        if ($parts === false) { return null; }
+
+        $allowedHosts = array();
+        $allowedHostPorts = array();
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $hostValue = trim((string) $_SERVER['HTTP_HOST']);
+            if ($hostValue !== '') {
+                $allowedHostPorts[] = strtolower($hostValue);
+                $allowedHosts[] = strtolower(preg_replace('/:.*/', '', $hostValue));
+            }
+        }
+        if (isset($_SERVER['SERVER_NAME'])) {
+            $allowedHosts[] = strtolower((string) $_SERVER['SERVER_NAME']);
+        }
+        if (isset($_SERVER['SERVER_ADDR'])) {
+            $allowedHosts[] = strtolower((string) $_SERVER['SERVER_ADDR']);
+        }
+        $allowedHosts = array_values(array_unique(array_filter($allowedHosts)));
+        $allowedHostPorts = array_values(array_unique(array_filter($allowedHostPorts)));
+
+        if (isset($parts['scheme']) || isset($parts['host'])) {
+            $scheme = isset($parts['scheme']) ? strtolower($parts['scheme']) : 'http';
+            if ($scheme !== 'http' && $scheme !== 'https') {
+                return null;
+            }
+
+            $host = isset($parts['host']) ? strtolower($parts['host']) : '';
+            if ($host === '') {
+                return null;
+            }
+
+            $hostMatches = false;
+            foreach ($allowedHosts as $allowedHost) {
+                if ($allowedHost === $host) {
+                    $hostMatches = true;
+                    break;
+                }
+            }
+
+            if ($hostMatches && isset($parts['port'])) {
+                if ($allowedHostPorts) {
+                    $hostWithPort = $host . ':' . $parts['port'];
+                    $hostMatches = in_array($hostWithPort, $allowedHostPorts, true);
+                } else {
+                    $hostMatches = false;
+                }
+            }
+
+            if (! $hostMatches) {
+                return null;
+            }
+
+            $normalized = array(
+                'path' => $parts['path'] ?? '/',
+                'query' => $parts['query'] ?? '',
+            );
+            if ($normalized['path'] === '') {
+                $normalized['path'] = '/';
+            }
+            if (isset($parts['fragment'])) {
+                $normalized['fragment'] = $parts['fragment'];
+            }
+
+            return self::joinParsedUrl($normalized);
+        }
+
+        $path = $parts['path'] ?? '';
+        if ($path === '') {
+            $path = '/';
+        } elseif ($path[0] !== '/') {
+            $path = '/' . $path;
+        }
+
+        $normalized = array(
+            'path' => $path,
+            'query' => $parts['query'] ?? '',
+        );
+        if (isset($parts['fragment'])) {
+            $normalized['fragment'] = $parts['fragment'];
+        }
+
+        return self::joinParsedUrl($normalized);
+    }
+
+    /**
      * Returns whether the URL is that of the current user's page
      *
      * @param $url string  the URL to test

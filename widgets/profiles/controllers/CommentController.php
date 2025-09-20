@@ -1,6 +1,7 @@
 <?php
 
 XG_App::includeFileOnce('/lib/XG_Message.php');
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 
 class Profiles_CommentController extends XG_BrowserAwareController {
 
@@ -17,14 +18,20 @@ class Profiles_CommentController extends XG_BrowserAwareController {
             if (! (isset($_POST['comment']) && (mb_strlen($comment = trim(xg_scrub($_POST['comment'])))))) {
                 throw new Exception("No comment specified");
             }
-            if (! isset($_POST['attachedTo']) && mb_strlen($_POST['attachedTo'])) {
+            $attachedToRaw = $_POST['attachedTo'] ?? '';
+            $attachedTo = is_scalar($attachedToRaw) ? trim((string) $attachedToRaw) : '';
+            if ($attachedTo === '') {
                 throw new Exception('Nothing specified to attach the comment to');
             }
-            $attachedToType = $_POST['attachedToType'];
-            $this->attachedToContent = self::getAttachedTo($attachedToType, $_POST['attachedTo']);
-            if ($attachedToType == 'User') {
+            $attachedToTypeRaw = $_POST['attachedToType'] ?? '';
+            $attachedToType = is_scalar($attachedToTypeRaw) ? trim((string) $attachedToTypeRaw) : '';
+            if ($attachedToType === '') {
+                throw new Exception('No attachment type specified');
+            }
+            $this->attachedToContent = self::getAttachedTo($attachedToType, $attachedTo);
+            if ($attachedToType === 'User') {
                 $cacheKeys = array();
-				$commentIsModerated = $this->getModeratedStatus($this->attachedToContent->contributorName);
+                                $commentIsModerated = $this->getModeratedStatus($this->attachedToContent->contributorName);
                 $appName = XN_Application::load()->name;
                 $commentReason = xg_text('X_ADDED_A_COMMENT_TO_YOUR_PAGE_ON_Y', xg_username($this->_user), $appName);
                 $activityMessageSubject= xg_text('X_ADDED_A_COMMENT_TO_YOUR_PAGE_ON_Y', xg_username($this->_user), $appName);
@@ -52,7 +59,7 @@ class Profiles_CommentController extends XG_BrowserAwareController {
             } else {
                 $this->attachedToContent->save();
             }
-            if ((!$commentIsModerated)&&($this->attachedToContent->contributorName != $this->_user->screenName)&&($attachedToType == 'User')) {
+            if ((!$commentIsModerated)&&($this->attachedToContent->contributorName != $this->_user->screenName)&&($attachedToType === 'User')) {
                 XG_App::includeFileOnce('/lib/XG_ActivityHelper.php');
                 XG_ActivityHelper::logActivityIfEnabled(XG_ActivityHelper::CATEGORY_NEW_COMMENT, XG_ActivityHelper::SUBCATEGORY_PROFILE, $this->_user->screenName.','.$this->attachedToContent->contributorName, array($this->comment));
             }
@@ -94,14 +101,21 @@ class Profiles_CommentController extends XG_BrowserAwareController {
 
         try {
             // chatter form submited before page load or from user with javascript turned off BAZ-2458
-            if ( ($attachedToType == 'User') && ($_GET['xn_out']!='htmljson') ) {
-                header('Location:'.$_POST['successTarget']);
-            } else {
-                $renderInfo = $this->getRenderingInfo($attachedToType, $this->_user, $this->comment);
-                $this->partialTemplate = $renderInfo['template'];
-                $this->partialController = $renderInfo['controller'];
-                $this->partialArgs = $renderInfo['args'];
+            if (($attachedToType === 'User') && ($_GET['xn_out'] != 'htmljson')) {
+                $redirectTarget = null;
+                if (isset($_POST['successTarget']) && ! is_array($_POST['successTarget'])) {
+                    $redirectTarget = XG_HttpHelper::normalizeRedirectTarget($_POST['successTarget']);
+                }
+                if ($redirectTarget !== null) {
+                    header('Location: ' . $redirectTarget);
+                    return;
+                }
             }
+
+            $renderInfo = $this->getRenderingInfo($attachedToType, $this->_user, $this->comment);
+            $this->partialTemplate = $renderInfo['template'];
+            $this->partialController = $renderInfo['controller'];
+            $this->partialArgs = $renderInfo['args'];
         } catch (Exception $e) {
             $_GET['xn_out'] = 'json';
             $this->errorMessages = $e->getMessage();
@@ -187,12 +201,14 @@ class Profiles_CommentController extends XG_BrowserAwareController {
             if (! (isset($_POST['comment']) && (mb_strlen($comment = trim(xg_scrub($_POST['comment'])))))) {
                 throw new Exception("No comment specified");
             }
-            if (! isset($_GET['attachedTo']) && mb_strlen($_GET['attachedTo'])) {
+            $attachedToRaw = $_GET['attachedTo'] ?? '';
+            $attachedTo = is_scalar($attachedToRaw) ? trim((string) $attachedToRaw) : '';
+            if ($attachedTo === '') {
                 throw new Exception('Nothing specified to attach the comment to');
             }
             $attachedToType = 'BlogPost';
-            $attachedToContent = self::getAttachedTo($attachedToType, $_GET['attachedTo']);
-            if ($attachedToType == 'BlogPost') {
+            $attachedToContent = self::getAttachedTo($attachedToType, $attachedTo);
+            if ($attachedToType === 'BlogPost') {
                 // Who is the owner of this post?
                 $postOwner = User::load($attachedToContent->contributorName);
 
@@ -233,7 +249,7 @@ class Profiles_CommentController extends XG_BrowserAwareController {
                 Profiles_CommentHelper::updateCommentsToApprove($postOwner);
                 $postOwner->save();
             }
-            if ((!$commentIsModerated)&&($attachedToType == 'BlogPost')&&($attachedToContent->my->visibility == 'all')) {
+            if ((!$commentIsModerated)&&($attachedToType === 'BlogPost')&&($attachedToContent->my->visibility == 'all')) {
                 XG_App::includeFileOnce('/lib/XG_ActivityHelper.php');
                 XG_ActivityHelper::logActivityIfEnabled(XG_ActivityHelper::CATEGORY_NEW_COMMENT, XG_ActivityHelper::SUBCATEGORY_BLOG, $comment->contributorName, array($comment,$attachedToContent));
             }
@@ -265,7 +281,7 @@ class Profiles_CommentController extends XG_BrowserAwareController {
                 $opts = array('content' => $attachedToContent,
                               'type' => $activityType,
                               'url' => Profiles_CommentHelper::url($comment));
-                if ($attachedToType == 'BlogPost') {
+                if ($attachedToType === 'BlogPost') {
                     // Blog post
                     $opts['viewActivity'] = xg_text('TO_VIEW_THE_NEW_COMMENT_VISIT');
                     $opts['activity'] = xg_text('X_ADDED_A_COMMENT_TO_THE_BLOG_POST_Y_ON_Z',
@@ -310,11 +326,11 @@ class Profiles_CommentController extends XG_BrowserAwareController {
             $comment = Comment::load($_POST['id']);
             $attachedToType = $comment->my->attachedToType;
             $attachedToAuthor = $comment->my->attachedToAuthor;
-            if ($attachedToType == 'BlogPost') {
+            if ($attachedToType === 'BlogPost') {
                 if (! Profiles_CommentHelper::userCanDeleteComment($this->_user, $comment)) {
                     throw new Exception("You're not allowed to delete this comment.");
                 }
-            } elseif ($attachedToType == 'User') {
+            } elseif ($attachedToType === 'User') {
                 if (! Profiles_CommentHelper::userCanDeleteChatter($this->_user, $comment)) {
                     throw new Exception("You're not allowed to delete this comment.");
                 }

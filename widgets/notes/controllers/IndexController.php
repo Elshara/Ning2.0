@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__) . '/lib/helpers/Notes_RequestHelper.php';
 /**
  *  Handles all requests to Notes module.
  *
@@ -31,28 +32,30 @@ class Notes_IndexController extends W_Controller {
      */
     public function action_show() {
         XG_App::includeFileOnce('/lib/XG_PromotionHelper.php');
-        $key = $_GET['noteKey'];
-        if ( mb_strlen($key) > Note::MAX_TITLE_LENGTH ) {
+        $noteKey = Notes_RequestHelper::readNoteKey($_GET);
+        if (mb_strlen($noteKey) > Note::MAX_TITLE_LENGTH) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
+        $_GET['noteKey'] = $noteKey;
+        $createRequested = Notes_RequestHelper::readBoolean($_GET, 'create');
         $isAdmin = XG_SecurityHelper::userIsAdmin();
         // If note already loaded, do not reload it.
-        if ($this->note || $this->note = Note::byKey($key)) {
+        if ($this->note || $this->note = Note::byKey($noteKey)) {
 
             $this->canFeature = (bool)$isAdmin;
             $this->canEdit = (bool)$isAdmin;
-            $this->canDelete = (bool)$isAdmin && !Note::isMain($key);
+            $this->canDelete = (bool)$isAdmin && !Note::isMain($noteKey);
             $this->canRead = $this->note->my->visibility != 'A' || $isAdmin;
-            $this->showEditBox = (bool) @$_GET['create'];
-            $this->isMain = Note::isMain($key);
+            $this->showEditBox = $createRequested;
+            $this->isMain = Note::isMain($noteKey);
 
-            $this->title = $key ? $this->note->title : xg_text('NOTES');
-            $this->pageTitle = $key ? $this->note->title : xg_text('NOTES_HOME');
+            $this->title = $noteKey ? $this->note->title : xg_text('NOTES');
+            $this->pageTitle = $noteKey ? $this->note->title : xg_text('NOTES_HOME');
             $this->noteContent = $this->canRead ? $this->note->description : xg_html('NOTE_ACCESS_DENIED', xnhtmlentities($this->note->title));
 
             User::loadMultiple(array($this->note->contributorName, $this->note->my->lastUpdatedBy));
         } else {
-            $this->title = Note::title($key);
+            $this->title = Note::title($noteKey);
             $this->noteContent = xg_html('NOTE_NOT_EXISTS',xnhtmlentities($this->title));
             $this->noteTitle = $this->title;
         }
@@ -66,7 +69,9 @@ class Notes_IndexController extends W_Controller {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         $this->note = $object;
-        $_GET['noteKey'] = $this->note->my->noteKey;
+        $noteKey = Notes_RequestHelper::readString(['noteKey' => (string) $this->note->my->noteKey], 'noteKey');
+        $_GET['noteKey'] = $noteKey;
+        $_REQUEST['noteKey'] = $noteKey;
         return $this->forwardTo('show','index');
     }
 
@@ -122,8 +127,15 @@ class Notes_IndexController extends W_Controller {
      */
     public function action_feed() {
         $feedSize = 20;
-        $sort = isset($_GET['sort']) ? $_GET['sort'] : 'created';
-        switch ($_GET['type']) {
+        $sort = Notes_RequestHelper::normalizeSort(
+            Notes_RequestHelper::readString($_GET, 'sort', 'created'),
+            'created'
+        );
+        $type = Notes_RequestHelper::normalizeFeedType(
+            Notes_RequestHelper::readString($_GET, 'type', 'recent'),
+            'recent'
+        );
+        switch ($type) {
             case 'featured':
                 $list = Note::getFeaturedNotes($feedSize, $sort);
                 $title = xg_text('FEATURED_NOTES');
@@ -146,9 +158,9 @@ class Notes_IndexController extends W_Controller {
      *  @param      $q	string		Search request
      */
     public function action_search() {
-        $this->searchQuery = trim($_REQUEST['q']);
-		$this->pageTitle = xg_text('NOTES');
-		$this->title = xg_text('SEARCH_RESULTS');
+        $this->searchQuery = Notes_RequestHelper::readString($_REQUEST, 'q');
+                $this->pageTitle = xg_text('NOTES');
+                $this->title = xg_text('SEARCH_RESULTS');
         if ($this->searchQuery && count($this->allNotes = Note::searchNotes($this->searchQuery, self::PAGE_SIZE))) {
             $this->hideSort = true;
             $this->render('listNotes');
@@ -162,17 +174,19 @@ class Notes_IndexController extends W_Controller {
 //** CRUD actions
 	// handler for the "quick post" feature
     public function action_createQuick() { # void
-		$_GET['noteKey'] = $_REQUEST['noteKey'];
-		$this->action_update();
-		unset($this->content, $this->version);
-		if ($this->status == 'ok') {
-			$this->message = xg_html('YOUR_NOTE_WAS_ADDED');
-			$this->viewUrl = Notes_UrlHelper::noteUrl($_GET['noteKey']);
-			$this->viewText = xg_html('VIEW_THIS_NOTE');
-		} elseif ($this->status == 'updated') {
-			// Overwrite this specific message to match the mocks
-			$this->message = xg_html('NOTE_EXISTS2', qh($_GET['noteKey']));
-		}
+                $noteKey = Notes_RequestHelper::readNoteKey($_REQUEST);
+                $_GET['noteKey'] = $noteKey;
+                $_REQUEST['noteKey'] = $noteKey;
+                $this->action_update();
+                unset($this->content, $this->version);
+                if ($this->status == 'ok') {
+                        $this->message = xg_html('YOUR_NOTE_WAS_ADDED');
+                        $this->viewUrl = Notes_UrlHelper::noteUrl($noteKey);
+                        $this->viewText = xg_html('VIEW_THIS_NOTE');
+                } elseif ($this->status == 'updated') {
+                        // Overwrite this specific message to match the mocks
+                        $this->message = xg_html('NOTE_EXISTS2', qh($noteKey));
+                }
     }
 
     /**
@@ -185,24 +199,28 @@ class Notes_IndexController extends W_Controller {
     public function action_edit () {
         XG_SecurityHelper::redirectIfNotAdmin();
 
-        if ($_REQUEST['fromQuickPost']) {
-			$this->noteKey = $_REQUEST['noteKey'];
-			$this->activeTab = 1; // activate the Source tab
-			$defaultContent = "".$_REQUEST['content'];
-		} else {
-			$this->noteKey = $_GET['noteKey'];
-			$this->activeTab = 0;
-			$defaultContent = '';
+        $fromQuickPost = Notes_RequestHelper::readBoolean($_REQUEST, 'fromQuickPost');
+        if ($fromQuickPost) {
+                        $this->noteKey = Notes_RequestHelper::readNoteKey($_REQUEST);
+                        $this->activeTab = 1; // activate the Source tab
+                        $defaultContent = Notes_RequestHelper::readContent($_REQUEST, 'content');
+                } else {
+                        $this->noteKey = Notes_RequestHelper::readNoteKey($_GET);
+                        $this->activeTab = 0;
+                        $defaultContent = '';
 
-		}
+                }
+        $_GET['noteKey'] = $this->noteKey;
+        $_REQUEST['noteKey'] = $this->noteKey;
         if ( mb_strlen($this->noteKey) > Note::MAX_TITLE_LENGTH ) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         $this->isMain = Note::isMain($this->noteKey);
 
-		// If we came from the quick post, pretend that note doesn't exist
-        if ( !$_REQUEST['fromQuickPost'] && ($this->note = Note::byKey($this->noteKey)) ) {
-            if ($_GET['create'] || ! XG_SecurityHelper::userIsAdmin()) {
+                // If we came from the quick post, pretend that note doesn't exist
+        if ( !$fromQuickPost && ($this->note = Note::byKey($this->noteKey)) ) {
+            $createRequested = Notes_RequestHelper::readBoolean($_GET, 'create');
+            if ($createRequested || ! XG_SecurityHelper::userIsAdmin()) {
                 return $this->forwardTo('show');
             }
             $this->title = $this->note->title;
@@ -223,8 +241,10 @@ class Notes_IndexController extends W_Controller {
      *  @param      $noteKey	string 		Note to delete. Empty key is disallowed
      */
     public function action_delete() {
-        if ( XG_SecurityHelper::userIsAdmin() && !Note::isMain($key = $_GET['noteKey']) ) {
-            Note::delete($key);
+        $noteKey = Notes_RequestHelper::readNoteKey($_GET);
+        $_GET['noteKey'] = $noteKey;
+        if ( XG_SecurityHelper::userIsAdmin() && !Note::isMain($noteKey) ) {
+            Note::delete($noteKey);
         }
         return $this->redirectTo(Notes_UrlHelper::noteUrl(''));
     }
@@ -250,16 +270,17 @@ class Notes_IndexController extends W_Controller {
      */
     public function action_update() {
         $this->status = 'fail';
-        if (!isset($_GET['noteKey']) || $_SERVER['REQUEST_METHOD'] != 'POST') {
+        $noteKey = Notes_RequestHelper::readNoteKey($_GET);
+        $_GET['noteKey'] = $noteKey;
+        if ($noteKey === '' || $_SERVER['REQUEST_METHOD'] != 'POST') {
             $this->message = xg_html('BAD_REQUEST');
             return;
         }
-        if (mb_strlen($_GET['noteKey']) > Note::MAX_TITLE_LENGTH ) {
+        if (mb_strlen($noteKey) > Note::MAX_TITLE_LENGTH ) {
             $this->message = xg_html('NOTE_TITLE_TOO_LONG');
             return;
         }
-        $key = $_GET['noteKey'];
-        if ($note = Note::byKey($key)) {
+        if ($note = Note::byKey($noteKey)) {
             if (! XG_SecurityHelper::userIsAdmin()) {
                 $this->message = xg_html('YOU_MUST_BE_ADMIN');
                 return;
@@ -268,9 +289,20 @@ class Notes_IndexController extends W_Controller {
             $this->message = xg_html('YOU_MUST_BE_ADMIN');
             return;
         }
-        $title = Note::isMain($key) ? "".$_POST['title'] : NULL;
+        $title = Note::isMain($noteKey) ? Notes_RequestHelper::readString($_POST, 'title') : NULL;
+        $version = Notes_RequestHelper::readInt($_POST, 'version', 0, 0);
+        $content = Notes_RequestHelper::readContent($_POST, 'content');
+        $featureOnMain = Notes_RequestHelper::readBoolean($_POST, 'featureOnMain');
         W_Cache::getWidget('notes')->includeFileOnce('/lib/helpers/Notes_Scrubber.php');
-		list($status, $note) = Note::update($key, $this->_user->screenName, $_POST['version'], Notes_Scrubber::scrub($_POST['content']), 'E', $title, $_POST['featureOnMain']);
+                list($status, $note) = Note::update(
+            $noteKey,
+            $this->_user->screenName,
+            $version,
+            Notes_Scrubber::scrub($content),
+            'E',
+            $title,
+            $featureOnMain
+        );
         switch($status) {
             case 'ok':
                 $this->status = 'ok';
@@ -289,7 +321,7 @@ class Notes_IndexController extends W_Controller {
                 break;
             case 'deleted':
                 $this->status = 'deleted';
-                $this->message = xg_html('NOTE_HAS_BEEN_DELETED', xnhtmlentities(Note::title($key)));
+                $this->message = xg_html('NOTE_HAS_BEEN_DELETED', xnhtmlentities(Note::title($noteKey)));
                 break;
             case 'device_busy':
             default:
@@ -306,18 +338,23 @@ class Notes_IndexController extends W_Controller {
      *	@param		$featured 	bool		Set/reset fatured flag for the note
      */
     public function action_setFeatured() {
+        $noteKey = Notes_RequestHelper::readNoteKey($_GET);
+        $_GET['noteKey'] = $noteKey;
+        $isFeatured = Notes_RequestHelper::readBoolean($_REQUEST, 'featured');
         if (XG_SecurityHelper::userIsAdmin()) {
-            Note::setFeatured($_GET['noteKey'], $_REQUEST['featured'] ? 1 : 0);
+            Note::setFeatured($noteKey, $isFeatured ? 1 : 0);
         }
-        $this->redirectTo(Notes_UrlHelper::noteUrl($_GET['noteKey']));
+        $this->redirectTo(Notes_UrlHelper::noteUrl($noteKey));
     }
 //** Helpers
     protected function _getSort() { # string
-		return $_GET['sort'] ? $_GET['sort'] : 'updated';
+                return Notes_RequestHelper::normalizeSort(
+            Notes_RequestHelper::readString($_GET, 'sort', '')
+        );
     }
 
-    protected function _getPage() { # string
-        return $_GET['page'] ? $_GET['page'] : 1;
+    protected function _getPage() { # int
+        return Notes_RequestHelper::readInt($_GET, 'page', 1, 1);
     }
 }
 ?>

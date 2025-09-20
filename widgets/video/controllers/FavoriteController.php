@@ -21,44 +21,63 @@ class Video_FavoriteController extends W_Controller {
     public function action_create() {
         try {
             session_start();
-            if ((!$this->_user->isLoggedIn())&&(isset($_GET['after']))) {
-                //the action to take after sign-in/up is stored on a cookie see BAZ-1492
-                $_SESSION[$_GET['after']] = 'favorize_'.$_GET['videoId'];
-                $target = $this->_buildUrl('favorite', 'create', '?videoId=' . $_GET['videoId'].'&after='.$_GET['after']);
+            $target = null;
+            $afterKey = $this->getAfterParam();
+            $queryVideoId = $this->getVideoIdFromQuery();
+            $requestVideoId = $this->getVideoIdFromRequest();
+
+            if (! $this->_user->isLoggedIn() && ($afterKey !== '') && ($queryVideoId !== '')) {
+                $_SESSION[$afterKey] = 'favorize_' . $queryVideoId;
+                $target = $this->_buildUrl('favorite', 'create', '?' . http_build_query(array(
+                    'videoId' => $queryVideoId,
+                    'after' => $afterKey,
+                )));
             }
             XG_SecurityHelper::redirectIfNotMember($target);
             XG_JoinPromptHelper::joinGroupOnSave();
-            $videoId = $_REQUEST['videoId'];
-            $get_allowed = ($_SESSION[$_GET['after']] == 'favorize_'.$videoId);
-            if (($_SERVER['REQUEST_METHOD'] != 'POST')&&(!$get_allowed)) {
-                $this->redirectTo('show', 'video', '?id=' . $_GET['videoId']);  // BAZ-3314 [Jon Aquino 2007-06-07]
+
+            if ($requestVideoId === '') {
+                throw new InvalidArgumentException('Missing videoId parameter.');
+            }
+
+            $getAllowed = ($afterKey !== ''
+                && isset($_SESSION[$afterKey])
+                && $_SESSION[$afterKey] === 'favorize_' . $requestVideoId);
+            if (($_SERVER['REQUEST_METHOD'] !== 'POST') && (! $getAllowed)) {
+                $this->redirectTo('show', 'video', array('id' => $requestVideoId));
                 return;
             }
-            if (Video_UserHelper::hasFavorite($user, $_GET['videoId'])) {
-                if($get_allowed){
-                    unset($_SESSION[$_GET['after']]);
-                    $this->redirectTo('show', 'video', '?id=' . $_GET['videoId']);
+
+            $user = Video_UserHelper::load($this->_user);
+            if (Video_UserHelper::hasFavorite($user, $requestVideoId)) {
+                if ($getAllowed) {
+                    if ($afterKey !== '' && isset($_SESSION[$afterKey])) {
+                        unset($_SESSION[$afterKey]);
+                    }
+                    $this->redirectTo('show', 'video', array('id' => $requestVideoId));
                     return;
-                }else{
-                    return Video_JsonHelper::outputAndExit(array());
                 }
+                Video_JsonHelper::outputAndExit(array());
+                return;
             }
-            $video = Video_ContentHelper::findByID('Video', $_GET['videoId']);
+
+            $video = Video_ContentHelper::findByID('Video', $requestVideoId);
             if ($this->error = Video_SecurityHelper::checkVisibleToCurrentUser($this->_user, $video)) {
                 $this->render('error', 'index');
                 return;
             }
-            $user = Video_UserHelper::load($this->_user);
             Video_UserHelper::addFavorite($user, $video->id);
             $user->save();
             $video->my->favoritedCount = $video->my->favoritedCount + 1;
             $video->addFavoriter($this->_user->screenName);
             $video->save();
-            if($get_allowed){
-                unset($_SESSION[$_GET['after']]);
-                $this->redirectTo('show', 'video', '?id=' . $_GET['videoId']);
-            }else{
-                Video_JsonHelper::outputAndExit(array(html => xg_html('FAVORITE_OF_N_PEOPLE', $video->my->favoritedCount)));
+            if ($getAllowed) {
+                if ($afterKey !== '' && isset($_SESSION[$afterKey])) {
+                    unset($_SESSION[$afterKey]);
+                }
+                $this->redirectTo('show', 'video', array('id' => $requestVideoId));
+            } else {
+                Video_JsonHelper::outputAndExit(array('html' => xg_html('FAVORITE_OF_N_PEOPLE', $video->my->favoritedCount)));
             }
         } catch (Exception $e) {
             Video_JsonHelper::handleExceptionInAjaxCall($e);
@@ -73,22 +92,53 @@ class Video_FavoriteController extends W_Controller {
                 $this->render('error', 'index');
                 return;
             }
-            $user = Video_UserHelper::load($this->_user);
-            if (! Video_UserHelper::hasFavorite($user, $_GET['videoId'])) {
-                return Video_JsonHelper::outputAndExit(array());
+            $videoId = $this->getVideoIdFromQuery();
+            if ($videoId === '') {
+                throw new InvalidArgumentException('Missing videoId parameter.');
             }
-            $video = Video_ContentHelper::findByID('Video', $_GET['videoId']);
+            $user = Video_UserHelper::load($this->_user);
+            if (! Video_UserHelper::hasFavorite($user, $videoId)) {
+                Video_JsonHelper::outputAndExit(array());
+                return;
+            }
+            $video = Video_ContentHelper::findByID('Video', $videoId);
             Video_UserHelper::removeFavorite($user, $video->id);
             $user->save();
             $video->my->favoritedCount = ($video->my->favoritedCount > 0 ? $video->my->favoritedCount - 1 : 0);
             $video->removeFavoriter($this->_user->screenName);
             $video->save();
-            Video_JsonHelper::outputAndExit(array(html => $video->my->favoritedCount ? xg_html('FAVORITE_OF_N_PEOPLE', $video->my->favoritedCount) : ''));
+            Video_JsonHelper::outputAndExit(array('html' => $video->my->favoritedCount ? xg_html('FAVORITE_OF_N_PEOPLE', $video->my->favoritedCount) : ''));
         } catch (Exception $e) {
             Video_JsonHelper::handleExceptionInAjaxCall($e);
         }
     }
 
+    private function getAfterParam(): string {
+        if (! array_key_exists('after', $_GET)) { return ''; }
+        $value = trim((string) $_GET['after']);
+        if ($value === '') { return ''; }
+        $value = mb_substr($value, 0, 128);
+        return preg_replace('/[^A-Za-z0-9_.:-]/u', '', $value);
+    }
 
+    private function getVideoIdFromQuery(): string {
+        if (! array_key_exists('videoId', $_GET)) { return ''; }
+        return $this->sanitizeId($_GET['videoId']);
+    }
 
+    private function getVideoIdFromRequest(): string {
+        if (array_key_exists('videoId', $_POST)) {
+            return $this->sanitizeId($_POST['videoId']);
+        }
+        if (array_key_exists('videoId', $_GET)) {
+            return $this->sanitizeId($_GET['videoId']);
+        }
+        return '';
+    }
+
+    private function sanitizeId($value): string {
+        $value = trim((string) $value);
+        if ($value === '') { return ''; }
+        return mb_substr($value, 0, 64);
+    }
 }

@@ -44,7 +44,6 @@ class Forum_BulkHelper {
             }
         }
         if ($changed < $limit) {
-            $topicId = $topic->id; //TODO: unused?
             $categoryId = $topic->my->categoryId;
             Forum_FileHelper::deleteAttachments($topic);
             XN_Content::delete(W_Content::unwrap($topic));
@@ -75,7 +74,7 @@ class Forum_BulkHelper {
         $query->filter('type', '=', 'Topic');
         if (defined('UNIT_TESTING')) { $query->filter('my->test', '=', 'Y'); }
         if ($groupId) { $query->filter('my->groupId', '=', $groupId); }
-        $query->begin($begin);
+        $query->begin(0);
         $query->end($limit - $changed);
         foreach ($query->execute() as $topic) {
             if ($changed < $limit) {
@@ -109,7 +108,7 @@ class Forum_BulkHelper {
         $query->filter('contributorName', '=', $user);
         if (defined('UNIT_TESTING')) { $query->filter('my->test', '=', 'Y'); }
         if ($groupId) { $query->filter('my->groupId', '=', $groupId); }
-        $query->begin($begin);
+        $query->begin(0);
         $query->end($limit - $changed);
         $idsOfTopicsToUpdate = array();
         foreach ($query->execute() as $object) {
@@ -157,7 +156,7 @@ class Forum_BulkHelper {
                 $comment->my->raw(XG_App::widgetAttributeName($widget, 'commentTimestamps')));
         $query->filter('my->' . XG_App::widgetAttributeName($widget, 'commentTimestamps'), '>=',
                 str_replace(' X', '', $comment->my->raw(XG_App::widgetAttributeName($widget, 'commentTimestamps'))));
-        $query->begin($begin);
+        $query->begin(0);
         $query->end($limit - $changed);
         $contributorNames = array();
         foreach ($query->execute() as $c) {

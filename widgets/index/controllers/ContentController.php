@@ -1,4 +1,5 @@
 <?php
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 
 /**
  * The methods in this controller provide wrappers for content/profile
@@ -96,17 +97,24 @@ class Index_ContentController extends W_Controller {
 
 
         //  Check for an explicit success target (e.g. launch)
-        if (isset($_POST['successTarget']) && mb_strlen($_POST['successTarget'])) {
-            header('Location: ' . $_POST['successTarget']);
+        $successTarget = null;
+        if (isset($_POST['successTarget']) && ! is_array($_POST['successTarget'])) {
+            $successTarget = XG_HttpHelper::normalizeRedirectTarget($_POST['successTarget']);
+        }
+        if ($successTarget !== null) {
+            header('Location: ' . $successTarget);
             exit;
         }
-        // Check for a joinTarget (for the join-the-app flow)
-        else if (isset($_POST['joinTarget']) && mb_strlen($_POST['joinTarget'])) {
-            // After adding content, visit the invite page (BAZ-947)
-            $this->redirectTo('invite','index', array('joinTarget' => $_POST['joinTarget']));
-            return;
+
+        $joinTarget = null;
+        if (isset($_POST['joinTarget']) && ! is_array($_POST['joinTarget'])) {
+            $joinTarget = XG_HttpHelper::normalizeRedirectTarget($_POST['joinTarget']);
         }
-        else {
+        if ($joinTarget !== null) {
+            // After adding content, visit the invite page (BAZ-947)
+            $this->redirectTo('invite','index', array('joinTarget' => $joinTarget));
+            return;
+        } else {
             if (is_null($nextStep)) {
                 //  We're editing post-sequence - redisplay the form
                 $this->redirectTo('content','content',array('saved' => 1));

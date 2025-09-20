@@ -35,7 +35,12 @@ class Forum_AttachmentController extends XG_GroupEnabledController {
         if (! Forum_SecurityHelper::currentUserCanDeleteAttachments($attachedTo)) { throw new Exception('Not allowed'); }
         Forum_FileHelper::deleteAttachment($attachment, $attachedTo);
         $attachedTo->save();
-        header('Location: ' . 'http://' . $_SERVER['HTTP_HOST'] . '/xn/detail/' . urlencode($_GET['attachedTo']));
+        header('Location: ' . $this->buildAttachedContentUrl($attachedTo));
+    }
+
+    private function buildAttachedContentUrl(XN_Content $attachedTo): string
+    {
+        return xg_absolute_url('/xn/detail/' . rawurlencode($attachedTo->id));
     }
 
 }

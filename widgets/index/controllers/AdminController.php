@@ -1,5 +1,6 @@
 <?php
 XG_App::includeFileOnce('/lib/XG_Layout.php');
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 
 class Index_AdminController extends W_Controller {
 
@@ -174,10 +175,11 @@ class Index_AdminController extends W_Controller {
 		}
 
         //  Check for an explicit success target (e.g. launch)
-        if (isset($_POST['successTarget']) && mb_strlen($_POST['successTarget']) > 0) {
-            $successTarget = $_POST['successTarget'];
+        $successTarget = null;
+        if (isset($_POST['successTarget']) && ! is_array($_POST['successTarget'])) {
+            $successTarget = XG_HttpHelper::normalizeRedirectTarget($_POST['successTarget']);
         }
-        else {
+        if ($successTarget === null) {
             if (XG_App::appIsLaunched()) {
                 //  We're editing post-sequence - redisplay the form
                 $successTarget = W_Cache::getWidget('main')->buildUrl('admin', 'appProfile', array('saved'=>1));

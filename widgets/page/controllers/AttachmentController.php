@@ -1,4 +1,5 @@
 <?php
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 
 /**
  * Dispatches requests pertaining to file attachments.
@@ -41,7 +42,31 @@ class Page_AttachmentController extends W_Controller {
         if (! Page_SecurityHelper::currentUserCanDeleteAttachments($attachedTo)) { throw new Exception('Not allowed'); }
         Page_FileHelper::deleteAttachment($attachment, $attachedTo);
         $attachedTo->save();
-        header('Location: ' . $_GET['target']);
+
+        $redirectTarget = $this->getSanitizedRedirectTarget();
+        if ($redirectTarget === null) {
+            $redirectTarget = $this->buildAttachmentRedirect($attachedTo);
+        }
+
+        header('Location: ' . $redirectTarget);
+    }
+
+    private function getSanitizedRedirectTarget(): ?string
+    {
+        if (! isset($_GET['target']) || is_array($_GET['target'])) {
+            return null;
+        }
+
+        return XG_HttpHelper::normalizeRedirectTarget($_GET['target']);
+    }
+
+    private function buildAttachmentRedirect(XN_Content $attachedTo): string
+    {
+        if ($attachedTo->type === 'Page') {
+            return W_Cache::current('W_Widget')->buildUrl('page', 'show', array('id' => $attachedTo->id));
+        }
+
+        return W_Cache::current('W_Widget')->buildUrl('page', 'show', array('id' => $attachedTo->my->attachedTo));
     }
 
 }

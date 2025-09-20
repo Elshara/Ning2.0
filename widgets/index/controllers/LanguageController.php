@@ -1,5 +1,7 @@
 <?php
 
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
+
 /**
  * Dispatches requests pertaining to translations and I18N.
  */
@@ -269,8 +271,10 @@ class Index_LanguageController extends W_Controller {
      */
     public function action_delete() {
         XG_SecurityHelper::redirectIfNotAdmin();
+        $target = $this->getRedirectTargetFromGet();
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: ' . $_GET['target']);
+            header('Location: ' . $target);
+            return;
         }
     // @todo unlink only if the file exists [ywh 2008-05-02]
     // create new lang, back to lang editor, delete
@@ -282,7 +286,7 @@ class Index_LanguageController extends W_Controller {
         } elseif ($_GET['locale'] == XG_LOCALE) {
             XG_LanguageHelper::updateLocaleConfig();
         }
-        header('Location: ' . XG_HttpHelper::addParameter($_GET['target'], 'localeDeleted', 1));
+        header('Location: ' . XG_HttpHelper::addParameter($target, 'localeDeleted', 1));
     }
 
     /**
@@ -296,7 +300,7 @@ class Index_LanguageController extends W_Controller {
     public function action_new($error = null) {
         XG_SecurityHelper::redirectIfNotAdmin();
         $this->_widget->includeFileOnce('/lib/helpers/Index_LanguageHelper.php');
-        $this->form = new XNC_Form(array('target' => $_GET['target'], 'baseLocale' => 'en_US'));
+        $this->form = new XNC_Form(array('target' => $this->getRedirectTargetFromGet(), 'baseLocale' => 'en_US'));
         $this->error = $error;
     }
 
@@ -335,6 +339,20 @@ class Index_LanguageController extends W_Controller {
             $this->redirectTo('edit', 'language', array('locale' => $locale));
             return;
         }
+    }
+
+    private function getRedirectTargetFromGet($key = 'target', $default = '/')
+    {
+        if (! isset($_GET[$key]) || is_array($_GET[$key])) {
+            return $default;
+        }
+
+        $normalized = XG_HttpHelper::normalizeRedirectTarget($_GET[$key]);
+        if ($normalized === null) {
+            return $default;
+        }
+
+        return $normalized;
     }
 
 }
