@@ -9,13 +9,20 @@ class Forum_CommentController extends XG_GroupEnabledController {
     * A single page with a form to reply to a topic (used on the mobile version)
     */
     public function action_new_iphone() {
+        $this->loadRequestHelper();
         XG_App::includeFileOnce('/lib/XG_TagHelper.php');
-        $topic = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($_GET['topicId']));
-        if ($_GET['parentCommentId']) {
-            $parentComment = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($_GET['parentCommentId']));
+
+        $topicId = Forum_RequestHelper::readTopicId($_GET);
+        if ($topicId === null) { throw new InvalidArgumentException('Missing topic identifier (1354381586)'); }
+
+        $topic = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($topicId));
+        $parentCommentId = Forum_RequestHelper::readCommentId($_GET, 'parentCommentId');
+        if ($parentCommentId !== null) {
+            $parentComment = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($parentCommentId));
             if ($parentComment->type != 'Comment') { throw new Exception('Not a Comment (555433787)'); }
             $this->parentComment = $parentComment;
         }
+
         $this->title = xg_text('REPLY_TO_TOPIC_X', $topic->title);
         $this->topic = $topic;
         $this->tags = XG_TagHelper::getTagNamesForObject($this->topic);
@@ -43,30 +50,40 @@ class Forum_CommentController extends XG_GroupEnabledController {
         $this->_widget->includeFileOnce('/lib/helpers/Forum_FileHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Forum_CommentHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Forum_UserHelper.php');
+        $this->loadRequestHelper();
         if ($_SERVER['REQUEST_METHOD'] != 'POST') { throw new Exception('Not a POST (500675993)'); }
         XG_HttpHelper::trimGetAndPostValues();
-        $topic = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($_GET['topicId']));
+
+        $topicId = Forum_RequestHelper::readTopicId($_GET);
+        if ($topicId === null) { throw new InvalidArgumentException('Missing topic identifier (1793858248)'); }
+        $topic = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($topicId));
         if ($topic->type != 'Topic') { throw new Exception('Not a Topic'); }
+
+        $outputFormat = Forum_RequestHelper::wantsJson($_GET) ? 'json' : 'html';
         if ($topic->my->commentsClosed == 'Y') {
-            if ($_GET['xn_out'] == 'json') {
+            if ($outputFormat === 'json') {
                 $this->commentsClosed = true;
             } else {
-                $this->redirectTo('show', 'topic', array('id' => $_GET['topicId'], 'repliedToClosedDiscussion' => 1));
+                $this->redirectTo('show', 'topic', array('id' => $topicId, 'repliedToClosedDiscussion' => 1));
             }
             return;
         }
         if (! Forum_SecurityHelper::currentUserCanAddComment($topic)) { throw new Exception('Not allowed (122304363)'); }
+
         $parentComment = null;
-        if ($_GET['parentCommentId']) {
-            $parentComment = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($_GET['parentCommentId']));
+        $parentCommentId = Forum_RequestHelper::readCommentId($_GET, 'parentCommentId');
+        if ($parentCommentId !== null) {
+            $parentComment = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($parentCommentId));
             if ($parentComment->type != 'Comment') { throw new Exception('Not a Comment (555433787)'); }
         }
-        if (! $_POST['description']) {
-            $this->redirectTo('show', 'topic', array('id' => $_GET['topicId']));
+
+        $description = Forum_RequestHelper::readContent($_POST, 'description');
+        if ($description === '') {
+            $this->redirectTo('show', 'topic', array('id' => $topicId));
             return;
         }
 
-        $comment = Forum_CommentHelper::createComment($topic, Forum_CommentHelper::cleanDescription($_POST['description']), $parentComment);
+        $comment = Forum_CommentHelper::createComment($topic, Forum_CommentHelper::cleanDescription($description), $parentComment);
         if (XG_GroupHelper::inGroupContext()) {
             $group = XG_GroupHelper::currentGroup();
             Group::updateActivityScore($group,GROUP::ACTIVITY_SCORE_FORUM_COMMENT);
@@ -95,11 +112,19 @@ class Forum_CommentController extends XG_GroupEnabledController {
 		XG_Browser::execInEmailContext(array($this,'_sendCommentNotification'), $topic, $comment);
         XG_App::includeFileOnce('/lib/XG_ActivityHelper.php');
         XG_ActivityHelper::logActivityIfEnabled(XG_ActivityHelper::CATEGORY_NEW_COMMENT, XG_ActivityHelper::SUBCATEGORY_TOPIC, $comment->contributorName, array($comment));
-        if ($_GET['xn_out'] == 'json') {
+        $firstPage = Forum_RequestHelper::readBoolean($_GET, 'firstPage');
+        $lastPage = Forum_RequestHelper::readBoolean($_GET, 'lastPage');
+
+        if ($outputFormat === 'json') {
             // Workaround for BAZ-1366 [Jon Aquino 2007-02-01]
             $_REQUEST['dojo_transport'] = '';
             // Provide the HTML in a separate request, as the IFrameTransport in IE has problems with returned HTML [Jon Aquino 2007-01-30]
-            $this->commentHtmlUrl = $this->_buildUrl('comment', 'show', array('id' => $comment->id, 'xn_out' => 'json', 'firstPage' => $_GET['firstPage'], 'lastPage' => $_GET['lastPage']));
+            $this->commentHtmlUrl = $this->_buildUrl('comment', 'show', array(
+                'id' => $comment->id,
+                'xn_out' => 'json',
+                'firstPage' => $firstPage ? 1 : 0,
+                'lastPage' => $lastPage ? 1 : 0,
+            ));
             return;
         }
         header('Location: ' . Forum_CommentHelper::url($comment));
@@ -135,13 +160,19 @@ class Forum_CommentController extends XG_GroupEnabledController {
      *     lastPage - 1 if we are on the last page; otherwise, 0
      */
     public function action_create_iphone() {
-        if ($_GET['parentCommentId']) {
-            $parentComment = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($_GET['parentCommentId']));
+        $this->loadRequestHelper();
+        $parentCommentId = Forum_RequestHelper::readCommentId($_GET, 'parentCommentId');
+        $description = Forum_RequestHelper::readContent($_POST, 'description');
+        if ($parentCommentId !== null) {
+            $parentComment = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($parentCommentId));
             if ($parentComment->type != 'Comment') { throw new Exception('Not a Comment (555433787)'); }
-            if ($this->_widget->config['threadingModel'] != 'threaded' && $_POST['description']) {
-                $_POST['description'] .= '<br/><br/><cite>'. xg_html('X_SAID_COLON', xnhtmlentities(xg_username($parentComment->contributorName))) .'</cite><blockquote><div>'. $parentComment->description .'</div></blockquote>';
+            if ($this->_widget->config['threadingModel'] != 'threaded' && $description !== '') {
+                $description .= '<br/><br/><cite>' . xg_html('X_SAID_COLON', xnhtmlentities(xg_username($parentComment->contributorName)))
+                    . '</cite><blockquote><div>' . $parentComment->description . '</div></blockquote>';
             }
         }
+
+        $_POST['description'] = $description;
         $this->action_create();
     }
 
@@ -155,20 +186,36 @@ class Forum_CommentController extends XG_GroupEnabledController {
      *     lastPage - 1 if we are on the last page; otherwise, 0
      */
     public function action_show() {
+        $this->loadRequestHelper();
         $this->_widget->includeFileOnce('/lib/helpers/Forum_FileHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Forum_HtmlHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Forum_SecurityHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Forum_CommentHelper.php');
         $threadingModel = $this->_widget->config['threadingModel'];
-        $comment = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($_GET['id']));
+        $commentId = Forum_RequestHelper::readCommentId($_GET, 'id');
+        if ($commentId === null) { throw new InvalidArgumentException('Missing comment identifier (885234436)'); }
+        $comment = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($commentId));
         if ($comment->type != 'Comment') { throw new Exception('Not a Comment'); }
         $topic = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($comment->my->attachedTo));
         if ($topic->type != 'Topic') { throw new Exception('Not a Topic'); }
+        $firstPage = Forum_RequestHelper::readBoolean($_GET, 'firstPage');
+        $lastPage = Forum_RequestHelper::readBoolean($_GET, 'lastPage');
         ob_start();
-        $this->renderPartial('fragment_comment', 'topic', array('topic' => $topic, 'comment' => $comment, 'firstPage' => $_GET['firstPage'], 'lastPage' => $_GET['lastPage'], 'threaded' => $threadingModel == 'threaded'));
+        $this->renderPartial('fragment_comment', 'topic', array(
+            'topic' => $topic,
+            'comment' => $comment,
+            'firstPage' => $firstPage,
+            'lastPage' => $lastPage,
+            'threaded' => $threadingModel == 'threaded',
+        ));
         $this->html = trim(ob_get_contents());
         ob_end_clean();
-        $this->positionOfNewComment = Forum_CommentHelper::positionOfNewComment(Forum_CommentHelper::getAncestorCommentCount($comment), $_GET['firstPage'], $_GET['lastPage'], Forum_CommentHelper::newestPostsFirst());
+        $this->positionOfNewComment = Forum_CommentHelper::positionOfNewComment(
+            Forum_CommentHelper::getAncestorCommentCount($comment),
+            $firstPage,
+            $lastPage,
+            Forum_CommentHelper::newestPostsFirst()
+        );
     }
 
     /**
@@ -178,7 +225,8 @@ class Forum_CommentController extends XG_GroupEnabledController {
      *     topicId - ID of the Topic object
      */
     public function action_showDeleted() {
-        $this->topicId = $_GET['topicId'];
+        $this->loadRequestHelper();
+        $this->topicId = Forum_RequestHelper::readTopicId($_GET) ?? '';
     }
 
     /**
@@ -196,12 +244,16 @@ class Forum_CommentController extends XG_GroupEnabledController {
         $this->_widget->includeFileOnce('/lib/helpers/Forum_SecurityHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Forum_HtmlHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Forum_CommentHelper.php');
+        $this->loadRequestHelper();
         if ($_SERVER['REQUEST_METHOD'] != 'POST') { throw new Exception('Not a POST'); }
         XG_HttpHelper::trimGetAndPostValues();
-        $comment = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($_GET['id']));
+        $commentId = Forum_RequestHelper::readCommentId($_GET, 'id');
+        if ($commentId === null) { throw new InvalidArgumentException('Missing comment identifier (1273423653)'); }
+        $comment = XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($commentId));
         if ($comment->type != 'Comment') { throw new Exception('Not a Comment'); }
         if (! Forum_SecurityHelper::currentUserCanEditComment($comment)) { throw new Exception('Not allowed'); }
-        $description = Forum_CommentHelper::cleanDescription($_POST['value']);
+        $rawValue = Forum_RequestHelper::readContent($_POST, 'value');
+        $description = Forum_CommentHelper::cleanDescription($rawValue);
         if ($description != xg_text('NO_DESCRIPTION')) {
             $comment->description = $description;
             $comment->save();
@@ -227,9 +279,12 @@ class Forum_CommentController extends XG_GroupEnabledController {
         $this->_widget->includeFileOnce('/lib/helpers/Forum_FileHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Forum_UserHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Forum_CommentHelper.php');
+        $this->loadRequestHelper();
         if ($_SERVER['REQUEST_METHOD'] != 'POST') { throw new Exception('Not a POST'); }
         $threadingModel = $this->_widget->config['threadingModel'];
-        $comment = XG_GroupHelper::checkCurrentUserCanAccess(XN_Content::load($_GET['id']));
+        $commentId = Forum_RequestHelper::readCommentId($_GET, 'id');
+        if ($commentId === null) { throw new InvalidArgumentException('Missing comment identifier (1798291086)'); }
+        $comment = XG_GroupHelper::checkCurrentUserCanAccess(XN_Content::load($commentId));
         if ($comment->type != 'Comment') { throw new Exception('Not a Comment'); }
         if (! Forum_SecurityHelper::currentUserCanDeleteComment($comment)) { throw new Exception('Not allowed'); }
         $targetUrl = Forum_CommentHelper::url($comment);
@@ -240,12 +295,25 @@ class Forum_CommentController extends XG_GroupEnabledController {
         Forum_UserHelper::updateActivityCount(User::load($this->_user));
         // Empty string rather than null, as DeleteCommentLink checks for the presence of the html property [Jon Aquino 2007-04-03]
         $this->html = '';
+        $firstPage = Forum_RequestHelper::readBoolean($_GET, 'firstPage');
+        $lastPage = Forum_RequestHelper::readBoolean($_GET, 'lastPage');
         if (! $actuallyDeleted) {
             ob_start();
-            $this->renderPartial('fragment_comment', 'topic', array('topic' => XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($topicId)), 'comment' => $comment, 'firstPage' => $_GET['firstPage'], 'lastPage' => $_GET['lastPage'], 'threaded' => $threadingModel == 'threaded' ));
+            $this->renderPartial('fragment_comment', 'topic', array(
+                'topic' => XG_GroupHelper::checkCurrentUserCanAccess(W_Content::load($topicId)),
+                'comment' => $comment,
+                'firstPage' => $firstPage,
+                'lastPage' => $lastPage,
+                'threaded' => $threadingModel == 'threaded',
+            ));
             $this->html = trim(ob_get_contents());
             ob_end_clean();
         }
+    }
+
+    private function loadRequestHelper(): void
+    {
+        $this->_widget->includeFileOnce('/lib/helpers/Forum_RequestHelper.php');
     }
 
 }
