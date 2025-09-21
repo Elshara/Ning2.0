@@ -21,6 +21,7 @@ jobs:
         run: |
           set -euo pipefail
 
+          keep_patterns=$'CodeQL\nPHP Mess Detector\nPHPMD\nPsalm\nOSV'
           keep_tools=$'CodeQL\nPHPMD\nPsalm Security Scan\nOSV-Scanner'
 
           echo "Fetching open code scanning alerts for $REPO"
@@ -65,6 +66,20 @@ jobs:
               number=$(echo "$alert_json" | jq -r '.number')
               tool=$(echo "$alert_json" | jq -r '.tool.name')
 
+              tool_match=false
+              tool_lc=$(echo "$tool" | tr '[:upper:]' '[:lower:]')
+
+              while IFS= read -r pattern; do
+                [ -z "$pattern" ] && continue
+                pattern_lc=$(echo "$pattern" | tr '[:upper:]' '[:lower:]')
+
+                if printf '%s' "$tool_lc" | grep -Fq "$pattern_lc"; then
+                  tool_match=true
+                  break
+                fi
+              done <<< "$keep_patterns"
+
+              if [ "$tool_match" = true ]; then
               if printf '%s\n' "$keep_tools" | grep -Fxq "$tool"; then
                 echo "Keeping alert #$number reported by \"$tool\""
                 continue
