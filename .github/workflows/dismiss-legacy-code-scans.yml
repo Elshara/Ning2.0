@@ -64,6 +64,7 @@ jobs:
 
           default_branch=${DEFAULT_BRANCH:-master}
           default_branch_ref="refs/heads/${default_branch}"
+          keep_tools=$'CodeQL\nPHPMD\nPsalm Security Scan\nOSV-Scanner'
 
           echo "Fetching open code scanning alerts for $REPO"
           page=1
@@ -156,6 +157,14 @@ jobs:
               fi
 
               payload=$(jq -n --arg comment "$comment" --arg reason "$dismiss_reason" '{state:"dismissed","dismissed_reason":$reason,"dismissed_comment":$comment}')
+              if [ "$tool_match" = true ]; then
+              if printf '%s\n' "$keep_tools" | grep -Fxq "$tool"; then
+                echo "Keeping alert #$number reported by \"$tool\""
+                continue
+              fi
+
+              comment="Alert automatically dismissed because the $tool scanner is no longer part of this repository's workflow."
+              payload=$(jq -n --arg comment "$comment" '{state:"dismissed","dismissed_reason":"false positive","dismissed_comment":$comment}')
 
               echo "Dismissing alert #$number from tool \"$tool\""
               patch_file="$(mktemp)"
