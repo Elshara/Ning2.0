@@ -1,0 +1,190 @@
+name: Dismiss legacy code scanning alerts
+
+on:
+  workflow_dispatch:
+    inputs:
+      outdated_after_days:
+        description: 'Dismiss alerts last detected before this many days ago (0 to disable)'
+        required: false
+        default: '0'
+      dismiss_non_default_branch_alerts:
+        description: 'Dismiss alerts whose latest occurrence is not on the default branch'
+        required: false
+        default: 'true'
+  push:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dismiss:
+    name: Close alerts from removed scanners
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dismiss retired scanner alerts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          OUTDATED_AFTER_DAYS: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.outdated_after_days || '0' }}
+          DISMISS_NON_DEFAULT_BRANCH_ALERTS: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dismiss_non_default_branch_alerts || 'true' }}
+          DEFAULT_BRANCH: master
+        run: |
+          set -euo pipefail
+
+          keep_patterns=$'CodeQL\nPHP Mess Detector\nPHPMD\nPsalm\nOSV'
+
+          outdated_after_days=${OUTDATED_AFTER_DAYS:-0}
+          case "$outdated_after_days" in
+            ''|*[!0-9]*)
+              echo "Ignoring non-numeric OUTDATED_AFTER_DAYS value: $outdated_after_days"
+              outdated_after_days=0
+              ;;
+          esac
+
+          cutoff_ts=0
+          cutoff_date=""
+          if [ "$outdated_after_days" -gt 0 ]; then
+            cutoff_ts=$(date -u -d "-$outdated_after_days days" +%s)
+            cutoff_date=$(date -u -d "@${cutoff_ts}" '+%Y-%m-%d')
+            echo "Alerts last detected before ${cutoff_date} UTC will be dismissed."
+          fi
+
+          dismiss_branch_setting=${DISMISS_NON_DEFAULT_BRANCH_ALERTS:-true}
+          dismiss_branch_setting_lc=$(printf '%s' "$dismiss_branch_setting" | tr '[:upper:]' '[:lower:]')
+          case "$dismiss_branch_setting_lc" in
+            1|true|yes)
+              dismiss_non_default_branch_alerts=true
+              ;;
+            *)
+              dismiss_non_default_branch_alerts=false
+              ;;
+          esac
+
+          default_branch=${DEFAULT_BRANCH:-master}
+          default_branch_ref="refs/heads/${default_branch}"
+
+          echo "Fetching open code scanning alerts for $REPO"
+          page=1
+          dismissed_any=false
+
+          while true; do
+            response_file="$(mktemp)"
+            status=$(curl \
+              --silent \
+              --show-error \
+              --location \
+              --write-out '%{http_code}' \
+              --output "$response_file" \
+              --header 'Accept: application/vnd.github+json' \
+              --header "Authorization: Bearer $GITHUB_TOKEN" \
+              "https://api.github.com/repos/$REPO/code-scanning/alerts?state=open&per_page=100&page=${page}")
+
+            response=$(cat "$response_file")
+            rm -f "$response_file"
+
+            if [ "$status" -ge 400 ]; then
+              echo "GitHub API returned status $status when fetching alerts"
+              echo "$response"
+              exit 1
+            fi
+
+            count=$(echo "$response" | jq 'length')
+            if [ "$count" -eq 0 ]; then
+              if [ "$page" -eq 1 ] && [ "$dismissed_any" = false ]; then
+                echo "No open alerts to dismiss."
+              fi
+              break
+            fi
+
+            while IFS= read -r alert; do
+              if [ -z "$alert" ]; then
+                continue
+              fi
+
+              alert_json=$(echo "$alert" | base64 --decode)
+              number=$(echo "$alert_json" | jq -r '.number')
+              tool=$(echo "$alert_json" | jq -r '.tool.name')
+              most_recent_ref=$(echo "$alert_json" | jq -r '.most_recent_instance.ref // empty')
+              last_detected=$(echo "$alert_json" | jq -r '.last_detected_at // empty')
+
+              tool_match=false
+              tool_lc=$(echo "$tool" | tr '[:upper:]' '[:lower:]')
+
+              while IFS= read -r pattern; do
+                [ -z "$pattern" ] && continue
+                pattern_lc=$(echo "$pattern" | tr '[:upper:]' '[:lower:]')
+
+                if printf '%s' "$tool_lc" | grep -Fq "$pattern_lc"; then
+                  tool_match=true
+                  break
+                fi
+              done <<< "$keep_patterns"
+
+              dismiss_alert=false
+              dismiss_reason=""
+              comment=""
+
+              if [ "$tool_match" = false ]; then
+                dismiss_alert=true
+                dismiss_reason="false positive"
+                comment="Alert automatically dismissed because the $tool scanner is no longer part of this repository's workflow."
+              else
+                if [ "$dismiss_alert" = false ] && [ "$dismiss_non_default_branch_alerts" = true ] && [ -n "$most_recent_ref" ] && [ "$most_recent_ref" != "$default_branch_ref" ]; then
+                  dismiss_alert=true
+                  dismiss_reason="won't fix"
+                  comment="Alert automatically dismissed because its most recent occurrence was on $most_recent_ref rather than $default_branch_ref."
+                fi
+
+                if [ "$dismiss_alert" = false ] && [ "$outdated_after_days" -gt 0 ] && [ -n "$last_detected" ]; then
+                  if detected_ts=$(date -u -d "$last_detected" +%s 2>/dev/null); then
+                    if [ "$detected_ts" -lt "$cutoff_ts" ]; then
+                      dismiss_alert=true
+                      dismiss_reason="won't fix"
+                      comment="Alert automatically dismissed because it has not been detected since $last_detected, exceeding the ${outdated_after_days}-day threshold."
+                    fi
+                  else
+                    echo "Unable to parse last_detected_at value '$last_detected' for alert #$number" >&2
+                  fi
+                fi
+
+                if [ "$dismiss_alert" = false ]; then
+                  echo "Keeping alert #$number reported by \"$tool\""
+                  continue
+                fi
+              fi
+
+              payload=$(jq -n --arg comment "$comment" --arg reason "$dismiss_reason" '{state:"dismissed","dismissed_reason":$reason,"dismissed_comment":$comment}')
+
+              echo "Dismissing alert #$number from tool \"$tool\""
+              patch_file="$(mktemp)"
+              patch_status=$(curl \
+                --silent \
+                --show-error \
+                --location \
+                --request PATCH \
+                --write-out '%{http_code}' \
+                --output "$patch_file" \
+                --header 'Accept: application/vnd.github+json' \
+                --header "Authorization: Bearer $GITHUB_TOKEN" \
+                --data "$payload" \
+                "https://api.github.com/repos/$REPO/code-scanning/alerts/$number")
+
+              if [ "$patch_status" -ge 300 ]; then
+                echo "Failed to dismiss alert #$number from tool $tool (HTTP $patch_status)"
+                cat "$patch_file"
+                rm -f "$patch_file"
+                exit 1
+              fi
+
+              rm -f "$patch_file"
+              dismissed_any=true
+            done < <(echo "$response" | jq -rc '.[] | @base64')
+
+            page=$((page + 1))
+          done
+
+          if [ "$dismissed_any" = true ]; then
+            echo "Finished dismissing legacy scanner alerts."
+          fi
