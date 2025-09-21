@@ -803,7 +803,22 @@ if(typeof window == 'undefined'){
 				if((sp[0].length > 9)&&(sp[0].substr(0, 9) == "djConfig.")){
 					var opt = sp[0].substr(9);
 					try{
-						djConfig[opt]=eval(sp[1]);
+						// Securely parse sp[1] to allow booleans, numbers, JSON, or fallback to string
+						var val = sp[1];
+						if (val === "true") {
+							djConfig[opt] = true;
+						} else if (val === "false") {
+							djConfig[opt] = false;
+						} else if (!isNaN(val) && val.trim() !== "") {
+							djConfig[opt] = Number(val);
+						} else {
+							// Try JSON parse for objects/arrays, fallback to string
+							try {
+								djConfig[opt] = JSON.parse(val);
+							} catch (jsonErr) {
+								djConfig[opt] = val;
+							}
+						}
 					}catch(e){
 						djConfig[opt]=sp[1];
 					}
