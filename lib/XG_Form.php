@@ -125,6 +125,23 @@ class XG_Form {
             $attributes .= ' ' . $htmlAttributes;
         }
 
+        $isList = ( $first == 0 && $last == count($values)-1 );
+        $value = $this->_values[$name] ?? null;
+        foreach ($values as $k=>$v) {
+            if ($isList) {
+                $k = $v;
+            }
+            $optionValue = xg_xmlentities((string) $k);
+            $optionLabel = xg_xmlentities((string) $v);
+            $isSelected = ((string) $k === (string) $value) ? ' selected="selected"' : '';
+            $options .= '<option value="' . $optionValue . '"' . $isSelected . '>' . $optionLabel . '</option>';
+        }
+
+        $htmlAttributes = trim((string) $html);
+        if ($htmlAttributes !== '') {
+            $attributes .= ' ' . $htmlAttributes;
+        }
+
         return '<select' . $attributes . '>' . $options . '</select>';
     }
 
@@ -151,6 +168,10 @@ class XG_Form {
         $res = '';
         if (FALSE !== mb_stripos($fields, 'm')) {
             $res .= $this->select($name . 'M', XG_DateHelper::monthsShort(), $required, $html);
+        }
+        if (FALSE !== mb_stripos($fields, 'd')) {
+            $res .= $this->select($name . 'D', range(1, 31), $required, $html);
+        }
         }
         if (FALSE !== mb_stripos($fields, 'd')) {
             $res .= $this->select($name . 'D', range(1, 31), $required, $html);
@@ -225,6 +246,10 @@ class XG_Form {
         $htmlSuffix = ($htmlAttributes !== '') ? ' ' . $htmlAttributes : '';
 
         return '<input type="text" id="' . $fieldName . '" name="' . $fieldName . '" class="' . $css . '" value="' . $valueAttribute . '"' . $htmlSuffix . ' />';
+        $css = 'textfield' . ($required ? ' required' : '');
+        $value = $this->_values[$name] ?? '';
+
+        return '<input type="text" id="'.$name.'" name="'.$name.'" class="'.$css.'" value="'.xg_xmlentities((string) $value).'"'.($html?' '.$html:'').' />';
     }
 
     /**
@@ -239,6 +264,8 @@ class XG_Form {
         $valueAttribute = xnhtmlentities((string) $value);
 
         return '<input type="hidden" id="' . $fieldName . '" name="' . $fieldName . '" value="' . $valueAttribute . '" />';
+
+        return '<input type="hidden" name="'.$name.'" value="'.xnhtmlentities((string) $value).'" />';
     }
 
     /**
@@ -253,6 +280,8 @@ class XG_Form {
         $isChecked = ((string) $value === (string) $current) ? ' checked="checked"' : '';
 
         return '<input class="radio" type="radio" name="' . $fieldName . '" value="' . $valueAttribute . '"' . $isChecked . '>';
+
+        return '<input class="radio" type="radio" name="'.$name.'" value="'.xg_xmlentities((string) $value).'"'.(((string) $value === (string) $current)?' checked="checked"':'').'>';
     }
 
     /**
@@ -268,6 +297,8 @@ class XG_Form {
         $checkedAttribute = $isChecked ? ' checked="checked"' : '';
 
         return '<input class="checkbox" type="checkbox" name="' . $fieldName . '" value="1"' . $checkedAttribute . $attributeSuffix . '>';
+
+        return '<input class="checkbox" type="checkbox" name="'.$name.'" value="1"'.($isChecked?' checked="checked"':'') . ($html?' '.$html:'') . '>';
     }
 
     /**
@@ -289,6 +320,10 @@ class XG_Form {
         return
             '<div class="texteditor">'.
                 '<textarea id="'.$fieldName.'" name="'.$fieldName.'" dojoType="SimpleToolbar"'.($css ? ' class="'.$css.'"' : '') . $attributeSuffix . '>'.
+
+        return
+            '<div class="texteditor">'.
+                '<textarea id="'.$name.'" name="'.$name.'" dojoType="SimpleToolbar"'.($css ? ' class="'.$css.'"' : '') . ($html?' '.$html:'') . '>'.
                     xg_xmlentities((string) $value).
                 '</textarea>'.
             '</div>';
@@ -371,6 +406,11 @@ class XG_Form {
         $meridiemRaw = $_REQUEST[$idx."R"] ?? null;
         $hourRaw = $_REQUEST[$idx."H"] ?? null;
         $minuteRaw = $_REQUEST[$idx."I"] ?? null;
+
+        $meridiem = is_scalar($meridiemRaw) ? mb_strtolower(trim((string) $meridiemRaw)) : '';
+        $hourValue = (is_scalar($hourRaw) && $hourRaw !== '') ? (int) $hourRaw : 0;
+        $minuteValue = (is_scalar($minuteRaw) && $minuteRaw !== '') ? (int) $minuteRaw : 0;
+
 
         $meridiem = is_scalar($meridiemRaw) ? mb_strtolower(trim((string) $meridiemRaw)) : '';
         $hourValue = (is_scalar($hourRaw) && $hourRaw !== '') ? (int) $hourRaw : 0;

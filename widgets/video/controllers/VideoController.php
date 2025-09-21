@@ -20,6 +20,8 @@ class Video_VideoController extends W_Controller {
     public function action_overridePrivacy($action) {
         $rssParam = $this->getQueryString('rss', 8);
         $isRss = ($rssParam === 'yes');
+        $rssParam = $_GET['rss'] ?? '';
+        $isRss = $rssParam === 'yes';
 
         return
             // Player feeds implement their own privacy mechanism [Jon Aquino 2006-12-09]
@@ -80,6 +82,9 @@ class Video_VideoController extends W_Controller {
         $requested = $this->getQueryString('sort', 64);
 
         if ($requested !== '' && isset($this->sorts[$requested])) {
+        $requested = $_GET['sort'] ?? null;
+
+        if ($requested !== null && isset($this->sorts[$requested])) {
             return $this->sorts[$requested];
         }
 
@@ -149,11 +154,13 @@ class Video_VideoController extends W_Controller {
 
     public function action_list() {
         $searchTerms = $this->getQueryString('q');
+        $searchTerms = trim((string) ($_GET['q'] ?? ''));
         if ($searchTerms !== '') { return $this->forwardTo('search'); }
         if (! $this->_user->isLoggedIn()) {
             $this->setCaching(array(md5(XG_HttpHelper::currentUrl())), 300);
         }
         $this->handleSortingAndPagination(null, self::NUM_THUMBS_TWOCOLUMNVIEW);
+        self::handleSortingAndPagination(null, self::NUM_THUMBS_TWOCOLUMNVIEW);
         Video_FullNameHelper::initialize($this->videos);
         if ($this->page == 1) {
             $this->featuredVideos = Video_VideoHelper::getPromotedVideos(6);
@@ -166,6 +173,7 @@ class Video_VideoController extends W_Controller {
         $this->pageTitle = xg_text('VIDEOS');
         $this->title = xg_text('ALL_VIDEOS');
         $this->showFacebookMeta = ($this->getQueryString('from', 16) === 'fb');
+        $this->showFacebookMeta = array_key_exists('from', $_GET) && ($_GET['from'] === 'fb');
         if ($searchTerms !== '') { $this->title = xg_text('SEARCH_RESULTS'); }
     }
 
@@ -180,6 +188,12 @@ class Video_VideoController extends W_Controller {
             try {
                 $this->pageSize = self::NUM_THUMBS_TWOCOLUMNVIEW;
                 $pageNumber = $this->getPositiveIntParam('page') ?? 1;
+        $searchTerms = trim((string) ($_GET['q'] ?? ''));
+        if (XG_QueryHelper::getSearchMethod() == 'search') {
+            try {
+                $this->pageSize = self::NUM_THUMBS_TWOCOLUMNVIEW;
+                $pageValue = $_GET['page'] ?? null;
+                $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
                 $begin = XG_PaginationHelper::computeStart($pageNumber, $this->pageSize);
                 $query = XN_Query::create('Search');
                 $query->filter('type', 'like', 'Video');
@@ -199,6 +213,15 @@ class Video_VideoController extends W_Controller {
         } else {
             $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
             $this->handleSortingAndPagination($filters, 20);
+            }
+        } else {
+            $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+            $this->handleSortingAndPagination($filters, 20);
+                self::handleSortingAndPagination($filters, 20);
+            }
+        } else {
+            $filters = ($searchTerms !== '') ? array('searchTerms' => $searchTerms) : null;
+            self::handleSortingAndPagination($filters, 20);
         }
         Video_FullNameHelper::initialize($this->videos);
     }
@@ -227,6 +250,17 @@ class Video_VideoController extends W_Controller {
             header("Content-Type: text/xml");
             $this->setCaching(array('video-video-rss-' . md5(XG_HttpHelper::currentUrl())), 1800);
             if ($this->getQueryString('test_caching', 16) !== '') { var_dump('Not cached'); }
+        $this->location = trim((string) ($_GET['location'] ?? ''));
+        $this->pageSize = self::NUM_THUMBS_TWOCOLUMNVIEW;
+        $filters = $this->location !== '' ? array('location' => $this->location) : null;
+        $this->handleSortingAndPagination($filters, $this->pageSize);
+        self::handleSortingAndPagination($filters, $this->pageSize);
+        Video_FullNameHelper::initialize($this->videos);
+        $rssParam = $_GET['rss'] ?? '';
+        if ($rssParam === 'yes') {
+            header("Content-Type: text/xml");
+            $this->setCaching(array('video-video-rss-' . md5(XG_HttpHelper::currentUrl())), 1800);
+            if (!empty($_GET['test_caching'])) { var_dump('Not cached'); }
             $this->title = xg_text('VIDEOS_FOR_LOCATION', $this->location);
             $this->link = 'http://' . $_SERVER['HTTP_HOST'];
             $this->render('rss');
@@ -250,6 +284,8 @@ class Video_VideoController extends W_Controller {
         $this->bodyId = 'videos-to-approve';
         if (Video_SecurityHelper::isApprovalRequired()) {
             $pageNumber = $this->getPositiveIntParam('page') ?? 1;
+            $pageValue = $_GET['page'] ?? null;
+            $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
             $this->query = Video_VideoHelper::query($this->_user, $pageNumber, $this->pageSize, $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT], false);
             $this->query->filter('my->approved', '=', 'N');
             $this->videos = $this->query->execute();
@@ -268,6 +304,7 @@ class Video_VideoController extends W_Controller {
     public function action_rss() {
         $this->setCaching(array('video-video-rss-' . md5(XG_HttpHelper::currentUrl())), 1800);
         if ($this->getQueryString('test_caching', 16) !== '') { var_dump('Not cached'); }
+        if (!empty($_GET['test_caching'])) { var_dump('Not cached'); }
         $query = Video_VideoHelper::query($this->_user, 1, self::NUM_THUMBS_RSS, $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT]);
         $this->videos = $query->execute();
         $this->title = xg_text('LATEST_VIDEOS');
@@ -290,6 +327,7 @@ class Video_VideoController extends W_Controller {
 
     public function action_listTagged() {
         $this->tag = $this->getQueryString('tag');
+        $this->tag = trim((string) ($_GET['tag'] ?? ''));
         if ($this->tag === '') {
             $this->error = xg_text('NO_TAG_WAS_SPECIFIED');
             $this->render('error', 'index');
@@ -297,11 +335,14 @@ class Video_VideoController extends W_Controller {
         }
         $rssParam = $this->getQueryString('rss', 8);
         $isRss = ($rssParam === 'yes');
+        $rssParam = $_GET['rss'] ?? '';
+        $isRss = $rssParam === 'yes';
         if ($isRss) {
             header("Content-Type: text/xml");
         }
         if ($isRss) { $this->sort = Video_VideoHelper::getMostRecentSortingOrder(); }
         $this->handleSortingAndPagination(array('tag' => $this->tag), $isRss ? self::NUM_THUMBS_RSS : self::NUM_THUMBS_TWOCOLUMNVIEW);
+        self::handleSortingAndPagination(array('tag' => $this->tag), $isRss ? self::NUM_THUMBS_RSS : self::NUM_THUMBS_TWOCOLUMNVIEW);
         $this->rssTitle = xg_text('ALL_VIDEOS_TAGGED_X_X', $this->tag, XN_Application::load()->name);
         if ($isRss) {
             $this->title = $this->rssTitle;
@@ -319,6 +360,7 @@ class Video_VideoController extends W_Controller {
      */
     public function action_listForContributor() {
         $requestedScreenName = $this->getQueryString('screenName');
+        $requestedScreenName = trim((string) ($_GET['screenName'] ?? ''));
         if ($requestedScreenName !== '' && User::isMember($requestedScreenName)) {
             $this->user = Video_UserHelper::load($requestedScreenName);
         } else {
@@ -337,6 +379,12 @@ class Video_VideoController extends W_Controller {
             header("Content-Type: text/xml");
             $this->setCaching(array('video-video-listForContributor-' . md5(XG_HttpHelper::currentUrl())), 1800);
             if ($this->getQueryString('test_caching', 16) !== '') { var_dump('Not cached'); }
+        $rssParam = $_GET['rss'] ?? '';
+        $isRss = $rssParam === 'yes';
+        if ($isRss) {
+            header("Content-Type: text/xml");
+            $this->setCaching(array('video-video-listForContributor-' . md5(XG_HttpHelper::currentUrl())), 1800);
+            if (!empty($_GET['test_caching'])) { var_dump('Not cached'); }
         }
         $this->myOwnVideos = ($this->user->title == $this->_user->screenName);
         $this->title = $this->myOwnVideos ? xg_text('MY_VIDEOS') :
@@ -352,6 +400,9 @@ class Video_VideoController extends W_Controller {
                 $this->sort = $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT];
             }
         }
+            $requestedSort = $_GET['sort'] ?? null;
+            $this->sort = ($requestedSort !== null && $requestedSort !== '') ? $this->sort : $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT];
+        }//force merge conflict
 
         $this->handleSortingAndPagination(array('contributor'              => $this->user->title,
                                                'includeUnconvertedVideos' => $this->myOwnVideos),
@@ -368,6 +419,7 @@ class Video_VideoController extends W_Controller {
         $this->friends = Video_UserHelper::getFriends($this->user->title, 7, $numFriends);
         Video_FullNameHelper::initialize(array_merge($this->videos, array($this->user), $this->friends));
         if ($this->getQueryString('uploaded', 8) !== '') {
+        if (!empty($_GET['uploaded'])) {
             if (XG_SecurityHelper::userIsAdmin(XN_Profile::current()) || !Video_SecurityHelper::isApprovalRequired()) {
                 $this->uploadMessage = xg_text('VIDEOS_SUCCESSFULLY_UPLOADED');
             } else {
@@ -395,6 +447,8 @@ class Video_VideoController extends W_Controller {
     private function handleSortingAndPagination($filters = null, $numPerPage = self::NUM_THUMBS_TWOCOLUMNVIEW, $beginOffset = 0) {
         XG_App::includeFileOnce('/lib/XG_PaginationHelper.php');
         $pageNumber = $this->getPositiveIntParam('page') ?? 1;
+        $pageValue = $_GET['page'] ?? null;
+        $pageNumber = is_numeric($pageValue) ? max(1, (int) $pageValue) : 1;
         $begin = XG_PaginationHelper::computeStart($pageNumber, $numPerPage);
         $begin = max(0, $begin + $beginOffset);
         if ($this->sort['alias'] == Video_VideoHelper::SORT_ORDER_PROMOTED) {
@@ -454,6 +508,7 @@ class Video_VideoController extends W_Controller {
 
     public function action_listFavorites() {
         $screenNameParam = $this->getQueryString('screenName');
+        $screenNameParam = trim((string) ($_GET['screenName'] ?? ''));
         if ($screenNameParam !== '' && User::isMember($screenNameParam)) {
             $this->user = Video_UserHelper::load($screenNameParam);
         } else {
@@ -467,11 +522,13 @@ class Video_VideoController extends W_Controller {
             return;
         }
         $rssParam = $this->getQueryString('rss', 8);
+        $rssParam = $_GET['rss'] ?? '';
         $isRss = ($rssParam !== '' && $rssParam !== '0');
         if ($isRss) {
             header("Content-Type: text/xml");
             $this->setCaching(array('video-video-listFavorites-' . md5(XG_HttpHelper::currentUrl())), 1800);
             if ($this->getQueryString('test_caching', 16) !== '') { var_dump('Not cached'); }
+            if (!empty($_GET['test_caching'])) { var_dump('Not cached'); }
         }
         $this->myOwnFavorites = ($this->user->title == $this->_user->screenName);
         $this->pageUrl = $this->_buildUrl('video', 'listFavorites', array('screenName' => $this->user->title));
@@ -486,6 +543,13 @@ class Video_VideoController extends W_Controller {
             if ($requestedSort === '') {
                 $this->sort = $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT];
             }
+        $pageValue = $_GET['page'] ?? null;
+        if (is_numeric($pageValue) && (int) $pageValue > 0) {
+            $begin = ((int) $pageValue - 1) * $numPerPage;
+        }
+        if ($isRss) {
+            $requestedSort = $_GET['sort'] ?? null;
+            $this->sort = ($requestedSort !== null && $requestedSort !== '') ? $this->sort : $this->sorts[Video_VideoHelper::SORT_ORDER_MOSTRECENT];
         }
         $favoritesData = Video_VideoHelper::getSpecificVideos($this->_user,
                                                               Video_ContentHelper::ids($this->user, Video_UserHelper::attributeName('favorites')),
@@ -515,6 +579,7 @@ class Video_VideoController extends W_Controller {
 
     public function action_conversionStatus() {
         $videoId = $this->getQueryId('id');
+        $videoId = $_GET['id'] ?? '';
         if ($videoId === '') {
             Video_JsonHelper::outputAndExit(array('conversionStatus' => 'failed'));
         }
@@ -1405,6 +1470,7 @@ class Video_VideoController extends W_Controller {
 
     public function action_approve() {
         $videoId = $this->getQueryId('id');
+        $videoId = $_GET['id'] ?? '';
         if ($videoId === '') { throw new Exception('Video id missing'); }
         $video = Video_ContentHelper::findByID('Video', $videoId);
         if (! $video) { throw new Exception('Video not found'); }
@@ -1417,6 +1483,10 @@ class Video_VideoController extends W_Controller {
         $isJsonRequest = ($this->getQueryString('json', 8) === 'yes');
         $targetParam = $this->getQueryString('target', 2048);
         $targetParam = str_replace(array("\r", "\n"), '', $targetParam);
+        $isApproved = (($_GET['approved'] ?? '') === 'Y');
+        $this->approveOrReject($video, $isApproved);
+        $isJsonRequest = (($_GET['json'] ?? '') === 'yes');
+        $targetParam = isset($_GET['target']) ? trim((string) $_GET['target']) : '';
         $targetUrl = ($targetParam !== '') ? $targetParam : $this->_buildUrl('video', 'index');
         if (! $isJsonRequest) {
             header('Location: ' . $targetUrl);
