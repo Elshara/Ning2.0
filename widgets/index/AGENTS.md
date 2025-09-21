@@ -21,6 +21,7 @@ for feed previews.
 
 ## Outstanding Work Log
 - Track pending personalization features, theme variable migrations, and caching strategies.
+- Finish migrating controllers such as `AuthorizationController` and `AdminController` to `Index_RequestHelper`; `ContentController` and `SharingController` now depend on the helper for sanitised request parsing.
 
 ## Audit Summary
 - Pending lint audit captured for `widgets/index`. Run `php tools/php_lint_audit.php widgets/index` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.

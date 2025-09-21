@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__) . '/lib/helpers/Index_RequestHelper.php';
 
 /**
  * Dispatches requests pertaining to composing messages to friends.
@@ -43,7 +44,9 @@ class Index_MessageController extends W_Controller {
      */
     public function action_friendData() {
         $this->_widget->includeFileOnce('/lib/helpers/Index_MessageHelper.php');
-        $friendData = Index_MessageHelper::dataForFriendsOnNetwork($_GET['start'], $_GET['end']);
+
+        [$start, $end] = Index_RequestHelper::readRange($_GET, 'start', 'end');
+        $friendData = Index_MessageHelper::dataForFriendsOnNetwork($start, $end);
         $this->friends = $friendData['friends'];
     }
 
