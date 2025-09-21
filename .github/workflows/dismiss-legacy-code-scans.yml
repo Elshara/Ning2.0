@@ -1,0 +1,106 @@
+name: Dismiss legacy code scanning alerts
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dismiss:
+    name: Close alerts from removed scanners
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dismiss retired scanner alerts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          keep_tools=$'CodeQL\nPHPMD\nPsalm Security Scan\nOSV-Scanner'
+
+          echo "Fetching open code scanning alerts for $REPO"
+          page=1
+          dismissed_any=false
+
+          while true; do
+            response_file="$(mktemp)"
+            status=$(curl \
+              --silent \
+              --show-error \
+              --location \
+              --write-out '%{http_code}' \
+              --output "$response_file" \
+              --header 'Accept: application/vnd.github+json' \
+              --header "Authorization: Bearer $GITHUB_TOKEN" \
+              "https://api.github.com/repos/$REPO/code-scanning/alerts?state=open&per_page=100&page=${page}")
+
+            response=$(cat "$response_file")
+            rm -f "$response_file"
+
+            if [ "$status" -ge 400 ]; then
+              echo "GitHub API returned status $status when fetching alerts"
+              echo "$response"
+              exit 1
+            fi
+
+            count=$(echo "$response" | jq 'length')
+            if [ "$count" -eq 0 ]; then
+              if [ "$page" -eq 1 ] && [ "$dismissed_any" = false ]; then
+                echo "No open alerts to dismiss."
+              fi
+              break
+            fi
+
+            while IFS= read -r alert; do
+              if [ -z "$alert" ]; then
+                continue
+              fi
+
+              alert_json=$(echo "$alert" | base64 --decode)
+              number=$(echo "$alert_json" | jq -r '.number')
+              tool=$(echo "$alert_json" | jq -r '.tool.name')
+
+              if printf '%s\n' "$keep_tools" | grep -Fxq "$tool"; then
+                echo "Keeping alert #$number reported by \"$tool\""
+                continue
+              fi
+
+              comment="Alert automatically dismissed because the $tool scanner is no longer part of this repository's workflow."
+              payload=$(jq -n --arg comment "$comment" '{state:"dismissed","dismissed_reason":"false positive","dismissed_comment":$comment}')
+
+              echo "Dismissing alert #$number from tool \"$tool\""
+              patch_file="$(mktemp)"
+              patch_status=$(curl \
+                --silent \
+                --show-error \
+                --location \
+                --request PATCH \
+                --write-out '%{http_code}' \
+                --output "$patch_file" \
+                --header 'Accept: application/vnd.github+json' \
+                --header "Authorization: Bearer $GITHUB_TOKEN" \
+                --data "$payload" \
+                "https://api.github.com/repos/$REPO/code-scanning/alerts/$number")
+
+              if [ "$patch_status" -ge 300 ]; then
+                echo "Failed to dismiss alert #$number from tool $tool (HTTP $patch_status)"
+                cat "$patch_file"
+                rm -f "$patch_file"
+                exit 1
+              fi
+
+              rm -f "$patch_file"
+              dismissed_any=true
+            done < <(echo "$response" | jq -rc '.[] | @base64')
+
+            page=$((page + 1))
+          done
+
+          if [ "$dismissed_any" = true ]; then
+            echo "Finished dismissing legacy scanner alerts."
+          fi
