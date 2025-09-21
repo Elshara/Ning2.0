@@ -2,6 +2,7 @@
 XG_App::includeFileOnce('/lib/XG_LangHelper.php');
 XG_App::includeFileOnce('/lib/XG_LayoutHelper.php');
 XG_App::includeFileOnce('/lib/XG_ModuleHelper.php');
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 
 class Index_FeatureController extends W_Controller {
 
@@ -181,11 +182,14 @@ class Index_FeatureController extends W_Controller {
        }
 
        //  Check for an explicit success target (e.g. launch)
-       if (isset($_POST['successTarget']) && mb_strlen($_POST['successTarget']) > 0) {
-           header('Location: ' . $_POST['successTarget']);
-           exit;
+       $successTarget = null;
+       if (isset($_POST['successTarget']) && ! is_array($_POST['successTarget'])) {
+           $successTarget = XG_HttpHelper::normalizeRedirectTarget($_POST['successTarget']);
        }
-       else {
+       if ($successTarget !== null) {
+           header('Location: ' . $successTarget);
+           exit;
+       } else {
            if (XG_App::appIsLaunched()) {
                $this->redirectTo('add', 'feature', array('saved' => 1));
            } else {

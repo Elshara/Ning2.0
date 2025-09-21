@@ -1,4 +1,6 @@
 <?php
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
+require_once dirname(__DIR__) . '/lib/helpers/Index_RequestHelper.php';
 
 /**
  * The methods in this controller provide wrappers for content/profile
@@ -53,8 +55,13 @@ class Index_ContentController extends W_Controller {
         }
 
         // setup appropriate target if it's not prelaunch, but joinflow
-        $joinTarget = isset($_GET['joinTarget']) ? $_GET['joinTarget'] : ( isset($_POST['joinTarget']) ? $_POST['joinTarget'] : null);
-        if (isset($joinTarget)) {
+        $joinTarget = Index_RequestHelper::readRedirectTarget($_GET, 'joinTarget');
+        if ($joinTarget === null) {
+            $joinTarget = Index_RequestHelper::readRedirectTarget($_POST, 'joinTarget');
+        }
+
+        $defaults = array();
+        if ($joinTarget !== null) {
             $this->inJoinFlow = true;
             $defaults['joinTarget'] = $joinTarget;
         } else {
@@ -96,17 +103,18 @@ class Index_ContentController extends W_Controller {
 
 
         //  Check for an explicit success target (e.g. launch)
-        if (isset($_POST['successTarget']) && mb_strlen($_POST['successTarget'])) {
-            header('Location: ' . $_POST['successTarget']);
+        $successTarget = Index_RequestHelper::readRedirectTarget($_POST, 'successTarget');
+        if ($successTarget !== null) {
+            header('Location: ' . $successTarget);
             exit;
         }
-        // Check for a joinTarget (for the join-the-app flow)
-        else if (isset($_POST['joinTarget']) && mb_strlen($_POST['joinTarget'])) {
+
+        $joinTarget = Index_RequestHelper::readRedirectTarget($_POST, 'joinTarget');
+        if ($joinTarget !== null) {
             // After adding content, visit the invite page (BAZ-947)
-            $this->redirectTo('invite','index', array('joinTarget' => $_POST['joinTarget']));
+            $this->redirectTo('invite','index', array('joinTarget' => $joinTarget));
             return;
-        }
-        else {
+        } else {
             if (is_null($nextStep)) {
                 //  We're editing post-sequence - redisplay the form
                 $this->redirectTo('content','content',array('saved' => 1));
@@ -129,9 +137,15 @@ class Index_ContentController extends W_Controller {
             error_log('not a post');
             throw new Exception('startFollowing can only be called by POST!');
         }
-        if (!isset($_GET['id']) || !($obj = XN_Content::load($_GET['id']))) {
-            error_log('bad ID ' . $_GET['id']);
+        $contentId = Index_RequestHelper::readContentId($_GET, 'id');
+        if ($contentId === '') {
             throw new Exception('couldn\'t load object with ID ' . $_GET['id'] . '!');
+        }
+        try {
+            $obj = XN_Content::load($contentId);
+        } catch (Exception $e) {
+            error_log('bad ID ' . $contentId);
+            throw new Exception('couldn\'t load object with ID ' . $contentId . '!');
         }
         W_Cache::getWidget('main')->includeFileOnce('/lib/helpers/Index_NotificationHelper.php');
         Index_NotificationHelper::startFollowing($obj);
@@ -149,8 +163,14 @@ class Index_ContentController extends W_Controller {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             throw new Exception('stopFollowing can only be called by POST!');
         }
-        if (!isset($_GET['id']) || !($obj = XN_Content::load($_GET['id']))) {
+        $contentId = Index_RequestHelper::readContentId($_GET, 'id');
+        if ($contentId === '') {
             throw new Exception('couldn\'t load object with ID ' . $_GET['id'] . '!');
+        }
+        try {
+            $obj = XN_Content::load($contentId);
+        } catch (Exception $e) {
+            throw new Exception('couldn\'t load object with ID ' . $contentId . '!');
         }
         W_Cache::getWidget('main')->includeFileOnce('/lib/helpers/Index_NotificationHelper.php');
         Index_NotificationHelper::stopFollowing($obj);

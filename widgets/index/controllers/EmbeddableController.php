@@ -1,4 +1,5 @@
 <?php
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 
 /**
  * Dispatches requests pertaining to <embed> elements that can be put
@@ -143,8 +144,14 @@ class Index_EmbeddableController extends W_Controller {
 
     public function action_updateResources(){
         XG_App::includeFileOnce('/lib/XG_EmbeddableHelper.php');
-        XG_EmbeddableHelper::generateResources($_GET['application_name'], $_GET['application_description']);
-        header('Location: ' . $_GET['successTarget']);
+        $applicationName = $this->getQueryValue('application_name');
+        $applicationDescription = $this->getQueryValue('application_description', 2048);
+        XG_EmbeddableHelper::generateResources($applicationName, $applicationDescription);
+        $successTarget = $this->sanitizeRedirectTargetFromGet('successTarget');
+        if ($successTarget === null) {
+            $successTarget = '/';
+        }
+        header('Location: ' . $successTarget);
         exit();
     }
     /**
@@ -181,6 +188,7 @@ class Index_EmbeddableController extends W_Controller {
                 if ($option['selected']) { $this->defaultPhotoSlideshowSizeOption = $option; }
             }
         }
+
         //the correspondence table between the dropdown values of /main/facebook/setup and /main/embeddable/list
         $this->facebookPhotoSourceReference = array(
             'default' => 'all'
@@ -383,5 +391,32 @@ class Index_EmbeddableController extends W_Controller {
         }
 
         return $newImageUrl;
+    }
+
+    private function getQueryValue(string $key, int $maxLength = 255): string
+    {
+        if (! isset($_GET[$key]) || is_array($_GET[$key])) {
+            return '';
+        }
+
+        $value = trim((string) $_GET[$key]);
+        $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value);
+        if ($value === null) {
+            return '';
+        }
+        if ($maxLength > 0) {
+            $value = mb_substr($value, 0, $maxLength);
+        }
+
+        return $value;
+    }
+
+    private function sanitizeRedirectTargetFromGet(string $key): ?string
+    {
+        if (! isset($_GET[$key]) || is_array($_GET[$key])) {
+            return null;
+        }
+
+        return XG_HttpHelper::normalizeRedirectTarget($_GET[$key]);
     }
 }

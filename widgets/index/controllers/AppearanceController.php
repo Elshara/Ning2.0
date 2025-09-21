@@ -1,5 +1,6 @@
 <?php
 W_Cache::getWidget('main')->includeFileOnce('/lib/helpers/Index_AppearanceHelper.php');
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 
 class Index_AppearanceController extends W_Controller {
 
@@ -57,11 +58,14 @@ class Index_AppearanceController extends W_Controller {
         }
 
         //  Check for an explicit success target (e.g. launch)
-        if (isset($_POST['successTarget']) && mb_strlen($_POST['successTarget']) > 0) {
-            header('Location: ' . $_POST['successTarget']);
-            exit;
+        $successTarget = null;
+        if (isset($_POST['successTarget']) && ! is_array($_POST['successTarget'])) {
+            $successTarget = XG_HttpHelper::normalizeRedirectTarget($_POST['successTarget']);
         }
-        else {
+        if ($successTarget !== null) {
+            header('Location: ' . $successTarget);
+            exit;
+        } else {
             if (XG_App::appIsLaunched()) {
                 //  We're editing post-sequence - redisplay the form
                 $this->redirectTo('edit', 'appearance', array('saved' => 1));

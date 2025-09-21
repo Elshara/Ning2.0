@@ -118,6 +118,13 @@ class XG_Form {
         $attributes = ' id="' . $fieldName . '" name="' . $fieldName . '"';
         if ($css !== '') {
             $attributes .= ' class="' . $css . '"';
+        }
+
+        $htmlAttributes = trim((string) $html);
+        if ($htmlAttributes !== '') {
+            $attributes .= ' ' . $htmlAttributes;
+        }
+
         $isList = ( $first == 0 && $last == count($values)-1 );
         $value = $this->_values[$name] ?? null;
         foreach ($values as $k=>$v) {
@@ -161,6 +168,10 @@ class XG_Form {
         $res = '';
         if (FALSE !== mb_stripos($fields, 'm')) {
             $res .= $this->select($name . 'M', XG_DateHelper::monthsShort(), $required, $html);
+        }
+        if (FALSE !== mb_stripos($fields, 'd')) {
+            $res .= $this->select($name . 'D', range(1, 31), $required, $html);
+        }
         }
         if (FALSE !== mb_stripos($fields, 'd')) {
             $res .= $this->select($name . 'D', range(1, 31), $required, $html);
@@ -249,6 +260,10 @@ class XG_Form {
      */
     public function hidden($name) {
         $value = $this->_values[$name] ?? '';
+        $fieldName = xg_xmlentities((string) $name);
+        $valueAttribute = xnhtmlentities((string) $value);
+
+        return '<input type="hidden" id="' . $fieldName . '" name="' . $fieldName . '" value="' . $valueAttribute . '" />';
 
         return '<input type="hidden" name="'.$name.'" value="'.xnhtmlentities((string) $value).'" />';
     }
@@ -259,6 +274,12 @@ class XG_Form {
      */
     public function radio($name,$value) {
         $current = $this->_values[$name] ?? null;
+        $fieldName = xg_xmlentities((string) $name);
+        $valueAttribute = xg_xmlentities((string) $value);
+
+        $isChecked = ((string) $value === (string) $current) ? ' checked="checked"' : '';
+
+        return '<input class="radio" type="radio" name="' . $fieldName . '" value="' . $valueAttribute . '"' . $isChecked . '>';
 
         return '<input class="radio" type="radio" name="'.$name.'" value="'.xg_xmlentities((string) $value).'"'.(((string) $value === (string) $current)?' checked="checked"':'').'>';
     }
@@ -270,6 +291,12 @@ class XG_Form {
      */
     public function checkbox($name, $html = '') {
         $isChecked = !empty($this->_values[$name]);
+        $fieldName = xg_xmlentities((string) $name);
+        $htmlAttributes = trim((string) $html);
+        $attributeSuffix = ($htmlAttributes !== '') ? ' ' . $htmlAttributes : '';
+        $checkedAttribute = $isChecked ? ' checked="checked"' : '';
+
+        return '<input class="checkbox" type="checkbox" name="' . $fieldName . '" value="1"' . $checkedAttribute . $attributeSuffix . '>';
 
         return '<input class="checkbox" type="checkbox" name="'.$name.'" value="1"'.($isChecked?' checked="checked"':'') . ($html?' '.$html:'') . '>';
     }
@@ -286,6 +313,13 @@ class XG_Form {
         $css = $required ? 'required' : '';
         XG_App::ningLoaderRequire('xg.shared.SimpleToolbar');
         $value = $this->_values[$name] ?? '';
+        $fieldName = xg_xmlentities((string) $name);
+        $htmlAttributes = trim((string) $html);
+        $attributeSuffix = ($htmlAttributes !== '') ? ' ' . $htmlAttributes : '';
+
+        return
+            '<div class="texteditor">'.
+                '<textarea id="'.$fieldName.'" name="'.$fieldName.'" dojoType="SimpleToolbar"'.($css ? ' class="'.$css.'"' : '') . $attributeSuffix . '>'.
 
         return
             '<div class="texteditor">'.

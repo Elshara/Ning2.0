@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__) . '/lib/helpers/Index_RequestHelper.php';
 
 class Index_SharingController extends W_Controller {
 
@@ -9,7 +10,9 @@ class Index_SharingController extends W_Controller {
         W_Cache::getWidget('main')->includeFileOnce('/lib/helpers/Index_InvitationFormHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Index_SharingHelper.php');
         XG_HttpHelper::trimGetAndPostValues();
-        $_GET['id'] = urldecode($_GET['id']);  // Is this needed?  [Jon Aquino 2007-10-26]
+        if (isset($_GET['id']) && is_string($_GET['id'])) {
+            $_GET['id'] = urldecode($_GET['id']);  // Is this needed?  [Jon Aquino 2007-10-26]
+        }
     }
 
     /**
@@ -27,17 +30,18 @@ class Index_SharingController extends W_Controller {
         $this->_widget->includeFileOnce('/lib/helpers/Index_MessageHelper.php');
         XG_App::includeFileOnce('/lib/XG_ContactHelper.php');
         if (! $this->_user->isLoggedIn()) { return $this->forwardTo('shareSignedOut'); }
-        $this->itemInfo = self::getItemInfo($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type']);
-        self::verifyUserCanShare($this->itemInfo['object'], $_GET['id'], $_GET['url'], $_GET['title'], $_GET['type']);
+        $shareRequest = $this->readShareRequest();
+        $this->itemInfo = self::getItemInfo($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type']);
+        self::verifyUserCanShare($this->itemInfo['object'], $shareRequest['id'], $shareRequest['url'], $shareRequest['title']);
         $this->pageTitle = Index_SharingHelper::pageTitle($this->itemInfo);
-        $this->showInvitationsSentMessage = $_GET['sent'];
-        $this->showNoAddressesFoundMessage = $_GET['noAddressesFound'];
+        $this->showInvitationsSentMessage = $shareRequest['sent'];
+        $this->showNoAddressesFoundMessage = $shareRequest['noAddressesFound'];
         $numFriendsAcrossNing = Index_MessageHelper::numberOfFriendsAcrossNing($this->_user->screenName);
         $numFriendsOnNetwork = Index_MessageHelper::numberOfFriendsOnNetwork($this->_user->screenName);
         $this->invitationArgs = array(
                 'formToOpen' => $formToOpen,
                 'errors' => $errors,
-                'createUrl' => $this->_buildUrl('sharing', 'create', self::getItemArr($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type'])),
+                'createUrl' => $this->_buildUrl('sharing', 'create', self::getItemArr($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type'])),
                 'enterEmailAddressesButtonText' => xg_text('SEND_MESSAGE'),
                 'inviteFriendsTitle' => xg_text('SHARE_WITH_FRIENDS'),
                 'inviteFriendsDescription' => xg_text('SHARE_THIS_WITH_FRIENDS'),
@@ -62,20 +66,21 @@ class Index_SharingController extends W_Controller {
      */
     public function action_friendData() {
         $this->_widget->includeFileOnce('/lib/helpers/Index_MessageHelper.php');
-        $friendData = Index_MessageHelper::dataForFriendsAcrossNing($_GET['start'], $_GET['end']);
+        [$start, $end] = Index_RequestHelper::readRange($_GET, 'start', 'end');
+        $friendData = Index_MessageHelper::dataForFriendsAcrossNing($start, $end);
         $this->friends = $friendData['friends'];
     }
 
     /**
      *  Handler for the "quick post" feature.
      *
-     *  @param      $title		string		Document title
-     *  @param		$url		string		Document URL
-     *  @param		$contentId	string		If the sharing dialog is called from the content page, specifies the content id of
-     *  									this object.
-     *	@param		$message	string		Optional message
-     *  @param		$emailAddresses string	Email addresses
-     *  @param		..friend-data..			Selected friends
+     *  @param      $title              string          Document title
+     *  @param          $url            string          Document URL
+     *  @param          $contentId      string          If the sharing dialog is called from the content page, specifies the content id of
+     *                                                                          this object.
+     *  @param          $message        string          Optional message
+     *  @param          $emailAddresses string  Email addresses
+     *  @param          ..friend-data..                 Selected friends
      *  @return     void
      */
     public function action_shareQuick() {
@@ -85,13 +90,20 @@ class Index_SharingController extends W_Controller {
             $this->message = xg_html('YOU_MUST_BE_SIGNED');
             return;
         }
-        if (! $_POST['url']) {
+
+        $_POST['url'] = Index_RequestHelper::readString($_POST, 'url', '', true, 2048);
+        if ($_POST['url'] === '') {
             $this->message = xg_html('URL_MUST_BE_SPECIFIED');
             return;
         }
 
-        $emailResult = NULL;
-        if ($_POST['emailAddresses']) {
+        $_POST['emailAddresses'] = Index_RequestHelper::readContent($_POST, 'emailAddresses');
+        $_POST['message'] = Index_RequestHelper::readContent($_POST, 'message');
+        $_POST['title'] = Index_RequestHelper::readString($_POST, 'title', '', true, 512);
+        $_POST['contentId'] = Index_RequestHelper::readContentId($_POST, 'contentId');
+
+        $emailResult = null;
+        if ($_POST['emailAddresses'] !== '') {
             $emailResult = Index_InvitationFormHelper::processEnterEmailAddressesForm();
             if ($emailResult['errorHtml']) {
                 $this->message = $emailResult['errorHtml'];
@@ -103,7 +115,7 @@ class Index_SharingController extends W_Controller {
             'inviteOrShare' => 'share',
             'message' => $_POST['message'],
         );
-        if ($_POST['contentId']) {
+        if ($_POST['contentId'] !== '') {
             $itemInfo = self::getItemInfo($_POST['contentId']);
             if (!Index_SharingHelper::userCanShare($itemInfo['object'])) {
                 $this->message = xg_html('YOU_CANNOT_SHARE_THIS');
@@ -177,9 +189,16 @@ class Index_SharingController extends W_Controller {
      */
     public function action_create() {
         if (! $this->_user->isLoggedIn()) { return $this->forwardTo('shareSignedOut'); }
-        $this->itemInfo = self::getItemInfo($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type']);
-        self::verifyUserCanShare($this->itemInfo['object'], $_GET['id'], $_GET['url'], $_GET['title'], $_GET['type']);
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') { return $this->redirectTo('share', 'sharing', self::getItemArr($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type'])); }
+        $shareRequest = $this->readShareRequest();
+        $this->itemInfo = self::getItemInfo($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type']);
+        self::verifyUserCanShare($this->itemInfo['object'], $shareRequest['id'], $shareRequest['url'], $shareRequest['title']);
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') { return $this->redirectTo('share', 'sharing', self::getItemArr($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type'])); }
+
+        $_POST['form'] = Index_RequestHelper::readString($_POST, 'form');
+        $_POST['emailAddresses'] = Index_RequestHelper::readContent($_POST, 'emailAddresses');
+        $_POST['message'] = Index_RequestHelper::readContent($_POST, 'message');
+        $_POST['inviteFriendsMessage'] = Index_RequestHelper::readContent($_POST, 'inviteFriendsMessage');
+
         switch ($_POST['form']) {
 
             case 'enterEmailAddresses':
@@ -190,11 +209,11 @@ class Index_SharingController extends W_Controller {
                         'groupId' => Index_SharingHelper::groupId($this->itemInfo),
                         'contactList' => $result['contactList'],
                         'message' => $_POST['message'],
-                        'contentId' => $_GET['id'],
-                		'docUrl' => $_GET['url'],
-                		'docTitle' => $_GET['title'],
-                		'shareType' => $_GET['type']));
-                $this->redirectTo('share', 'sharing', self::getItemArr($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type'], array('sent' => 1)));
+                        'contentId' => $shareRequest['id'],
+                                'docUrl' => $shareRequest['url'],
+                                'docTitle' => $shareRequest['title'],
+                                'shareType' => $shareRequest['type']));
+                $this->redirectTo('share', 'sharing', self::getItemArr($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type'], array('sent' => 1)));
                 break;
 
             case 'inviteFriends':
@@ -207,11 +226,11 @@ class Index_SharingController extends W_Controller {
                         'contactList' => $result['contactList'],
                         'screenNamesExcluded' => $result['screenNamesExcluded'],
                         'message' => $_POST['inviteFriendsMessage'],
-                        'contentId' => $_GET['id'],
-                		'docUrl' => $_GET['url'],
-                		'docTitle' => $_GET['title'],
-                		'shareType' => $_GET['type']));
-                $this->redirectTo('share', 'sharing', self::getItemArr($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type'], array('sent' => 1)));
+                        'contentId' => $shareRequest['id'],
+                                'docUrl' => $shareRequest['url'],
+                                'docTitle' => $shareRequest['title'],
+                                'shareType' => $shareRequest['type']));
+                $this->redirectTo('share', 'sharing', self::getItemArr($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type'], array('sent' => 1)));
                 break;
 
             case 'webAddressBook':
@@ -239,13 +258,18 @@ class Index_SharingController extends W_Controller {
      */
     public function action_editContactList() {
         if (! $this->_user->isLoggedIn()) { return $this->forwardTo('shareSignedOut'); }
-        if (! unserialize(ContactList::load($_GET['contactListId'])->my->contacts)) { return $this->redirectTo('share', 'sharing', array('noAddressesFound' => 1, 'id' => $_GET['id'])); }
-        $this->itemInfo = self::getItemInfo($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type']);
-        self::verifyUserCanShare($this->itemInfo['object'], $_GET['id'], $_GET['url'], $_GET['title'], $_GET['type']);
+        $shareRequest = $this->readShareRequest();
+        $contactListId = Index_RequestHelper::readContentId($_GET, 'contactListId');
+        if ($contactListId === '') { throw new Exception('No contact list specified (1657397187)'); }
+        $_GET['contactListId'] = $contactListId;
+        $contactList = ContactList::load($contactListId);
+        if (! unserialize($contactList->my->contacts)) { return $this->redirectTo('share', 'sharing', self::getItemArr($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type'], array('noAddressesFound' => 1))); }
+        $this->itemInfo = self::getItemInfo($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type']);
+        self::verifyUserCanShare($this->itemInfo['object'], $shareRequest['id'], $shareRequest['url'], $shareRequest['title']);
         $this->pageTitle = Index_SharingHelper::pageTitle($this->itemInfo);
         $this->invitationArgs = array(
-                'contactListId' => $_GET['contactListId'],
-                'createWithContactListUrl' => $this->_buildUrl('sharing', 'createWithContactList', self::getItemArr($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type'], array('contactListId' => $_GET['contactListId']))),
+                'contactListId' => $contactListId,
+                'createWithContactListUrl' => $this->_buildUrl('sharing', 'createWithContactList', self::getItemArr($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type'], array('contactListId' => $contactListId))),
                 'cancelUrl' => Index_SharingHelper::url($this->itemInfo),
                 'inviteOrShare' => 'share',
                 'searchLabelText' => xg_text('SEARCH_FRIENDS'),
@@ -266,18 +290,24 @@ class Index_SharingController extends W_Controller {
      */
     public function action_createWithContactList() {
         if (! $this->_user->isLoggedIn()) { return $this->forwardTo('shareSignedOut'); }
-        $this->itemInfo = self::getItemInfo($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type']);
-        self::verifyUserCanShare($this->itemInfo['object'], $_GET['id'], $_GET['url'], $_GET['title'], $_GET['type']);
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') { return $this->redirectTo('share', 'sharing', self::getItemArr($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type'])); }
+        $shareRequest = $this->readShareRequest();
+        $contactListId = Index_RequestHelper::readContentId($_GET, 'contactListId');
+        if ($contactListId === '') { throw new Exception('No contact list specified (1657397187)'); }
+        $_GET['contactListId'] = $contactListId;
+        $this->itemInfo = self::getItemInfo($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type']);
+        self::verifyUserCanShare($this->itemInfo['object'], $shareRequest['id'], $shareRequest['url'], $shareRequest['title']);
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') { return $this->redirectTo('share', 'sharing', self::getItemArr($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type'])); }
+        $_POST['message'] = Index_RequestHelper::readContent($_POST, 'message');
         Index_InvitationFormHelper::processContactListForm('share', Index_SharingHelper::groupId($this->itemInfo));
-        $this->redirectTo('share', 'sharing', self::getItemArr($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type'], array('sent' => 1)));
+        $this->redirectTo('share', 'sharing', self::getItemArr($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type'], array('sent' => 1)));
     }
 
     public function action_shareSignedOut() {
         XG_App::includeFileOnce('/lib/XG_Message.php');
         if ($this->_user->isLoggedIn()) { return $this->forwardTo('share'); }
-        $this->itemInfo = self::getItemInfo($_GET['id'], $_GET['url'], $_GET['title'], $_GET['type']);
-        self::verifyCanDisplayToLoggedOut($this->itemInfo['object'], $_GET['id'], $_GET['url'], $_GET['title'], $_GET['type']);
+        $shareRequest = $this->readShareRequest();
+        $this->itemInfo = self::getItemInfo($shareRequest['id'], $shareRequest['url'], $shareRequest['title'], $shareRequest['type']);
+        self::verifyCanDisplayToLoggedOut($this->itemInfo['object'], $shareRequest['id'], $shareRequest['url'], $shareRequest['title']);
         $this->pageTitle = Index_SharingHelper::pageTitle($this->itemInfo);
         $message = Index_SharingHelper::createMessage($this->itemInfo, $message);
         $body = $message->build(null, null, false);
@@ -285,8 +315,8 @@ class Index_SharingController extends W_Controller {
     }
 
     private function verifyUserCanShare($obj, $objid, $url, $title) {
-    	if (empty($objid) && !empty($url) && !empty($title)) 
-    		return;
+        if (empty($objid) && !empty($url) && !empty($title))
+                return;
         if (! Index_SharingHelper::userCanShare($obj)) {
             header('Location: ' . xg_absolute_url('/'));
             exit;
@@ -297,9 +327,9 @@ class Index_SharingController extends W_Controller {
      * can this item be displayed on the logged out share page?
      */
     private function verifyCanDisplayToLoggedOut($obj, $objid, $url, $title) {
-    	if (empty($objid) && !empty($url) && !empty($title)) 
-    		return;
-    	if (! Index_SharingHelper::canDisplayToLoggedOut($obj)) {
+        if (empty($objid) && !empty($url) && !empty($title))
+                return;
+        if (! Index_SharingHelper::canDisplayToLoggedOut($obj)) {
             header('Location: ' . xg_absolute_url('/'));
             exit;
         }
@@ -313,11 +343,11 @@ class Index_SharingController extends W_Controller {
      * @param $id string
      */
     private function getItemInfo($id, $url = NULL, $title = NULL, $type = NULL) {
-    	if (!is_null($url) && !is_null($title) && !is_null($type)) {
-    		$itemInfo = Index_SharingHelper::getPageInfo($url, $title, $type);
-    	} else {
-        	$itemInfo = Index_SharingHelper::getItemInfo($id);
-    	}
+        if (!is_null($url) && !is_null($title) && !is_null($type)) {
+                $itemInfo = Index_SharingHelper::getPageInfo($url, $title, $type);
+        } else {
+                $itemInfo = Index_SharingHelper::getItemInfo($id);
+        }
         if (! $itemInfo) {
             W_Cache::getWidget('main')->dispatch('error','404');
             exit;
@@ -326,11 +356,54 @@ class Index_SharingController extends W_Controller {
     }
 
     private function getItemArr($id, $url, $title, $type, $inarr = array()) {
-    	if (!is_null($url) && !is_null($title) && !is_null($type)) {
-    		$arr = array('url' => $url, 'title' => $title, 'type' => $type);
-    	} else {
-        	$arr = array('id' => $id);
-    	}
-    	return array_merge($arr, $inarr);
+        if (!is_null($url) && !is_null($title) && !is_null($type)) {
+                $arr = array('url' => $url, 'title' => $title, 'type' => $type);
+        } else {
+                $arr = array('id' => $id);
+        }
+        return array_merge($arr, $inarr);
+    }
+
+    private function readShareRequest(): array {
+        $id = Index_RequestHelper::readContentId($_GET, 'id');
+        if ($id === '') {
+            unset($_GET['id']);
+            $id = null;
+        } else {
+            $_GET['id'] = $id;
+        }
+
+        $url = Index_RequestHelper::readString($_GET, 'url', '', true, 2048);
+        if ($url === '') {
+            unset($_GET['url']);
+            $url = null;
+        } else {
+            $_GET['url'] = $url;
+        }
+
+        $title = Index_RequestHelper::readString($_GET, 'title', '', true, 512);
+        if ($title === '') {
+            unset($_GET['title']);
+            $title = null;
+        } else {
+            $_GET['title'] = $title;
+        }
+
+        $type = Index_RequestHelper::readContentId($_GET, 'type');
+        if ($type === '') {
+            unset($_GET['type']);
+            $type = null;
+        } else {
+            $_GET['type'] = $type;
+        }
+
+        return array(
+            'id' => $id,
+            'url' => $url,
+            'title' => $title,
+            'type' => $type,
+            'sent' => Index_RequestHelper::readBoolean($_GET, 'sent'),
+            'noAddressesFound' => Index_RequestHelper::readBoolean($_GET, 'noAddressesFound'),
+        );
     }
 }

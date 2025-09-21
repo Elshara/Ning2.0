@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__) . '/lib/helpers/Index_RequestHelper.php';
 
 /**
  * Dispatches requests pertaining to invitations.
@@ -33,8 +34,8 @@ class Index_InvitationController extends XG_BrowserAwareController {
         W_Cache::getWidget('main')->includeFileOnce('/lib/helpers/Index_MessageHelper.php');
         XG_SecurityHelper::redirectIfNotMember();
         if (! XG_App::canSendInvites($this->_user)) { return $this->redirectTo(xg_absolute_url('/')); }
-        $this->showInvitationsSentMessage = $_GET['sent'];
-        $this->showNoAddressesFoundMessage = $_GET['noAddressesFound'];
+        $this->showInvitationsSentMessage = Index_RequestHelper::readBoolean($_GET, 'sent');
+        $this->showNoAddressesFoundMessage = Index_RequestHelper::readBoolean($_GET, 'noAddressesFound');
         $numFriendsAcrossNing = Index_MessageHelper::numberOfFriendsAcrossNing($this->_user->screenName);
         $numFriendsOnNetwork = Index_MessageHelper::numberOfFriendsOnNetwork($this->_user->screenName);
         $this->invitationArgs = array(
@@ -65,7 +66,8 @@ class Index_InvitationController extends XG_BrowserAwareController {
     public function action_new_iphone($errors = array()) {
         XG_SecurityHelper::redirectIfNotMember();
         if (! XG_App::canSendInvites($this->_user)) { return $this->redirectTo(xg_absolute_url('/')); }
-        $this->previousUrl = $_GET['previousUrl'] ? $_GET['previousUrl'] : xg_absolute_url('/');
+        $previousUrl = Index_RequestHelper::readRedirectTarget($_GET, 'previousUrl');
+        $this->previousUrl = $previousUrl ?? xg_absolute_url('/');
         if (count($errors) > 0) $this->errors = $errors;
     }
 
@@ -80,7 +82,8 @@ class Index_InvitationController extends XG_BrowserAwareController {
      */
     public function action_friendData() {
         W_Cache::getWidget('main')->includeFileOnce('/lib/helpers/Index_MessageHelper.php');
-        $friendData = Index_MessageHelper::dataForFriendsAcrossNing($_GET['start'], $_GET['end']);
+        [$start, $end] = Index_RequestHelper::readRange($_GET, 'start', 'end');
+        $friendData = Index_MessageHelper::dataForFriendsAcrossNing($start, $end);
         $this->friends = $friendData['friends'];
         $users = User::loadMultiple($friendData['screenNames']);
         $n = count($this->friends);
@@ -172,7 +175,8 @@ class Index_InvitationController extends XG_BrowserAwareController {
                 'contactList' => $result['contactList'],
                 'message' => $_POST['message']));
         $notificationParameter = array('notification' => xg_html('YOUR_INVITATIONS_HAVE_BEEN_SENT'));
-        $previousUrl = $_GET['previousUrl'] ? xg_url($_GET['previousUrl'], $notificationParameter) : xg_url(xg_absolute_url('/'), $notificationParameter);
+        $redirectTarget = Index_RequestHelper::readRedirectTarget($_GET, 'previousUrl');
+        $previousUrl = $redirectTarget ? xg_url($redirectTarget, $notificationParameter) : xg_url(xg_absolute_url('/'), $notificationParameter);
         $this->redirectTo($previousUrl, null);
     }
 
@@ -256,10 +260,13 @@ class Index_InvitationController extends XG_BrowserAwareController {
     public function action_editContactList() {
         XG_SecurityHelper::redirectIfNotMember();
         if (! XG_App::canSendInvites($this->_user)) { return $this->redirectTo(xg_absolute_url('/')); }
-        if (! unserialize(ContactList::load($_GET['contactListId'])->my->contacts)) { return $this->redirectTo('new', 'invitation', array('noAddressesFound' => 1)); }
+        $contactListId = Index_RequestHelper::readContentId($_GET, 'contactListId');
+        if ($contactListId === '') { return $this->redirectTo('new', 'invitation', array('noAddressesFound' => 1)); }
+        $contactList = ContactList::load($contactListId);
+        if (! unserialize($contactList->my->contacts)) { return $this->redirectTo('new', 'invitation', array('noAddressesFound' => 1)); }
         $this->invitationArgs = array(
-                'contactListId' => $_GET['contactListId'],
-                'createWithContactListUrl' => $this->_buildUrl('invitation', 'createWithContactList', array('contactListId' => $_GET['contactListId'])),
+                'contactListId' => $contactListId,
+                'createWithContactListUrl' => $this->_buildUrl('invitation', 'createWithContactList', array('contactListId' => $contactListId)),
                 'cancelUrl' => $this->_buildUrl('invitation', 'new'),
                 'inviteOrShare' => 'invite',
                 'searchLabelText' => xg_text('SEARCH_FRIENDS_TO_INVITE'),
@@ -327,7 +334,7 @@ class Index_InvitationController extends XG_BrowserAwareController {
         $importServices = XN_ContactImportService::listServices();
         $this->showEmailApplicationForm = $importServices['csv'] || $importServices['vcf'];
         $formDefaults = array(
-            'emailAddress' => $_REQUEST['emailAddresses'],
+            'emailAddress' => Index_RequestHelper::readContent($_REQUEST, 'emailAddresses'),
         );
         $emailParts = explode('@', $this->_user->email);
         if ($this->emailDomains[$emailParts[1]]) {
@@ -375,14 +382,16 @@ class Index_InvitationController extends XG_BrowserAwareController {
      *     target - the URL to redirect to afterwards
      */
     public function action_deleteContactList() {
-        if (! $_GET['contactListId']) { throw new Exception('No contact list specified (1657397187)'); }
+        $contactListId = Index_RequestHelper::readContentId($_GET, 'contactListId');
+        if ($contactListId === '') { throw new Exception('No contact list specified (1657397187)'); }
         if ($_SERVER['REQUEST_METHOD'] != 'POST') { throw new Exception('Not a POST (748876971)'); }
         try {
-            XN_Content::delete(ContactList::load($_GET['contactListId']));
+            XN_Content::delete(ContactList::load($contactListId));
         } catch (Exception $e) {
             // Ignore [Jon Aquino 2007-10-25]
         }
-        $this->redirectTo($_GET['target']);
+        $target = Index_RequestHelper::readRedirectTarget($_GET, 'target');
+        $this->redirectTo($target ?? $this->_buildUrl('invitation', 'new'));
     }
 
     /**
@@ -403,8 +412,8 @@ class Index_InvitationController extends XG_BrowserAwareController {
      *     target - URL to go to after the import (contactListId will be appended)
      */
     public function action_waitForImport() {
-        $this->jobId = $_GET['jobId'];
-        $this->target = $_GET['target'];
+        $this->jobId = Index_RequestHelper::readString($_GET, 'jobId');
+        $this->target = Index_RequestHelper::readRedirectTarget($_GET, 'target') ?? $this->_buildUrl('invitation', 'new');
     }
 
     /**
@@ -417,7 +426,8 @@ class Index_InvitationController extends XG_BrowserAwareController {
      */
     public function action_checkMessageForSpam() {
         XG_App::includeFileOnce('/lib/XG_SpamHelper.php');
-        $parts = $_REQUEST['messageParts'] ? json_decode($_REQUEST['messageParts']) : array();
+        $messagePartsPayload = Index_RequestHelper::readContent($_REQUEST, 'messageParts');
+        $parts = $messagePartsPayload !== '' ? json_decode($messagePartsPayload) : array();
         $this->messageParts = array();
         $count = 0;
         foreach ($parts as $name=>$value) {
@@ -442,7 +452,8 @@ class Index_InvitationController extends XG_BrowserAwareController {
      */
     public function action_checkImport() {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') { throw new Exception('Not a POST (1013274105)'); }
-        $result = XN_ContactImportResult::load($_GET['jobId']);
+        $jobId = Index_RequestHelper::readString($_GET, 'jobId');
+        $result = XN_ContactImportResult::load($jobId);
         if (Index_InvitationHelper::isErrorArray($result)) { throw new Exception(Index_InvitationHelper::errorMessage(key($result))); }
         $this->complete = $result->status == XN_ContactImportResult::COMPLETE;
         if ($this->complete) { $this->contactListId = ContactList::create(Index_InvitationFormHelper::importedContactsToContactList(Index_InvitationFormHelper::allImportedContacts($result)))->id; }

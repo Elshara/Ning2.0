@@ -114,12 +114,11 @@ class XG_PagingList implements IteratorAggregate, Countable, ArrayAccess {
         if ($this->pageParam === '') {
             $this->page		= 0;
         } else {
-            $this->pageParam= $this->pageParam === NULL ? 'page' : $this->pageParam;
-            $this->page		= "".$_REQUEST[$this->pageParam];
-            // TODO: Set the _url's page parameter using XG_HttpHelper::addParameter [Jon Aquino 2008-04-08]
-            $this->_url		= preg_replace("/([?&])$this->pageParam=[^&]*(&|$)/u",'$1',XG_HttpHelper::currentUrl());
-            $this->_url		= preg_replace('/[?&]$/u','',$this->_url);
-            $this->_url		.= (false === mb_strpos($this->_url,'?')) ? '?' : '&';
+            $this->pageParam = $this->pageParam === null ? 'page' : $this->pageParam;
+            $pageValue = $_REQUEST[$this->pageParam] ?? '';
+            $this->page = is_scalar($pageValue) ? (string) $pageValue : '';
+            $currentUrl = XG_HttpHelper::currentUrl();
+            $this->_url = XG_HttpHelper::removeParameter($currentUrl, $this->pageParam);
         }
         if (is_numeric($this->page) && $this->page > 0) {
             $this->page--;
@@ -223,7 +222,7 @@ class XG_PagingList implements IteratorAggregate, Countable, ArrayAccess {
         if (!$asIs && is_numeric($page) && $page >= 0) {
             $page++;
         }
-        return $this->_url . $this->pageParam . '=' . urlencode($page);
+        return XG_HttpHelper::addParameter($this->_url, $this->pageParam, $page);
     }
     /**
      *  Returns the underlying array.

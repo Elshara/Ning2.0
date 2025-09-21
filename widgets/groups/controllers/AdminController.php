@@ -6,7 +6,6 @@ class Groups_AdminController extends XG_GroupEnabledController {
 
     protected function _before() {
         XG_SecurityHelper::redirectIfNotAdmin();
-        XG_App::includeFileOnce('/lib/XG_PaginationHelper.php'); //TODO move this to getModeratedGroups()
         $this->_widget->includeFileOnce('/lib/helpers/Groups_SecurityHelper.php');
         $this->_widget->includeFileOnce('/lib/helpers/Groups_HtmlHelper.php');
     }
@@ -16,8 +15,16 @@ class Groups_AdminController extends XG_GroupEnabledController {
     */
     public function action_approve() {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') { throw new Exception('Not a POST'); }
-        $group = Group::load($_GET['id']);
-        if ($_POST['approved'] == 'Y') {
+        $groupId = $_GET['id'] ?? '';
+        if (!is_scalar($groupId) || ($groupId = trim((string) $groupId)) === '') {
+            throw new Exception('Missing group id');
+        }
+
+        $group = Group::load($groupId);
+        $approvedFlag = $_POST['approved'] ?? '';
+        $approvedFlag = is_scalar($approvedFlag) ? strtoupper(trim((string) $approvedFlag)) : '';
+
+        if ($approvedFlag === 'Y') {
             $this->_widget->includeFileOnce('/lib/helpers/Groups_MessagingHelper.php');
             $group->my->approved = 'Y';
             $group->save();
@@ -55,17 +62,27 @@ class Groups_AdminController extends XG_GroupEnabledController {
       * $this->totalCount
       * $this->numPages
       * $this->page
-      */
+     */
      private function getModeratedGroups() {
+         XG_App::includeFileOnce('/lib/XG_PaginationHelper.php');
          $this->_widget->includeFileOnce('/lib/helpers/Groups_Filter.php');
          $query = XN_Query::create('Content');
          $this->pageSize = 20;
-         $begin = XG_PaginationHelper::computeStart($_GET['page'], $this->pageSize);
+         $pageParam = $_GET['page'] ?? 1;
+         $pageNumber = 1;
+         if (is_scalar($pageParam) && ($pageValue = trim((string) $pageParam)) !== '') {
+             $pageNumber = (int) $pageValue;
+         }
+         if ($pageNumber < 1) {
+             $pageNumber = 1;
+         }
+
+         $begin = XG_PaginationHelper::computeStart($pageNumber, $this->pageSize);
          $query->begin($begin);
          $query->end($begin + $this->pageSize);
          list($this->groups, $this->totalCount) = array(Groups_Filter::get('moderation')->execute($query, null), $query->getTotalCount());
-         $this->numPages = ceil($this->totalCount / $this->pageSize);
-         $this->page = isset($_GET['page']) ? $_GET['page'] : 1;
+         $this->numPages = ($this->pageSize > 0) ? (int) ceil($this->totalCount / $this->pageSize) : 0;
+         $this->page = $pageNumber;
      }
 
 }

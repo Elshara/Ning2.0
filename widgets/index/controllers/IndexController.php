@@ -32,7 +32,8 @@ class Index_IndexController extends XG_BrowserAwareController {
 
         $this->app = XN_Application::load();
         $this->isMainPage = true;
-        $this->showFacebookMeta = array_key_exists('from', $_GET) && ($_GET['from'] === 'fb');
+        $fromValue = (isset($_GET['from']) && ! is_array($_GET['from'])) ? (string) $_GET['from'] : null;
+        $this->showFacebookMeta = ($fromValue === 'fb');
         if ($this->showFacebookMeta) {
             // overloading for music?
             if (array_key_exists('fbmusic', $_GET)) {
@@ -63,22 +64,26 @@ class Index_IndexController extends XG_BrowserAwareController {
 
     /** @deprecated 2.0  Use XG_AuthorizationHelper::signUpUrl instead */
     public function action_sign() {
-        header('Location: ' . XG_AuthorizationHelper::signUpUrl($this->getSuccessTarget(), $_GET['groupToJoin']));
+        $groupToJoin = $this->getGroupToJoinParameter();
+        header('Location: ' . XG_AuthorizationHelper::signUpUrl($this->getSuccessTarget(), $groupToJoin));
     }
 
     /** @deprecated 2.0  Use XG_AuthorizationHelper::signUpUrl instead */
     public function action_signUp() {
-        header('Location: ' . XG_AuthorizationHelper::signUpUrl($this->getSuccessTarget(), $_GET['groupToJoin']));
+        $groupToJoin = $this->getGroupToJoinParameter();
+        header('Location: ' . XG_AuthorizationHelper::signUpUrl($this->getSuccessTarget(), $groupToJoin));
     }
 
     /** @deprecated 2.0  Use XG_AuthorizationHelper::signUpUrl instead */
     public function action_join() {
-        header('Location: ' . XG_AuthorizationHelper::signUpUrl($this->getSuccessTarget(), $_GET['groupToJoin']));
+        $groupToJoin = $this->getGroupToJoinParameter();
+        header('Location: ' . XG_AuthorizationHelper::signUpUrl($this->getSuccessTarget(), $groupToJoin));
     }
 
     /** @deprecated 2.0  Use XG_AuthorizationHelper::signInUrl instead */
     public function action_signIn() {
-        header('Location: ' . XG_AuthorizationHelper::signInUrl($this->getSuccessTarget(), $_GET['groupToJoin']));
+        $groupToJoin = $this->getGroupToJoinParameter();
+        header('Location: ' . XG_AuthorizationHelper::signInUrl($this->getSuccessTarget(), $groupToJoin));
     }
 
 
@@ -191,8 +196,14 @@ class Index_IndexController extends XG_BrowserAwareController {
             $this->appTitle = $_POST['appTitle'];
             $this->appUrl = $_POST['appUrl'];
         } else {
-            $this->appTitle = $_GET['appTitle'];
-            $this->appUrl = $_GET['appUrl'];
+            $this->appTitle = '';
+            if (isset($_GET['appTitle']) && ! is_array($_GET['appTitle'])) {
+                $this->appTitle = mb_substr(trim((string) $_GET['appTitle']), 0, 512);
+            }
+            $this->appUrl = '';
+            if (isset($_GET['appUrl']) && ! is_array($_GET['appUrl'])) {
+                $this->appUrl = mb_substr(trim((string) $_GET['appUrl']), 0, 2048);
+            }
         }
 
         // Define the form
@@ -286,20 +297,34 @@ class Index_IndexController extends XG_BrowserAwareController {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . '/';
         $dispatched = false;
         try {
-            if (! isset($_GET['id'])) {
+            if (! isset($_GET['id']) || is_array($_GET['id'])) {
                 throw new Exception("No content object ID specified");
             }
-            if (mb_strpos($_GET['id'], 'u_') === 0) {
-                $screenName = str_replace('/', '', mb_substr($_GET['id'], 2)); // Remove trailing slash if necessary [Jon Aquino 2007-10-11]
-                header('Location: ' . XG_HttpHelper::addParameter(xg_absolute_url(User::profileUrl($screenName)), 'xgp', $_GET['xgp']));
+            $contentId = trim((string) $_GET['id']);
+            if ($contentId === '') {
+                throw new Exception("No content object ID specified");
+            }
+            if (mb_strpos($contentId, 'u_') === 0) {
+                $screenName = str_replace('/', '', mb_substr($contentId, 2)); // Remove trailing slash if necessary [Jon Aquino 2007-10-11]
+                $destination = xg_absolute_url(User::profileUrl($screenName));
+                if (isset($_GET['xgp']) && ! is_array($_GET['xgp'])) {
+                    $xgp = trim((string) $_GET['xgp']);
+                    if ($xgp !== '') {
+                        $xgp = preg_replace('/[^A-Za-z0-9_-]/u', '', mb_substr($xgp, 0, 64));
+                        if ($xgp !== '') {
+                            $destination = XG_HttpHelper::addParameter($destination, 'xgp', $xgp);
+                        }
+                    }
+                }
+                header('Location: ' . $destination);
                 exit;
             }
-            if (mb_strpos($_GET['id'], 'f_') === 0) {
-                $screenName = str_replace('/', '', mb_substr($_GET['id'], 2)); // Remove trailing slash if necessary [Jon Aquino 2007-10-11]
+            if (mb_strpos($contentId, 'f_') === 0) {
+                $screenName = str_replace('/', '', mb_substr($contentId, 2)); // Remove trailing slash if necessary [Jon Aquino 2007-10-11]
                 header('Location: ' . xg_absolute_url('/friends/' . User::profileAddress($screenName)));
                 exit;
             }
-            $object = XN_Content::load($_GET['id']);
+            $object = XN_Content::load($contentId);
             if ($object && $object->my->mozzle) {
                 // If the object is owned by the main mozzle then figure out
                 // what to do right here.
@@ -344,7 +369,8 @@ class Index_IndexController extends XG_BrowserAwareController {
      * @deprecated 2.0  Use XG_AuthorizationHelper::signOutUrl instead
      */
     public function action_signOut() {
-        header('Location: ' . XG_AuthorizationHelper::signOutUrl($_GET['target'] ? $_GET['target'] : xg_absolute_url('/')));
+        $target = $this->getRedirectParameterFromGet('target', xg_absolute_url('/'));
+        header('Location: ' . XG_AuthorizationHelper::signOutUrl($target));
     }
 
     /**
@@ -355,24 +381,19 @@ class Index_IndexController extends XG_BrowserAwareController {
     }
 
     protected function getSuccessTarget() {
-        $target = NULL;
-        if ($_GET['target']) {
-            $target = $_GET['target'];
-        // Use referrer as target only if it's within this application!  BAZ-2481
-        } else if (isset($_SERVER['HTTP_REFERER'])) {
-            $parts = parse_url($_SERVER['HTTP_REFERER']);
-            $host = $parts['host'];
-            if ((!$host) || ($host == $_SERVER['HTTP_HOST'])) {
-                $target = $_SERVER['HTTP_REFERER'];
+        $target = $this->getRedirectParameterFromGet('target');
+        if ($target !== null) {
+            return $target;
+        }
+
+        if (isset($_SERVER['HTTP_REFERER']) && is_string($_SERVER['HTTP_REFERER'])) {
+            $referer = XG_HttpHelper::normalizeRedirectTarget($_SERVER['HTTP_REFERER']);
+            if ($referer !== null) {
+                return xg_absolute_url($referer);
             }
         }
-        if (!$target) {
-            $target = $_SERVER['HTTP_HOST'];
-        }
-        if (mb_substr($target, 0, 7) != 'http://') {
-            $target = 'http://' . $target;
-        }
-        return $target;
+
+        return xg_absolute_url('/');
     }
 
     /**
@@ -430,5 +451,33 @@ class Index_IndexController extends XG_BrowserAwareController {
         if (!$this->_asyncJobCompleted) {
             error_log("AsyncJob failure:".var_export($_REQUEST,TRUE));
         }
+    }
+
+    private function getGroupToJoinParameter()
+    {
+        if (! isset($_GET['groupToJoin']) || is_array($_GET['groupToJoin'])) {
+            return null;
+        }
+
+        $value = trim((string) $_GET['groupToJoin']);
+        if ($value === '') {
+            return null;
+        }
+
+        return mb_substr($value, 0, 512);
+    }
+
+    private function getRedirectParameterFromGet($key, $default = null)
+    {
+        if (! isset($_GET[$key]) || is_array($_GET[$key])) {
+            return $default;
+        }
+
+        $normalized = XG_HttpHelper::normalizeRedirectTarget($_GET[$key]);
+        if ($normalized === null) {
+            return $default;
+        }
+
+        return xg_absolute_url($normalized);
     }
 }

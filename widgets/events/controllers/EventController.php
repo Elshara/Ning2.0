@@ -1,5 +1,7 @@
 <?php
 XG_App::includeFileOnce('/lib/XG_Layout.php');
+XG_App::includeFileOnce('/lib/XG_DateHelper.php');
+XG_App::includeFileOnce('/lib/XG_HttpHelper.php');
 /**
  * Dispatches requests pertaining to Events.
  */
@@ -14,6 +16,7 @@ class Events_EventController extends W_Controller {
         parent::__construct($widget);
         W_Cache::getWidget('events')->includeFileOnce('/lib/helpers/Events_SecurityHelper.php');
         W_Cache::getWidget('events')->includeFileOnce('/lib/helpers/Events_TemplateHelper.php');
+        W_Cache::getWidget('events')->includeFileOnce('/lib/helpers/Events_RequestHelper.php');
         XG_App::includeFileOnce('/lib/XG_PromotionHelper.php');
         XG_App::includeFileOnce('/lib/XG_CommentHelper.php');
         EventWidget::init();
@@ -53,7 +56,8 @@ class Events_EventController extends W_Controller {
      *  @param    $type     string  The event type
      */
     public function action_listByType() {
-        if (!$type = trim($_GET['type'])) {
+        $type = Events_RequestHelper::readString($_GET, 'type');
+        if ($type === '') {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         $this->_prepareSideBlock('home');
@@ -82,10 +86,10 @@ class Events_EventController extends W_Controller {
      *  @param    $date string      YYYY-MM-DD
      */
     public function action_listByDate() {
-        if (!$date = trim($_GET['date'])) {
+        $date = Events_RequestHelper::readDate($_GET);
+        if ($date === null) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
-        $date = XG_DateHelper::format('Y-m-d',$date);
         $start = XG_DateHelper::format('Y-m',$date,'-1 month');
         $end = XG_DateHelper::format('Y-m',$date,'+1 month');
 
@@ -111,7 +115,8 @@ class Events_EventController extends W_Controller {
      *  @param    $location   string    Location string (exact match)
      */
     public function action_listByLocation() {
-        if (!$location = trim($_GET['location'])) {
+        $location = Events_RequestHelper::readString($_GET, 'location');
+        if ($location === '') {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         $this->_prepareSideBlock('home');
@@ -169,7 +174,8 @@ class Events_EventController extends W_Controller {
      */
     public function action_listMyEventsByType() {
         XG_SecurityHelper::redirectIfNotMember();
-        if (!$type = trim($_GET['type'])) {
+        $type = Events_RequestHelper::readString($_GET, 'type');
+        if ($type === '') {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         $this->_prepareSideBlock('my');
@@ -201,10 +207,10 @@ class Events_EventController extends W_Controller {
      */
     public function action_listMyEventsByDate() {
         XG_SecurityHelper::redirectIfNotMember();
-        if (!$date = trim($_GET['date'])) {
+        $date = Events_RequestHelper::readDate($_GET);
+        if ($date === null) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
-        $date = XG_DateHelper::format('Y-m-d',$date);
         $start = XG_DateHelper::format('Y-m',$date,'-1 month');
         $end = XG_DateHelper::format('Y-m',$date,'+1 month');
 
@@ -247,7 +253,8 @@ class Events_EventController extends W_Controller {
      *  @param	$user	string		User screenName
      */
     public function action_listUserEvents() {
-        if ( (!$user = trim($_GET['user'])) || !Events_SecurityHelper::currentUserCanSeeUserEvents($user) ) {
+        $user = Events_RequestHelper::readScreenName($_GET, 'user');
+        if ($user === null || !Events_SecurityHelper::currentUserCanSeeUserEvents($user)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
 		if ($this->_isMe($user)) {
@@ -276,13 +283,15 @@ class Events_EventController extends W_Controller {
      *  @param	$type   string  	The event type
      */
     public function action_listUserEventsByType() {
-        if ( (!$user = trim($_GET['user'])) || !Events_SecurityHelper::currentUserCanSeeUserEvents($user) ) {
+        $user = Events_RequestHelper::readScreenName($_GET, 'user');
+        if ($user === null || !Events_SecurityHelper::currentUserCanSeeUserEvents($user)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
-		if ($this->_isMe($user)) {
-			return $this->action_listMyEventsByType();
-		}
-        if (!$type = trim($_GET['type'])) {
+                if ($this->_isMe($user)) {
+                        return $this->action_listMyEventsByType();
+                }
+        $type = Events_RequestHelper::readString($_GET, 'type');
+        if ($type === '') {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         $this->_prepareSideBlock('user',$user);
@@ -302,7 +311,8 @@ class Events_EventController extends W_Controller {
      *  @param	$user	string		User screenName
      */
     public function action_listUserAllTypes() {
-        if ( (!$user = trim($_GET['user'])) || !Events_SecurityHelper::currentUserCanSeeUserEvents($user) ) {
+        $user = Events_RequestHelper::readScreenName($_GET, 'user');
+        if ($user === null || !Events_SecurityHelper::currentUserCanSeeUserEvents($user)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
 		if ($this->_isMe($user)) {
@@ -321,16 +331,17 @@ class Events_EventController extends W_Controller {
      *  @param	$date 	string      YYYY-MM-DD
      */
     public function action_listUserEventsByDate() {
-        if ( (!$user = trim($_GET['user'])) || !Events_SecurityHelper::currentUserCanSeeUserEvents($user) ) {
+        $user = Events_RequestHelper::readScreenName($_GET, 'user');
+        if ($user === null || !Events_SecurityHelper::currentUserCanSeeUserEvents($user)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
-		if ($this->_isMe($user)) {
-			return $this->action_listMyEventsByDate();
-		}
-        if (!$date = trim($_GET['date'])) {
+                if ($this->_isMe($user)) {
+                        return $this->action_listMyEventsByDate();
+                }
+        $date = Events_RequestHelper::readDate($_GET);
+        if ($date === null) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
-        $date = XG_DateHelper::format('Y-m-d',$date);
         $start = XG_DateHelper::format('Y-m',$date,'-1 month');
         $end = XG_DateHelper::format('Y-m',$date,'+1 month');
 
@@ -355,7 +366,8 @@ class Events_EventController extends W_Controller {
      *  @param	$user	string		User screenName
      */
     public function action_listUserNotAttendingEvents() {
-        if ( (!$user = trim($_GET['user'])) || !Events_SecurityHelper::currentUserCanSeeUserEvents($user) ) {
+        $user = Events_RequestHelper::readScreenName($_GET, 'user');
+        if ($user === null || !Events_SecurityHelper::currentUserCanSeeUserEvents($user)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
 		if ($this->_isMe($user)) {
@@ -381,8 +393,8 @@ class Events_EventController extends W_Controller {
     public function action_search() {
         $this->_prepareSideBlock('home');
 
-        $this->searchTerms      = $_GET['q'];
-        $this->eventList        = Event::searchEvents($_GET['q'], self::PAGE_SIZE);
+        $this->searchTerms      = Events_RequestHelper::readQuery($_GET, 'q');
+        $this->eventList        = Event::searchEvents($this->searchTerms, self::PAGE_SIZE);
         $this->title            = xg_text('SEARCH_RESULTS');
         $this->pageTitle        = xg_text('EVENTS');
 
@@ -402,7 +414,8 @@ class Events_EventController extends W_Controller {
             elseif ($object->type == 'Comment') { $this->event = Event::byId($object->my->attachedTo); }
             else 								{ $this->event = NULL; }
         } else {
-            $this->event = Event::byId($_GET['id']);
+            $eventId = Events_RequestHelper::readEventId($_GET);
+            $this->event = $eventId ? Event::byId($eventId) : null;
         }
         if (!$this->event) {
             $this->noAddLink = !Events_SecurityHelper::currentUserCanCreateEvent();
@@ -424,7 +437,7 @@ class Events_EventController extends W_Controller {
         list($this->prevEvent, $this->nextEvent) = Event::getPrevNextEvents($this->event);
 
         if (!$this->event->my->disableRsvp) {
-            if ($_GET['rsvpConfirm'])               { $this->rsvpMsg = $this->rsvp; }
+            if (Events_RequestHelper::readBoolean($_GET, 'rsvpConfirm'))               { $this->rsvpMsg = $this->rsvp; }
             else if ($this->event->my->isClosed)    { $this->rsvpMsg = 'event_is_full'; }
             else if (!$this->canAccessEventDetails) { $this->rsvpMsg = $this->rsvp; }
             else if ($this->rsvp == EventAttendee::NOT_RSVP) { $this->rsvpMsg = $this->rsvp; }
@@ -448,7 +461,8 @@ class Events_EventController extends W_Controller {
      *  @param    $status   string      RSVP string (see Events_EventHelper::rsvpToStr)
      */
     public function action_showAttendees() {
-        if (!$this->event = Event::byId($_GET['id'])) {
+        $eventId = Events_RequestHelper::readEventId($_GET);
+        if (!$eventId || !$this->event = Event::byId($eventId)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         $this->rsvp                     = EventAttendee::getStatuses($this->_user->screenName, $this->event);
@@ -460,7 +474,8 @@ class Events_EventController extends W_Controller {
             return $this->redirectTo('show','event',array('id'=>$this->event->id));
         }
 
-        if (!$this->status = Events_EventHelper::strToRsvp($_GET['status'])) {
+        $statusParam = Events_RequestHelper::readString($_GET, 'status');
+        if ($statusParam === '' || !$this->status = Events_EventHelper::strToRsvp($statusParam)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         if ($this->status == EventAttendee::NOT_RSVP) {
@@ -469,7 +484,8 @@ class Events_EventController extends W_Controller {
             $this->attendees            = EventAttendee::getAttendees($this->event, $this->status, 20);
             $this->attendeesProfiles    = XG_Cache::profiles($this->_titles($this->attendees));
         }
-        if (count($this->attendees) == 0 && $_GET['page'] > 1) {
+        $page = Events_RequestHelper::readPage($_GET);
+        if (count($this->attendees) == 0 && $page > 1) {
             // Get here after deleting the last person on the last page [Jon Aquino 2008-03-31]
             return $this->redirectTo(XG_HttpHelper::removeParameter(XG_HttpHelper::currentUrl(), 'page'));
         } elseif (count($this->attendees) == 0) {
@@ -489,17 +505,22 @@ class Events_EventController extends W_Controller {
      *  @param    $target       string    URL to redirect to
      */
     public function action_deleteAttendee() {
-        if (!$event = Event::byId($_GET['id'])) { return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404')); }
+        $eventId = Events_RequestHelper::readEventId($_GET);
+        if (!$eventId || !$event = Event::byId($eventId)) { return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404')); }
         if (!Events_SecurityHelper::currentUserCanDeleteAttendees($event)) { throw new Exception('Not allowed (600378279)'); }
-        $screenName = $_GET['screenName'];
-        if ($_GET['invitationId']) {
-            $invitation = XN_Invitation::load($_GET['invitationId']);
+        $screenName = Events_RequestHelper::readScreenName($_GET, 'screenName');
+        $invitationId = Events_RequestHelper::readInvitationId($_GET);
+        if ($invitationId) {
+            $invitation = XN_Invitation::load($invitationId);
             $profile = XG_Cache::profiles($invitation->recipient);
             if ($profile) { EventAttendee::delete($profile->screenName, $event); }
             XN_Invitation::delete($invitation);
         }
-        EventAttendee::delete($screenName, $event);
-        return $this->redirectTo($_GET['target']);
+        if ($screenName !== null) {
+            EventAttendee::delete($screenName, $event);
+        }
+        $target = Events_RequestHelper::readRedirectTarget($_GET, 'target', $this->_buildUrl('event', 'show', array('id' => $event->id)));
+        return $this->redirectTo($target ?: $this->_buildUrl('event', 'show', array('id' => $event->id)));
     }
 
     /**
@@ -508,7 +529,8 @@ class Events_EventController extends W_Controller {
      *  @param    $id       string      Event-ID
      */
     public function action_export() {
-        if (!$event = Event::byId($_GET['id'])) {
+        $eventId = Events_RequestHelper::readEventId($_GET);
+        if (!$eventId || !$event = Event::byId($eventId)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
 
@@ -545,7 +567,7 @@ class Events_EventController extends W_Controller {
                 $errors['photo'] = '';
             }
             $this->form     = new XG_Form($_POST, $errors);
-        } elseif ($_REQUEST['setValues']) {
+        } elseif (Events_RequestHelper::readBoolean($_REQUEST, 'setValues')) {
             $this->form     = new XG_Form($_REQUEST);
         } else {
             $this->form     = new XG_Form(array(
@@ -559,7 +581,8 @@ class Events_EventController extends W_Controller {
             $this->form->setTime('start', mb_substr($start,11,5));
         }
 
-        $this->cancelTarget = $_GET['cancelTarget'] ? $_GET['cancelTarget'] : $this->_buildUrl('event','listUpcoming');
+        $cancelTarget = Events_RequestHelper::readRedirectTarget($_GET, 'cancelTarget', $this->_buildUrl('event','listUpcoming'));
+        $this->cancelTarget = $cancelTarget ?: $this->_buildUrl('event','listUpcoming');
         $this->title        = xg_text('ADD_AN_EVENT');
         $this->render('new');
     }
@@ -643,7 +666,8 @@ class Events_EventController extends W_Controller {
     public function action_edit($errors = NULL, $photo = NULL) {
         XG_App::includeFileOnce('/lib/XG_TagHelper.php');
         XG_SecurityHelper::redirectIfNotMember();
-        if (!$event = Event::byId($_REQUEST['id'])) {
+        $eventId = Events_RequestHelper::readEventId($_REQUEST);
+        if (!$eventId || !$event = Event::byId($eventId)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         if (!Events_SecurityHelper::currentUserCanEditEvent($event)) {
@@ -682,7 +706,8 @@ class Events_EventController extends W_Controller {
             $this->form->setTime('end', mb_substr($event->my->endDate,11,5));
         }
         $this->eventId      = $event->id;
-        $this->cancelTarget = $_GET['cancelTarget'] ? $_GET['cancelTarget'] : $this->_buildUrl('event','show', array('id'=>$event->id));
+        $cancelTarget = Events_RequestHelper::readRedirectTarget($_GET, 'cancelTarget', $this->_buildUrl('event','show', array('id'=>$event->id)));
+        $this->cancelTarget = $cancelTarget ?: $this->_buildUrl('event','show', array('id'=>$event->id));
         $this->title        = xg_text('EDIT_EVENT');
     }
 
@@ -694,11 +719,11 @@ class Events_EventController extends W_Controller {
     public function action_update() {
         XG_App::includeFileOnce('/lib/XG_TagHelper.php');
         XG_SecurityHelper::redirectIfNotMember();
-        $id = $_REQUEST['id'];
+        $id = Events_RequestHelper::readEventId($_REQUEST);
         if ($errors = $this->_checkForm()) {
             return $this->forwardTo('edit','event',array($errors,$this->_photo));
         }
-        if (!$event = Event::byId($id)) {
+        if (!$id || !$event = Event::byId($id)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         if (!Events_SecurityHelper::currentUserCanEditEvent($event)) {
@@ -736,12 +761,14 @@ class Events_EventController extends W_Controller {
      *  @param    $id       string      Event-ID
      */
     public function action_delete() {
-        if ( $_SERVER['REQUEST_METHOD'] == 'POST'
-             && ($event = Event::byId($_REQUEST['id']))
-             && Events_SecurityHelper::currentUserCanDeleteEvent($event)) {
-            XG_App::includeFileOnce('/widgets/events/lib/helpers/Events_UserHelper.php');
-            $user = User::load($event->contributorName);
-            Event::delete($event);
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $eventId = Events_RequestHelper::readEventId($_REQUEST);
+            $event = $eventId ? Event::byId($eventId) : null;
+            if ($event && Events_SecurityHelper::currentUserCanDeleteEvent($event)) {
+                XG_App::includeFileOnce('/widgets/events/lib/helpers/Events_UserHelper.php');
+                $user = User::load($event->contributorName);
+                Event::delete($event);
+            }
         }
         $this->redirectTo('listUpcoming','event');
     }
@@ -755,9 +782,10 @@ class Events_EventController extends W_Controller {
     public function action_setFeatured() {
         XG_SecurityHelper::redirectIfNotAdmin();
         XG_App::includeFileOnce('/lib/XG_ActivityHelper.php');
-        if ($event = Event::byId($_REQUEST['id'])) {
+        $eventId = Events_RequestHelper::readEventId($_REQUEST);
+        if ($eventId && ($event = Event::byId($eventId))) {
             XG_App::includeFileOnce('/lib/XG_PromotionHelper.php');
-            if ($_REQUEST['set']) {
+            if (Events_RequestHelper::readBoolean($_REQUEST, 'set')) {
                 XG_PromotionHelper::promote($event);
                 XG_PromotionHelper::addActivityLogItem(XG_ActivityHelper::SUBCATEGORY_EVENT, $event);
             } else {
@@ -775,13 +803,18 @@ class Events_EventController extends W_Controller {
      *  @param    $rsvp     string      attending|might_attend|not_attending  ( ! but not not_rsvped )
      */
     public function action_rsvp() {
+        $eventId = Events_RequestHelper::readEventId($_REQUEST);
         if (!$this->_user->isLoggedIn()) {
-            return $this->redirectTo('show','event',array('id'=>$_REQUEST['id']));
+            if ($eventId) {
+                return $this->redirectTo('show','event',array('id'=>$eventId));
+            }
+            return $this->redirectTo('listUpcoming','event');
         }
-        if ( (!$status = Events_EventHelper::strToRsvp($_REQUEST['rsvp'])) || $status == EventAttendee::NOT_RSVP) {
+        $rsvpValue = Events_RequestHelper::readRsvp($_REQUEST);
+        if (!$rsvpValue || (!$status = Events_EventHelper::strToRsvp($rsvpValue)) || $status == EventAttendee::NOT_RSVP) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
-        if (!$event = Event::byId($_REQUEST['id'])) {
+        if (!$eventId || !$event = Event::byId($eventId)) {
             return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
         }
         if ($event->my->disableRsvp) {
@@ -808,15 +841,21 @@ class Events_EventController extends W_Controller {
      *  @param      $direction  string  forward|backward
      */
     public function action_getCalendar() {
-        if (($user = $_REQUEST['show_user']) && !Events_SecurityHelper::currentUserCanSeeUserEvents($user)) {
+        $user = Events_RequestHelper::readScreenName($_REQUEST, 'show_user');
+        if ($user && !Events_SecurityHelper::currentUserCanSeeUserEvents($user)) {
             return;
         }
-        $current        = XG_DateHelper::strToYm($_REQUEST['current']);
+        $currentMonth = Events_RequestHelper::readMonth($_REQUEST, 'current');
+        if ($currentMonth === null) {
+            return;
+        }
+        $current        = XG_DateHelper::strToYm($currentMonth);
         list($min,$max) = $user ? EventAttendee::getMinMaxEventDates($user) : EventWidget::getMinMaxEventDates();
         $min            = XG_DateHelper::strToYm($min);
         $max            = XG_DateHelper::strToYm($max);
-        $embed			= isset($_REQUEST['embed']) ? (bool)$_REQUEST['embed'] : 0;
-        if ($_REQUEST['direction'] == 'forward') {
+        $embed			= Events_RequestHelper::readEmbedFlag($_REQUEST, 'embed');
+        $direction = Events_RequestHelper::readDirection($_REQUEST, 'direction');
+        if ($direction == 'forward') {
             $start      = $current;
             $end        = min($current+2,$max);
             $this->more = $end < $max ? $end+1 : '';
@@ -848,12 +887,19 @@ class Events_EventController extends W_Controller {
      */
 
     public function action_updateLocationOrType() {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && ($event = Event::byId($_REQUEST['id'])) && Events_SecurityHelper::currentUserCanEditLocationEventType($event)) {
-            W_Cache::getWidget('events')->includeFileOnce('/lib/helpers/Events_TemplateHelper.php');
-            if ($_GET['field'] == 'type'){
-                if (mb_strlen($_POST['tags']) > Event::MAX_EVENT_TYPE_LENGTH) { throw new Exception('Event Type name is too long'); }
-                Event::update($event, array('eventType'=>$_POST['tags']));
-                $this->html = xg_html('EVENT_TYPE_COLON') . ' ' . Events_TemplateHelper::type($event);
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $eventId = Events_RequestHelper::readEventId($_REQUEST);
+            $event = $eventId ? Event::byId($eventId) : null;
+            if ($event && Events_SecurityHelper::currentUserCanEditLocationEventType($event)) {
+                W_Cache::getWidget('events')->includeFileOnce('/lib/helpers/Events_TemplateHelper.php');
+                $field = Events_RequestHelper::readFieldKey($_GET, 'field');
+                if ($field === 'type') {
+                    $rawTags = Events_RequestHelper::readOptionalString($_POST, 'tags', false, Event::MAX_EVENT_TYPE_LENGTH + 1);
+                    $tags = $rawTags ?? '';
+                    if (mb_strlen($tags) > Event::MAX_EVENT_TYPE_LENGTH) { throw new Exception('Event Type name is too long'); }
+                    Event::update($event, array('eventType'=>$tags));
+                    $this->html = xg_html('EVENT_TYPE_COLON') . ' ' . Events_TemplateHelper::type($event);
+                }
             }
         }
     }
@@ -873,9 +919,19 @@ class Events_EventController extends W_Controller {
      *  @return   $success          integer 1 if the broadcast completed successfully
      */
     public function action_broadcast() {
-        if (! $_SERVER['REQUEST_METHOD'] == 'POST') { throw new Exception('Not a POST (1985046009)'); }
-        if (! Events_SecurityHelper::currentUserCanBroadcastMessage($event = Event::byId($_REQUEST['id']))) { throw new Exception('Not allowed (584763022)'); }
-        Events_BroadcastHelper::broadcast(mb_substr($_REQUEST['message'], 0, 200), $event, $_REQUEST['attending'], $_REQUEST['might_attend'], $_REQUEST['not_attending'], $_REQUEST['not_rsvped']);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { throw new Exception('Not a POST (1985046009)'); }
+        $eventId = Events_RequestHelper::readEventId($_REQUEST);
+        $event = $eventId ? Event::byId($eventId) : null;
+        if (! $event || ! Events_SecurityHelper::currentUserCanBroadcastMessage($event)) { throw new Exception('Not allowed (584763022)'); }
+        $message = Events_RequestHelper::readMessage($_REQUEST, 'message', 200);
+        Events_BroadcastHelper::broadcast(
+            $message,
+            $event,
+            Events_RequestHelper::readBoolean($_REQUEST, 'attending'),
+            Events_RequestHelper::readBoolean($_REQUEST, 'might_attend'),
+            Events_RequestHelper::readBoolean($_REQUEST, 'not_attending'),
+            Events_RequestHelper::readBoolean($_REQUEST, 'not_rsvped')
+        );
         $this->success = 1;
     }
 
@@ -884,7 +940,7 @@ class Events_EventController extends W_Controller {
      */
     public function action_feed() {
         $this->setCaching(array('event-event-feed-' . md5(XG_HttpHelper::currentUrl())), 1800);
-        if ($_GET['test_caching']) { var_dump('Not cached'); }
+        if (Events_RequestHelper::readBoolean($_GET, 'test_caching')) { var_dump('Not cached'); }
         $this->events = Event::getEventsForFeed(W_Cache::getWidget('events')->config['maxEventsInFeed']);
         $this->title = xg_text('LATEST_EVENTS');
         header('Content-Type: application/atom+xml');

@@ -61,6 +61,21 @@ address or document each reported item before completing your work.
   the outcomes in your summary so audits remain traceable.
 - When code references missing dependencies or files, restore or implement them instead of leaving
   gaps—fresh installs must succeed without manual patching.
+- Prefer linear history updates over GitHub's "Update branch" merges. Synchronize workspaces with
+  the following cadence before starting a new batch of edits:
+
+  ```bash
+  git fetch origin
+  git switch <feature-branch>
+  git reset --hard origin/<feature-branch>
+  git rebase origin/master
+  git push --force-with-lease
+  ```
+
+  Rebasing locally (or within the task shell) keeps diffs focused and prevents the cascading merge
+  conflicts that the UI button introduces.
+- Enable Git's rerere cache locally (`git config --global rerere.enabled true`) so repeated conflict
+  resolutions are applied automatically across Codex sessions.
 
 ### Expected Work Plan
 1. Eliminate PHP 8.4 runtime notices and deprecation warnings across the legacy helpers and

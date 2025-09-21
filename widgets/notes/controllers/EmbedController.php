@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__) . '/lib/helpers/Notes_RequestHelper.php';
 XG_App::includeFileOnce('/lib/XG_Layout.php');
 /**
  * Dispatches requests pertaining to "embeds", which are reusable components.
@@ -32,21 +33,38 @@ class Notes_EmbedController extends W_Controller {
      */
     public function action_setValues() {
         XG_App::includeFileOnce('/lib/XG_Embed.php');
-        $embed = XG_Embed::load($_REQUEST['id']);
+        $embedId = Notes_RequestHelper::readString($_REQUEST, 'id');
+        $embed = XG_Embed::load($embedId);
         if (!$embed->isOwnedByCurrentUser() && !XG_SecurityHelper::userIsAdmin()) { throw new Exception('Not embed owner.'); }
 
-        $columnCount = $_REQUEST['columnCount'];
+        $columnCount = Notes_RequestHelper::readInt($_REQUEST, 'columnCount', 1, 1);
+        if ($columnCount > 2) {
+            $columnCount = 2;
+        }
+
         if ($this->isHomepage = ($embed->getType() == 'homepage')) {
+            $display = Notes_RequestHelper::normalizeDisplay(
+                Notes_RequestHelper::readString($_REQUEST, "{$this->prefix}_display_$columnCount"),
+                ['details', 'titles', 'note'],
+                'details'
+            );
             $this->settings = array(
-                'display' => $_REQUEST["{$this->prefix}_display_$columnCount"],
-                'title' => $_REQUEST["{$this->prefix}_title_$columnCount"],
-                'from' => $_REQUEST["{$this->prefix}_from_$columnCount"],
-                'count' => $_REQUEST["{$this->prefix}_count_$columnCount"],
+                'display' => $display,
+                'title' => Notes_RequestHelper::readString($_REQUEST, "{$this->prefix}_title_$columnCount"),
+                'from' => Notes_RequestHelper::normalizeHomepageFrom(
+                    Notes_RequestHelper::readString($_REQUEST, "{$this->prefix}_from_$columnCount")
+                ),
+                'count' => Notes_RequestHelper::readInt($_REQUEST, "{$this->prefix}_count_$columnCount", 0, 0),
             );
         } else {
+            $display = Notes_RequestHelper::normalizeDisplay(
+                Notes_RequestHelper::readString($_REQUEST, "{$this->prefix}_display_$columnCount"),
+                ['details', 'titles'],
+                'details'
+            );
             $this->settings = array(
-                'display' => $_REQUEST["{$this->prefix}_display_$columnCount"],
-                'count' => $_REQUEST["{$this->prefix}_count_$columnCount"],
+                'display' => $display,
+                'count' => Notes_RequestHelper::readInt($_REQUEST, "{$this->prefix}_count_$columnCount", 0, 0),
             );
         }
 
@@ -67,7 +85,7 @@ class Notes_EmbedController extends W_Controller {
         unset($this->content, $this->hasContent, $this->settings);
 
         // invalidate admin sidebar if necessary
-        if ($_GET['sidebar']) {
+        if (Notes_RequestHelper::readBoolean($_GET, 'sidebar')) {
             XG_App::includeFileOnce('/lib/XG_LayoutHelper.php');
             XG_LayoutHelper::invalidateAdminSidebarCache();
         }

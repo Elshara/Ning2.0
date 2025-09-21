@@ -21,6 +21,7 @@ Coordinate with `widgets/groups/AGENTS.md` for membership-linked visibility and 
 
 ## Outstanding Work Log
 - Track outstanding calendar integrations, reminder delivery methods, and accessibility improvements.
+- Continue migrating remaining event controller actions to `Events_RequestHelper` for POST sanitisation; GET flows for embed and invitation controllers now rely on the helper but form submissions still need to drop raw superglobals.
 
 ## Audit Summary
 - Pending lint audit captured for `widgets/events`. Run `php tools/php_lint_audit.php widgets/events` to log per-file results in `tmp/audit/php_lint_audit.json` and document follow-up fixes.

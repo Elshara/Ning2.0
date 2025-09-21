@@ -18,6 +18,7 @@ class Events_EmbedController extends W_Controller {
         parent::__construct($widget);
         W_Cache::getWidget('events')->includeFileOnce('/lib/helpers/Events_TemplateHelper.php');
         W_Cache::getWidget('events')->includeFileOnce('/lib/helpers/Events_SecurityHelper.php');
+        W_Cache::getWidget('events')->includeFileOnce('/lib/helpers/Events_RequestHelper.php');
         EventWidget::init();
     }
 
@@ -51,7 +52,11 @@ class Events_EmbedController extends W_Controller {
     public function action_updateEmbed() {
         XG_App::includeFileOnce('/lib/XG_Embed.php');
         XG_HttpHelper::trimGetAndPostValues();
-        $embed = XG_Embed::load($_GET['id']);
+        $embedId = Events_RequestHelper::readEventId($_GET, 'id');
+        if ($embedId === null) {
+            return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
+        }
+        $embed = XG_Embed::load($embedId);
         if (! $embed->isOwnedByCurrentUser() && !XG_SecurityHelper::userIsAdmin()) { throw new Exception('Not embed owner.'); }
         $columnCount    = $_POST['columnCount'];
         $this->isOwner  = $embed->isOwnedByCurrentUser();
@@ -97,7 +102,11 @@ class Events_EmbedController extends W_Controller {
     public function action_setValues() {
         XG_App::includeFileOnce('/lib/XG_Embed.php');
         XG_HttpHelper::trimGetAndPostValues();
-        $embed = XG_Embed::load($_GET['id']);
+        $embedId = Events_RequestHelper::readEventId($_GET, 'id');
+        if ($embedId === null) {
+            return $this->redirectTo(W_Cache::getWidget('main')->buildUrl('error', '404'));
+        }
+        $embed = XG_Embed::load($embedId);
         if (! $embed->isOwnedByCurrentUser() && !XG_SecurityHelper::userIsAdmin()) { throw new Exception('Not embed owner.'); }
         $columnCount = XG_Embed::getValueFromPostGet('columnCount');
         $this->isOwner  = $embed->isOwnedByCurrentUser();
@@ -127,7 +136,7 @@ class Events_EmbedController extends W_Controller {
         $this->moduleBodyAndFooter = trim(ob_get_clean());
 
         // invalidate admin sidebar if necessary
-        if ($_GET['sidebar']) {
+        if (Events_RequestHelper::readBoolean($_GET, 'sidebar')) {
             XG_App::includeFileOnce('/lib/XG_LayoutHelper.php');
             XG_LayoutHelper::invalidateAdminSidebarCache();
         }

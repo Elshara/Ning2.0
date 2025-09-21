@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__) . '/lib/helpers/Index_RequestHelper.php';
 
 class Index_BulkController extends W_Controller {
 
@@ -24,8 +25,8 @@ class Index_BulkController extends W_Controller {
              * the dojo widget that creates the link
              */
             if ($_SERVER['REQUEST_METHOD'] != 'POST') { throw new Exception("Only POST requests permitted"); }
-            $privacyLevel = $_GET['privacyLevel'];
-            if ($privacyLevel !== 'public' && $privacyLevel !== 'private') { throw new Exception("Desired privacy level must be 'public' or 'private'"); }
+            $privacyLevel = Index_RequestHelper::readEnum($_GET, 'privacyLevel', ['public', 'private']);
+            if ($privacyLevel === null) { throw new Exception("Desired privacy level must be 'public' or 'private'"); }
             if (($privacyLevel === 'private') === XG_App::appIsPrivate()) {
                 $this->contentChanged = 0;
                 $this->contentRemaining = 0;
@@ -63,7 +64,7 @@ class Index_BulkController extends W_Controller {
                 // OK, we're done, set the network to it's new privacy
                 XG_App::setNetworkPrivacyLevel($privacyLevel);
                 // and open it up to everyone else again, if that's necessary.
-                if ($_GET['finalOnlineStatus'] === 'true') {
+                if (Index_RequestHelper::readBoolean($_GET, 'finalOnlineStatus')) {
                     XG_App::setOnlineStatus(true);
                 }
                 XG_Cache::invalidate(XG_Cache::INVALIDATE_ALL);
@@ -88,7 +89,10 @@ class Index_BulkController extends W_Controller {
              */
             if ($_SERVER['REQUEST_METHOD'] != 'POST') { throw new Exception("Only POST requests permitted"); }
             // Banning from app or group puts user in POST rather than GET [Jon Aquino 2007-05-01]
-            $username = $_GET['user'] ? $_GET['user'] : ($_POST['user'] ? $_POST['user'] : null);
+            $username = Index_RequestHelper::readString($_GET, 'user');
+            if ($username === '') {
+                $username = Index_RequestHelper::readString($_POST, 'user');
+            }
             if (! $username) { throw new Exception("No user specified"); }
             XG_App::includeFileOnce('/lib/XG_SecurityHelper.php');
             if (! XG_SecurityHelper::currentUserCanDeleteUser($username)) { throw new Exception("Permission denied."); }
@@ -118,10 +122,11 @@ class Index_BulkController extends W_Controller {
             if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                 throw new Exception("Only POST requests permitted");
             }
-            if (! (isset($_GET['user']) && mb_strlen($_GET['user']))) {
+            $username = Index_RequestHelper::readString($_GET, 'user');
+            if ($username === '') {
                 throw new Exception("No user specified");
             }
-            $bulkInfo = $this->bulkAction('bulk','approveByUser', $approveLimit, array($_GET['user']));
+            $bulkInfo = $this->bulkAction('bulk','approveByUser', $approveLimit, array($username));
             // Set these so the JSON message contains them
             $this->contentApproved = $bulkInfo['changed'];
             $this->contentRemaining = $bulkInfo['remaining'];
@@ -144,10 +149,11 @@ class Index_BulkController extends W_Controller {
             if ($_SERVER['REQUEST_METHOD'] != 'POST') {
                 throw new Exception("Only POST requests permitted");
             }
-            if (! (isset($_GET['widget']) && mb_strlen($_GET['widget']))) {
+            $widgetKey = Index_RequestHelper::readString($_GET, 'widget');
+            if ($widgetKey === '') {
                 throw new Exception("No widget specified");
             }
-            $bulkInfo = $this->bulkAction('bulk','approveAll', $approveLimit, array(), $_GET['widget']);
+            $bulkInfo = $this->bulkAction('bulk','approveAll', $approveLimit, array(), $widgetKey);
             // Set these so the JSON message contains them
             $this->contentApproved = $bulkInfo['changed'];
             $this->contentRemaining = $bulkInfo['remaining'];
