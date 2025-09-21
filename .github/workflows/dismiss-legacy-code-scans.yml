@@ -22,6 +22,7 @@ jobs:
           set -euo pipefail
 
           keep_patterns=$'CodeQL\nPHP Mess Detector\nPHPMD\nPsalm\nOSV'
+          keep_tools=$'CodeQL\nPHPMD\nPsalm Security Scan\nOSV-Scanner'
 
           echo "Fetching open code scanning alerts for $REPO"
           page=1
@@ -79,6 +80,7 @@ jobs:
               done <<< "$keep_patterns"
 
               if [ "$tool_match" = true ]; then
+              if printf '%s\n' "$keep_tools" | grep -Fxq "$tool"; then
                 echo "Keeping alert #$number reported by \"$tool\""
                 continue
               fi
